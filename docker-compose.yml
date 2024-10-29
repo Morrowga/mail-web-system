@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  nginx:
+    build:
+      dockerfile: ./docker/nginx/Dockerfile
+      args:
+        TZ: ${TZ}
+    container_name: ${NGINX_CONTAINER_NAME}
+    ports:
+      - ${NGINX_HOST_HTTP_PORT}:80
+    restart: always
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web-php
+  web-php:
+    container_name: ${PHP_FPM_CONTAINER_NAME}
+    build:
+      dockerfile: ./docker/php-fpm/Dockerfile
+    volumes:
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+    ports:
+      - "${PHP_FPM_PORT}:8000"
+      - 5173:5173
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: ${MYSQL_CONTAINER_NAME}
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    links:
+      - db
+    ports:
+      - ${PHP_MYADMIN_PORT}:80
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
+  mailhog:
+    image: mailhog/mailhog
+    container_name: ${MAILHOG_CONTAINER_NAME}
+    ports:
+      - "${MAILHOG_SMTP_PORT}:1025"
+      - "${MAILHOG_UI_PORT}:8025"
+    environment:
+      MH_STORAGE: maildir
+      MH_MAILDIR_PATH: /tmp
+    volumes:
+      - maildir:/tmp
+volumes:
+  maildir: {}
