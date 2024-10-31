@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class AdminSeeder extends Seeder
@@ -15,11 +17,16 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        $user = User::create([
             "name" => "admin",
             "email" => "admin@mail.com",
-            "login_id" => Str::uuid(),
-            "password" => Hash::make('password')
+            "login_id" => $loginId = Str::uuid()->toString(),
+            "password" => Hash::make('password'),
         ]);
+
+        $filePath = public_path('admin_login_id.txt');
+
+        File::put($filePath, $loginId);
+
     }
 }

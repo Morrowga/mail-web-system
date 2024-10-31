@@ -44,6 +44,8 @@ php artisan migrate
 // シーディングの実行
 php artisan db:seed
 
+php artisan storage:link
+
 // フロントエンドの依存関係をインストール
 yarn install
 

@@ -13,7 +13,11 @@ import { Head } from '@inertiajs/vue3';
                     class="overflow-hidden sm:rounded-lg"
                 >
                     <div class="p-6 text-gray-900">
-                        <VBtn color="secondary">Template Create/Edit</VBtn>
+                        <VCard>
+                            <VCardText>
+                                Template Creation/Edit
+                            </VCardText>
+                        </VCard>
                     </div>
                 </div>
             </div>
