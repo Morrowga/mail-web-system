@@ -23,10 +23,5 @@ class AdminSeeder extends Seeder
             "login_id" => $loginId = Str::uuid()->toString(),
             "password" => Hash::make('password'),
         ]);
-
-        $filePath = public_path('admin_login_id.txt');
-
-        File::put($filePath, $loginId);
-
     }
 }
