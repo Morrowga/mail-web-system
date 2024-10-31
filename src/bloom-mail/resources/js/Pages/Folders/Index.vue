@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head,router } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import { Head } from '@inertiajs/vue3';
                     class="overflow-hidden sm:rounded-lg"
                 >
                     <div class="p-6 text-gray-900">
-                        <VBtn color="secondary">Folder</VBtn>
+                        <VBtn color="secondary" @click="router.get(route('folders.create'))">Folder</VBtn>
                     </div>
                 </div>
             </div>

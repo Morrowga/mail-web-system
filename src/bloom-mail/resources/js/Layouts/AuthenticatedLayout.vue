@@ -43,8 +43,8 @@ const showingNavigationDropdown = ref(false);
                                 {{ $t('nav.inbox') }}
                             </NavLink>
                             <NavLink
-                                :active="route().current('templates')"
-                                :href="route('templates')"
+                                :active="route().current('templinates')"
+                                :href="route('templates.index')"
                                 as="button"
                                 class="mx-5 layout-nav-text"
                             >
@@ -53,7 +53,7 @@ const showingNavigationDropdown = ref(false);
                             <NavLink
                                 :active="route().current('folders')"
                                 as="button"
-                                :href="route('folders')"
+                                :href="route('folders.index')"
                                 class="mx-5 layout-nav-text"
                             >
                                 {{ $t('nav.folder') }}

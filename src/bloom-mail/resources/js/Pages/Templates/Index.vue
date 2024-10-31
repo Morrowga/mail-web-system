@@ -14,7 +14,7 @@ import { Head,router } from '@inertiajs/vue3';
                 >
                     <div class="p-6 text-gray-900">
                         <div>
-                            <VBtn color="primary">Template Registration</VBtn>
+                            <VBtn color="primary" @click="router.get(route('templates.create'))">Template Registration</VBtn>
                             <VBtn color="primary" class="mx-2" @click="router.get('/template-categories')">Category List</VBtn>
                         </div>
                     </div>

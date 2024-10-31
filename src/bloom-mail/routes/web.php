@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\FolderController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TemplateController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -27,9 +29,8 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('TemplateCategories/Index');
     })->name('template-categories');
 
-    Route::get('/folders', function () {
-        return Inertia::render('Folders/Index');
-    })->name('folders');
+    Route::resource('folders', FolderController::class);
+    Route::resource('templates', TemplateController::class);
 
     Route::get('/spams', function () {
         return Inertia::render('Mail/Spams/Index');

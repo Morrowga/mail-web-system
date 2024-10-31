@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MailCreationDialog from '@/PageComponents/MailCreationDialog.vue';
 import { Head,router } from '@inertiajs/vue3';
 </script>
 
@@ -33,15 +34,11 @@ import { Head,router } from '@inertiajs/vue3';
                             </VCol>
                             <VCol cols="6">
                                 <div class="mt-10 mb-3">
-                                    <VBtn prepend-icon="mdi-mail" color="primary">Mail Box</VBtn>
+                                    <MailCreationDialog />
                                 </div>
                                 <div>
                                     <VCard>
                                         <VCardText>
-                                            <h3>Inbox Lists</h3>
-                                            <h3>Inbox Lists</h3>
-                                            <h3>Inbox Lists</h3>
-                                            <h3>Inbox Lists</h3>
                                             <h3>Inbox Lists</h3>
                                         </VCardText>
                                     </VCard>
