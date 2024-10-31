@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/admin_login_id.txt
 /storage/*.key
 /storage/pail
 /vendor
