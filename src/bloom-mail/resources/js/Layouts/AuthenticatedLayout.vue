@@ -14,7 +14,7 @@ const showingNavigationDropdown = ref(false);
     <div>
         <div class="min-h-screen bg-gray-100">
             <nav
-                class="border-b border-gray-100 bg-[#4891dc]"
+                class="border-b border-gray-100 bg-[#4891dc] fixed top-0 left-0 w-full z-10"
             >
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -37,20 +37,23 @@ const showingNavigationDropdown = ref(false);
                             <NavLink
                                 class="mx-5 layout-nav-text"
                                 :active="route().current('dashboard')"
+                                :href="route('dashboard')"
                                 as="button"
                             >
                                 {{ $t('nav.inbox') }}
                             </NavLink>
                             <NavLink
-                                :active="route().current('dashboard')"
+                                :active="route().current('templates')"
+                                :href="route('templates')"
                                 as="button"
                                 class="mx-5 layout-nav-text"
                             >
                                 {{ $t('nav.template') }}
                             </NavLink>
                             <NavLink
-                                :active="route().current('dashboard')"
+                                :active="route().current('folders')"
                                 as="button"
+                                :href="route('folders')"
                                 class="mx-5 layout-nav-text"
                             >
                                 {{ $t('nav.folder') }}
@@ -206,7 +209,7 @@ const showingNavigationDropdown = ref(false);
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main style="padding-top: 8vh;">
                 <slot />
             </main>
         </div>

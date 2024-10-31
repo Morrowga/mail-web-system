@@ -14,7 +14,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 
 const i18n = createI18n({
-    locale: 'jp',
+    locale: 'en',
     messages: {
         en,
         jp
