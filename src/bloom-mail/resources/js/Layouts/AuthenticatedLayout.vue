@@ -5,7 +5,7 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -19,51 +19,41 @@ const showingNavigationDropdown = ref(false);
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <!-- <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    /> -->
-                                </Link>
-                            </div>
-
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <!-- <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Email In
-                                </NavLink> -->
-                            </div>
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 50%;">
+                            <VTextField
+                                :loading="loading"
+                                prepend-inner-icon="mdi-magnify"
+                                density="compact"
+                                variant="solo"
+                                hide-details
+                                single-line
+                                @click:append-inner="onClick"
+                            ></VTextField>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 50%;">
                             <!-- Settings Dropdown -->
+
                             <NavLink
                                 class="mx-5 layout-nav-text"
                                 :active="route().current('dashboard')"
                                 as="button"
                             >
-                                Inbox
+                                {{ $t('nav.inbox') }}
                             </NavLink>
                             <NavLink
                                 :active="route().current('dashboard')"
                                 as="button"
                                 class="mx-5 layout-nav-text"
                             >
-                                Template
+                                {{ $t('nav.template') }}
                             </NavLink>
                             <NavLink
                                 :active="route().current('dashboard')"
                                 as="button"
                                 class="mx-5 layout-nav-text"
                             >
-                                Folder
+                                {{ $t('nav.folder') }}
                             </NavLink>
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -72,7 +62,7 @@ const showingNavigationDropdown = ref(false);
                                             <button
                                                 type="button"
                                                 class="inline-flex items-center rounded-md px-3 pt-2 text-sm font-medium leading-4 layout-nav-text transition duration-150 ease-in-out
-                                                hover:text-gray-700 focus:outline-none text-capitalize"
+                                                text-capitalize"
                                             >
                                                 {{ $page.props.auth.user.name }}
 
@@ -96,15 +86,14 @@ const showingNavigationDropdown = ref(false);
                                         <DropdownLink
                                             :href="route('profile.edit')"
                                         >
-                                            Profile
+                                         {{ $t('nav.profile') }}
                                         </DropdownLink>
                                         <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
+                                            @click="router.post(route('logout'))"
                                             as="button"
                                         >
-                                            Log Out
-                                        </DropdownLink>
+                                        {{ $t('nav.logout') }}
+                                    </DropdownLink>
                                     </template>
                                 </Dropdown>
                             </div>
@@ -161,26 +150,30 @@ const showingNavigationDropdown = ref(false);
                     }"
                     class="sm:hidden"
                 >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
                     <!-- Responsive Settings Options -->
                     <div
-                        class="border-t border-gray-200 pb-1 pt-4"
+                        class="border-t border-gray-200 pb-1"
                     >
+                    <div class="space-y-1">
+                            <!-- <ResponsiveNavLink :href="route('profile.edit')">
+                                Profile
+                            </ResponsiveNavLink> -->
+                            <ResponsiveNavLink
+                                class="layout-nav-text"
+                                :href="route('dashboard')"
+                                as="button"
+                            >
+                                <!-- Dashboard -->
+                            </ResponsiveNavLink>
+                        </div>
+
                         <div class="px-4">
                             <div
-                                class="text-base font-medium text-gray-800"
+                                class="text-base font-medium text-gray-800 layout-nav-text"
                             >
                                 {{ $page.props.auth.user.name }}
                             </div>
-                            <div class="text-sm font-medium text-gray-500">
+                            <div class="text-sm font-medium text-gray-500 layout-nav-text">
                                 {{ $page.props.auth.user.email }}
                             </div>
                         </div>
@@ -190,6 +183,7 @@ const showingNavigationDropdown = ref(false);
                                 Profile
                             </ResponsiveNavLink> -->
                             <ResponsiveNavLink
+                                class="layout-nav-text"
                                 :href="route('logout')"
                                 method="post"
                                 as="button"

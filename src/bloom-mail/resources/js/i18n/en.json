@@ -1,0 +1,15 @@
+{
+    "auth": {
+        "login_id": "Login Identification",
+        "password": "Password",
+        "remember_me": "Remember Me",
+        "login": "Log In"
+    },
+    "nav": {
+        "inbox": "Inbox",
+        "template": "Template",
+        "folder": "Folder",
+        "profile": "Profile",
+        "logout": "Logout"
+    }
+}
