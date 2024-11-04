@@ -35,12 +35,15 @@ const showingNavigationDropdown = ref(false);
                             <!-- Settings Dropdown -->
 
                             <NavLink
-                                class="mx-5 layout-nav-text"
+                                class="mx-5 layout-nav-text d-flex align-center"
                                 :active="route().current('dashboard')"
                                 :href="route('dashboard')"
                                 as="button"
                             >
-                                {{ $t('nav.inbox') }}
+                                <span>{{ $t('nav.inbox') }}</span>
+                                <v-badge color="red":content="'99+'" class="badge-adjust" style="margin-left: 5px;">
+                                    <VIcon icon="mdi-home"></VIcon>
+                                </v-badge>
                             </NavLink>
                             <NavLink
                                 :active="route().current('templinates')"
