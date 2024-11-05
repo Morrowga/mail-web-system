@@ -9,16 +9,10 @@
 ### 1. クローン〜コンテナ立ち上げ
 ```sh
 // クローンする
-git clone git@bitbucket.org:fastgo/lemone-matching.git
+git clone https://thihaeung@bitbucket.org/fastgo/bloom-web.git
 
 // プロジェクトディレクトリに移動
-cd lemone-matching
-
-// docker-compose.yamlで使用する環境変数ファイルを生成
-cp .env.sample .env
-
-// 各環境に合わせて.envを編集する
-vi .env
+cd bloom-web
 
 // コンテナ立ち上げ
 docker compose up -d
@@ -27,7 +21,7 @@ docker compose up -d
 ### 2. Laravelの設定
 ```
 // コンテナに入る
-docker container exec -it lm-php-fpm bash
+docker container exec -it bloom-php-fpm bash
 
 // envファイル生成
 cp .env.example .env
@@ -39,10 +33,7 @@ composer install
 php artisan key:generate
 
 // マイグレーションの実行
-php artisan migrate
-
-// シーディングの実行
-php artisan db:seed
+php artisan migrate --seed
 
 php artisan storage:link
 
