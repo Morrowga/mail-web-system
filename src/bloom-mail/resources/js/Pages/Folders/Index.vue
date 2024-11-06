@@ -4,29 +4,13 @@ import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const folders = ref([
-    {
-        search: "Bloom Men's",
-        method: "partial match"
-    },
-    {
-        search: "Yokohama Store] We received an application for the sale from the reservation form.",
-        method: "exact match"
-    },
-    {
-        search: "FB5] Ladies, we have an appointment from Slimming LP.",
-        method: "left hand match"
-    },
-    {
-        search: "Shinjuku (Tokyo)",
-        method: "backward match"
-    },
-])
+const props = defineProps(['folders'])
+const routeUrl = ref('/folders')
 
 const tableHeaders = ref([
    {
      header: "Search",
-     val: "search"
+     val: "search_character"
    },
    {
      header: "Method",
@@ -51,8 +35,9 @@ const tableHeaders = ref([
                             <VBtn color="primary" @click="router.get(route('folders.create'))">Folder</VBtn>
                             <div class="my-5">
                                 <CustomizeTable
+                                    :link="routeUrl"
                                     :headers="tableHeaders"
-                                    :data="folders"
+                                    :data="props?.folders"
                                 />
                             </div>
                         </div>

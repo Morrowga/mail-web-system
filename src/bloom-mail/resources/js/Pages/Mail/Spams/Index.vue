@@ -4,25 +4,14 @@ import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const spams = ref([
-    {
-        address: "dummy@example.com",
-    },
-    {
-        address: "spam@spam.com",
-    },
-    {
-        address: "error@error.jp",
-    },
-    {
-        address: "ng@mail.co",
-    },
-])
+const props = defineProps(['spams'])
+
+const routeUrl = ref('/spams')
 
 const tableHeaders = ref([
    {
      header: "Address",
-     val: "address"
+     val: "mail_address"
    }
 ]);
 </script>
@@ -44,7 +33,8 @@ const tableHeaders = ref([
                             <div class="my-5">
                                 <CustomizeTable
                                     :headers="tableHeaders"
-                                    :data="spams"
+                                    :data="props?.spams"
+                                    :link="routeUrl"
                                 />
                             </div>
                         </div>
