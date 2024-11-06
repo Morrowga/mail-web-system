@@ -7,6 +7,7 @@ use App\Http\Controllers\SpamController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\TemplateCategoryController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -17,7 +18,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
@@ -26,12 +27,9 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Templates/Index');
     })->name('templates');
 
-    Route::get('/template-categories', function () {
-        return Inertia::render('TemplateCategories/Index');
-    })->name('template-categories');
-
     Route::resource('folders', FolderController::class);
     Route::resource('templates', TemplateController::class);
+    Route::resource('template-categories', TemplateCategoryController::class);
     Route::resource('spams', SpamController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

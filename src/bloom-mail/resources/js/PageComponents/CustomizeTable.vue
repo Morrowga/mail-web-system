@@ -1,5 +1,7 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
+import { Head,router } from '@inertiajs/vue3';
+import ConfirmDialog from './ConfirmDialog.vue';
 
 // Define the props that this component accepts
 const props = defineProps({
@@ -11,7 +13,28 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  link: {
+    type: String,
+    required: true,
+  }
 });
+
+const snackbarVisible = ref(false);
+const snackbarMessage = ref("");
+
+// Copy function
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      snackbarMessage.value = "Text copied to clipboard!";
+      snackbarVisible.value = true;
+    })
+    .catch((error) => {
+      snackbarMessage.value = "Failed to copy text.";
+      snackbarVisible.value = true;
+      console.error('Error copying text: ', error);
+    });
+}
 </script>
 
 <template>
@@ -24,17 +47,24 @@ const props = defineProps({
         </thead>
         <tbody>
             <tr v-for="(item, rowIndex) in data" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'back-gray' : 'back-white'">
-                <td v-for="(header, colIndex) in headers" :key="colIndex">
+                <td  @click="router.get(link + '/' + item.id + '/edit')" v-for="(header, colIndex) in headers" :key="colIndex">
                     {{ item[header.val] }} <!-- Assuming keys are in lower case -->
                 </td>
                 <td>
-                    <span class="text-[#1b5d9b] font-[500]">Copy</span>
+                    <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">Copy</span>
                     <span class="text-[#1b5d9b] font-[500]"> | </span>
-                    <span class="text-red font-bold">Delete</span>
+                    <ConfirmDialog :item="item" :routeUrl="props?.link" />
+                    <!-- <span class="text-red font-bold cursor-pointer" @click="confirmDelete">Delete</span> -->
                 </td>
             </tr>
         </tbody>
     </VTable>
+    <VSnackbar v-model="snackbarVisible" :timeout="3000" color="info">
+      {{ snackbarMessage }}
+      <template v-slot:actions>
+        <VBtn text @click="snackbarVisible = false">Close</VBtn>
+      </template>
+    </VSnackbar>
 </template>
 
 <style scoped>
@@ -46,9 +76,11 @@ const props = defineProps({
 
 .back-white{
     background-color: #fff;
+    cursor: pointer;
 }
 
 .back-gray{
     background-color: #e6e6e6;
+    cursor: pointer;
 }
 </style>
