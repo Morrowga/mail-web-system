@@ -7,9 +7,6 @@
 node_modules/
 dist/
 
-docker/db/data
-docker/phpmyadmin/sessions
-
 # Compiled Java class files
 *.class
 
@@ -51,3 +48,7 @@ Thumbs.db
 *.mov
 *.wmv
 
+.env
+docker/db/data
+docker/phpmyadmin/sessions
+.vite/
