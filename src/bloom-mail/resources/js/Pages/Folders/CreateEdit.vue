@@ -31,16 +31,22 @@ const methods = ref([
     },
 ]);
 
+
 const formSubmit = () => {
-    let routeLink = props?.folder ?route('folders.update', props?.folder?.id) : route('folders.store')
-    form.post(routeLink,{
+    const isEdit = Boolean(props?.folder);
+
+    const routeLink = isEdit ? route('folders.update', props.folder.id) : route('folders.store');
+    const method = isEdit ? 'put' : 'post';
+
+    form[method](routeLink, {
         onSuccess: () => {
-            form.reset();
+            form.reset();  // Reset the form upon success
         },
         onError: (error) => {
+            console.error("Form submission error:", error); // Handle the error if needed
         },
-    })
-}
+    });
+};
 
 </script>
 

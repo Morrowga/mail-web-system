@@ -22,6 +22,7 @@ services:
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
     ports:
+      - "8081:8081"
       - "${PHP_FPM_PORT}:8000"
       - 5173:5173
   db:

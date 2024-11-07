@@ -19,6 +19,8 @@ RUN pecl install imagick \
 # PHP拡張ライブラリのインストール
 RUN docker-php-ext-install pdo_mysql zip bcmath opcache -j$(nproc) gd  && \
 docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-configure pcntl --enable-pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER 1

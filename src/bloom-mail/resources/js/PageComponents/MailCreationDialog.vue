@@ -2,13 +2,17 @@
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
 createDialog: Boolean,
-floatButton: Boolean
+floatButton: Boolean,
+templates: Array,
+from: String
 });
+
 const dialog = ref(props.createDialog);
+const formattedDateTime = ref(null);
 
 const emit = defineEmits(['update:dialog', 'update:visibleFloat']);
 
@@ -36,13 +40,42 @@ const onOpen = () => {
 
 const form = useForm({
     subject: "",
-    from: "",
+    from: props?.from,
     to: "",
-    template: "Texas",
+    template_id: "",
     cc: "",
     bcc: "",
     message_content: ""
 })
+
+const formatDateTime = () => {
+  const currentDate = new Date();
+
+  const formattedDate = currentDate.toISOString().split('T')[0].replace(/-/g, '/');
+
+  const formattedTime = currentDate.toTimeString().split(' ')[0];
+
+  formattedDateTime.value = `${formattedDate} ${formattedTime}`;
+};
+
+const formSubmit = () => {
+    form.post(route('mails.store'), {
+        onSuccess: () => {
+            form.reset();
+            // onClose();
+        },
+        onError: (error) => {
+            console.error("Form submission error:", error); // Handle the error if needed
+        },
+    });
+};
+
+
+onMounted(() => {
+  formatDateTime();
+});
+
+
 </script>
 <template>
     <div class="text-left">
@@ -56,249 +89,255 @@ const form = useForm({
     </div>
 
     <VDialog v-model="dialog" max-width="1250">
-        <VCard>
-        <!-- Card Header with Icons -->
-        <VCardTitle class="d-flex justify-end align-center">
-            <VSpacer></VSpacer>
+        <VForm @submit.prevent="formSubmit">
+            <VCard>
+                <!-- Card Header with Icons -->
+                <VCardTitle class="d-flex justify-end align-center">
+                    <VSpacer></VSpacer>
 
-            <!-- Minimize Icon -->
-            <div class="icon-border d-flex justify-center align-items-center">
-                <VIcon
-                    icon="mdi-minus"
-                    class="minimize-icon"
-                    style="color: #a5a5a5; font-weight: bold;"
-                    @click="minimizeDialog"
-                ></VIcon>
-            </div>
-
-            <!-- Close Icon -->
-             <div class="icon-border text-center">
-                <VIcon
-                    icon="mdi-close"
-                    class="close-icon"
-                    style="color: #a5a5a5; font-weight: bold;"
-                    @click="onClose"
-                ></VIcon>
-             </div>
-        </VCardTitle>
-
-        <!-- Card Content -->
-        <VCardText>
-            <VRow dense>
-                <VCol cols="12" md="12" sm="6">
-                    <VDivider />
-                    <div class="pb-2 pt-1 text-right">
-                        <VBtn class="spamtrashbtn">Spam</VBtn>
-                        <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
+                    <!-- Minimize Icon -->
+                    <div class="icon-border d-flex justify-center align-items-center">
+                        <VIcon
+                            icon="mdi-minus"
+                            class="minimize-icon"
+                            style="color: #a5a5a5; font-weight: bold;"
+                            @click="minimizeDialog"
+                        ></VIcon>
                     </div>
-                    <VDivider />
-                </VCol>
-                <VCol cols="12" md="12" sm="6">
-                    <VRow>
-                        <VCol cols="8">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 10%; align-self: flex-end;">
-                                    <InputLabel value="Subject" for="subject" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                        variant="plain"
-                                        density="compact"
-                                        required
-                                        v-model="form.subject"
-                                        hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.subject" />
-                            </div>
-                        </VCol>
-                        <VCol cols="4">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 50%; align-self: flex-end;">
-                                    <span class="font-bold">Sent date & time</span>
-                                </div>
-                                <div style="width: 50%; align-self: flex-end;">
-                                    2024/08/23 13:37:10
-                                </div>
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-1" />
-                    <VRow>
-                        <VCol cols="8">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 10%; align-self: flex-end;">
-                                    <InputLabel value="From" for="from" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                        v-model="form.from"
-                                        variant="plain"
-                                        density="compact"
-                                        required
-                                        hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.from" />
-                            </div>
-                        </VCol>
-                        <VCol cols="4">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 50%; align-self: flex-end;">
-                                    <span class="font-bold">Person in charge</span>
-                                </div>
-                                <div style="width: 50%; align-self: flex-end;">
-                                    ちは
-                                </div>
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-1" />
-                    <VRow>
-                        <VCol cols="8">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 10%; align-self: flex-end;">
-                                    <InputLabel value="To" for="to" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                        variant="plain"
-                                        density="compact"
-                                        required
-                                        hide-details
-                                        v-model="form.to"
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.to" />
-                            </div>
-                        </VCol>
-                        <VCol cols="4">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                <div style="width: 50%; align-self: flex-end;">
-                                    <span class="font-bold">Status</span>
-                                </div>
-                                <div style="width: 50%; align-self: flex-end;">
-                                    ちは
-                                </div>
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VRow >
-                        <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="8" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 10%; align-items: center;">
-                                    <InputLabel value="Template" for="template" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VSelect
-                                    v-model="form.template"
-                                    variant="outlined" density="compact" required hide-details
-                                    :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-                                    ></VSelect>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.template" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="8" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 10%; align-items: center;">
-                                    <InputLabel value="To" for="to" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                    v-model="form.to"
-                                    variant="outlined" density="compact" required hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.to" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="8" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 10%; align-items: center;">
-                                    <InputLabel value="CC" for="cc" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                    v-model="form.cc"
-                                    variant="outlined" density="compact" required hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.cc" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="8" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 10%; align-items: center;">
-                                    <InputLabel value="BCC" for="bcc" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                    v-model="form.bcc"
-                                    variant="outlined" density="compact" required hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.bcc" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="8" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 10%; align-items: center;">
-                                    <InputLabel value="Subject" for="subject" />
-                                </div>
-                                <div style="width: 90%;">
-                                    <VTextField
-                                    v-model="form.subject"
-                                    variant="outlined" density="compact" required hide-details
-                                    ></VTextField>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.subject" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                    <VDivider class="mt-2" />
-                    <VRow>
-                        <VCol cols="12" class="mt-3">
-                            <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                <div style="width: 100%;">
-                                    <InputLabel value="Message Content" class="mb-3" for="message" />
-                                    <VTextarea
-                                    v-model="form.message"
-                                    variant="outlined" density="compact" required hide-details
-                                    ></VTextarea>
-                                </div>
-                                <InputError class="mt-1" :message="form.errors.message" />
-                            </div>
-                        </VCol>
-                    </VRow>
-                </VCol>
-            </VRow>
-        </VCardText>
 
-        <!-- Card Actions -->
-        <VCardActions>
-            <VSpacer></VSpacer>
-            <!-- <VBtn text="Close" variant="plain" @click="dialog = false"></VBtn> -->
-            <VBtn prepend-icon="mdi-email-arrow-right" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important;" @click="onClose"></VBtn>
+                    <!-- Close Icon -->
+                    <div class="icon-border text-center">
+                        <VIcon
+                            icon="mdi-close"
+                            class="close-icon"
+                            style="color: #a5a5a5; font-weight: bold;"
+                            @click="onClose"
+                        ></VIcon>
+                    </div>
+                </VCardTitle>
 
-        </VCardActions>
-        </VCard>
+                <!-- Card Content -->
+                <VCardText>
+                    <VRow dense>
+                        <VCol cols="12" md="12" sm="6">
+                            <VDivider />
+                            <div class="pb-2 pt-1 text-right">
+                                <VBtn class="spamtrashbtn">Spam</VBtn>
+                                <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
+                            </div>
+                            <VDivider />
+                        </VCol>
+                        <VCol cols="12" md="12" sm="6">
+                            <VRow>
+                                <VCol cols="8">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 10%; align-self: flex-end;">
+                                            <InputLabel value="Subject" for="subject" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                                variant="plain"
+                                                density="compact"
+                                                required
+                                                v-model="form.subject"
+                                                hide-details
+                                            ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.subject" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                                <VCol cols="4">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            <span class="font-bold">Sent date & time</span>
+                                        </div>
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            {{formattedDateTime}}
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-1" />
+                            <VRow>
+                                <VCol cols="8">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 10%; align-self: flex-end;">
+                                            <InputLabel value="From" for="from" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                                v-model="form.from"
+                                                variant="plain"
+                                                type="email"
+                                                density="compact"
+                                                required
+                                                readonly
+                                                hide-details
+                                            ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.from" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                                <VCol cols="4">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            <span class="font-bold">Person in charge</span>
+                                        </div>
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            ちは
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-1" />
+                            <VRow>
+                                <VCol cols="8">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 10%; align-self: flex-end;">
+                                            <InputLabel value="To" for="to" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                                variant="plain"
+                                                density="compact"
+                                                type="email"
+                                                required
+                                                hide-details
+                                                v-model="form.to"
+                                            ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.to" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                                <VCol cols="4">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            <span class="font-bold">Status</span>
+                                        </div>
+                                        <div style="width: 50%; align-self: flex-end;">
+                                            ちは
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VRow >
+                                <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 10%; align-items: center;">
+                                            <InputLabel value="Template" for="template" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VSelect
+                                            placeholder="Select Template"
+                                            v-model="form.template_id"
+                                            variant="outlined" density="compact" required hide-details
+                                            :items="props?.templates"
+                                            item-title="title"
+                                            item-value="id"
+                                            ></VSelect>
+                                        </div>
+                                        <InputError class="mt-1" :message="form.errors.template" />
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 10%; align-items: center;">
+                                            <InputLabel value="To" for="to" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                            v-model="form.to"
+                                            variant="outlined" density="compact" required hide-details
+                                            ></VTextField>
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 10%; align-items: center;">
+                                            <InputLabel value="CC" for="cc" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                            v-model="form.cc"
+                                            variant="outlined" density="compact" required hide-details
+                                            ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.cc" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 10%; align-items: center;">
+                                            <InputLabel value="BCC" for="bcc" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                            v-model="form.bcc"
+                                            variant="outlined" density="compact" hide-details
+                                            ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.bcc" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 10%; align-items: center;">
+                                            <InputLabel value="Subject" for="subject" />
+                                        </div>
+                                        <div style="width: 90%;">
+                                            <VTextField
+                                            v-model="form.subject"
+                                            variant="outlined" density="compact" hide-details
+                                            ></VTextField>
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="12" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 100%;">
+                                            <InputLabel value="Message Content" class="mb-3" for="message" />
+                                            <VTextarea
+                                            v-model="form.message_content"
+                                            variant="outlined" density="compact" required hide-details
+                                            ></VTextarea>
+                                            <InputError class="mt-1" :message="form.errors.message_content" />
+                                        </div>
+                                    </div>
+                                </VCol>
+                            </VRow>
+                        </VCol>
+                    </VRow>
+                </VCardText>
+
+                <!-- Card Actions -->
+                <VCardActions>
+                    <VSpacer></VSpacer>
+                    <!-- <VBtn text="Close" variant="plain" @click="dialog = false"></VBtn> -->
+                    <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important;"></VBtn>
+
+                </VCardActions>
+                </VCard>
+        </VForm>
     </VDialog>
   </template>
 

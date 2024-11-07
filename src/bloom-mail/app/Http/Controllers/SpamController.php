@@ -59,7 +59,7 @@ class SpamController extends Controller
      */
     public function edit(Spam $spam)
     {
-        return Inertia::render('Mail/Spam/CreateEdit', [
+        return Inertia::render('Mail/Spams/CreateEdit', [
             "spam" => $spam
         ]);
     }
@@ -71,7 +71,7 @@ class SpamController extends Controller
     {
         $updateSpam = $this->spamRepository->update($request, $spam);
 
-        return redirect()->back()->with('success', 'Form subm itted successfully');
+        return redirect()->route('spams.index')->with('success', 'Form submitted successfully');
     }
 
     /**
@@ -81,6 +81,6 @@ class SpamController extends Controller
     {
         $deleteSpam = $this->spamRepository->delete($spam);
 
-        return redirect()->back()->with('success', 'Form submitted successfully');
+        return redirect()->back();
     }
 }

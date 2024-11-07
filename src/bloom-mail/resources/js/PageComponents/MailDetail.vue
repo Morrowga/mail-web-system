@@ -1,11 +1,22 @@
 <script setup>
 import { ref } from 'vue';
-const incomingEmail = ref('<asai@xxx.com>');
 
+const props = defineProps({
+    mail: Object,
+});
+
+const emit = defineEmits();
+
+const handleRemoveClick = () => {
+  emit('handleRemoveRow');
+};
 </script>
 
 <template>
     <VCardText>
+        <div class="text-right cursor-pointer">
+            <VIcon icon="mdi-close-box" @click="handleRemoveClick"></VIcon>
+        </div>
         <VRow>
             <VCol cols="12" lg="2">
                 <VIcon icon="mdi-trash-can-outline" />
@@ -28,31 +39,31 @@ const incomingEmail = ref('<asai@xxx.com>');
             </VCol>
             <VCol cols="12" lg="4">
                 <div>
-                    <p>Auguest 10,</p>
-                    <p>10: 07</p>
+                    <p>{{ props?.mail?.date }},</p>
+                    <p>{{ props?.mail?.time }},</p>
                 </div>
             </VCol>
         </VRow>
         <div class="my-4 mx-3">
-            <p class="mail-subject">RE: [Men's] I have an appointment.</p>
+            <p class="mail-subject">RE: {{ props?.mail?.subject }}</p>
             <div class="my-2">
-                <p>Toshiyuki Okada</p>
+                <p>{{ props?.mail?.name }}</p>
                 <p >
-                    {{ incomingEmail }}
+                    {{ props?.mail?.from }}
                 </p>
                 <div class="d-flex justify-between">
                     <p>
                         Attn:
                         <br>
-                        MACHINO
+                        <span v-html="props?.mail?.body"></span>
                     </p>
                     <div>
-                        <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">Completed</VBtn>
+                        <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
                     </div>
                 </div>
             </div>
             <hr style="opacity: 0.3;">
-            <div class="mt-3" style="margin-bottom: 3vh;">
+            <!-- <div class="mt-3" style="margin-bottom: 3vh;">
                 <div class="d-flex justify-between">
                     <div>
                         <p>
@@ -103,7 +114,7 @@ const incomingEmail = ref('<asai@xxx.com>');
                         holder ( ritsuryo system )
                     </p>
                 </div>
-            </div>
+            </div> -->
         </div>
     </VCardText>
 </template>

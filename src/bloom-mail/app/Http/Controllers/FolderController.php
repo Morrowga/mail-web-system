@@ -71,7 +71,7 @@ class FolderController extends Controller
     {
         $updateFolder = $this->folderRepository->update($request, $folder);
 
-        return redirect()->back()->with('success', 'Form subm itted successfully');
+        return redirect()->route('folders.index');
     }
 
     /**
@@ -81,6 +81,6 @@ class FolderController extends Controller
     {
         $deleteFolder = $this->folderRepository->delete($folder);
 
-        return redirect()->back()->with('success', 'Form submitted successfully');
+        return redirect()->back();
     }
 }

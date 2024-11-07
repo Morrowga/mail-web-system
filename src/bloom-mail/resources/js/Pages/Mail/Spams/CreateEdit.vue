@@ -7,19 +7,24 @@ import { Head, useForm } from '@inertiajs/vue3';
 const props = defineProps(['spam'])
 
 const form = useForm({
-    mail_address: '',
+    mail_address: props?.spam?.mail_address,
 })
 
 const formSubmit = () => {
-    let routeLink = props?.folder ?route('spams.update', props?.spam?.id) : route('spams.store')
-    form.post(routeLink,{
+    const isEdit = Boolean(props?.spam);
+
+    const routeLink = isEdit ? route('spams.update', props.spam.id) : route('spams.store');
+    const method = isEdit ? 'put' : 'post';
+
+    form[method](routeLink, {
         onSuccess: () => {
-            form.reset();
+            form.reset();  // Reset the form upon success
         },
         onError: (error) => {
+            console.error("Form submission error:", error); // Handle the error if needed
         },
-    })
-}
+    });
+};
 </script>
 
 <template>
@@ -48,7 +53,7 @@ const formSubmit = () => {
                                                             density="compact"
                                                             variant="outlined"
                                                             id="address"
-                                                            type="text"
+                                                            type="email"
                                                             class="mt-1 block w-full"
                                                             v-model="form.mail_address"
                                                             required

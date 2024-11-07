@@ -20,7 +20,7 @@ class AdminSeeder extends Seeder
         $user = User::create([
             "name" => "admin",
             "email" => "admin@mail.com",
-            "login_id" => $loginId = Str::uuid()->toString(),
+            "login_id" => 'admin',
             "password" => Hash::make('password'),
         ]);
     }

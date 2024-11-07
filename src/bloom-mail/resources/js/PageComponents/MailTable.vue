@@ -9,6 +9,13 @@ const props = defineProps({
   }
 });
 
+
+const emit = defineEmits();
+
+const handleRowClick = (row) => {
+  emit('rowSelected', row);
+};
+
 </script>
 
 <template>
@@ -22,9 +29,9 @@ const props = defineProps({
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(email, index) in props?.data" :key="index">
+        <tr v-for="(email, index) in props?.data" @click="handleRowClick(email)" :key="index" class="cursor-pointer">
           <td>
-            <VChip :style="'background:' + getStatusColor(email.color) + '; color: #fff;'">
+            <VChip :style="'background:' + getStatusColor(email.status) + '; color: #fff;'">
                 {{ email.status }}
             </VChip>
           </td>
@@ -34,7 +41,7 @@ const props = defineProps({
             {{ email.sender }}
           </td>
           <td>{{ email.subject }}</td>
-          <td>{{ email.datetime }}</td>
+          <td>{{ email.date + ' ' + email.time }}</td>
         </tr>
       </tbody>
     </VTable>

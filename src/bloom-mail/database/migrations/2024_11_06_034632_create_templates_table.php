@@ -18,6 +18,9 @@ return new class extends Migration
             $table->foreignId('folder_id')
             ->references('id')
             ->on('folders')->onDelete('cascade');
+            $table->foreignId('template_category_id')
+            ->references('id')
+            ->on('template_categories')->onDelete('cascade');
             $table->longText('message_content');
             $table->timestamps();
         });

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SpamRequest extends FormRequest
+class TemplateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,11 @@ class SpamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "mail_address" => ['required', 'email']
+            "title" => ['required'],
+            "subject" => ['required'],
+            "folder_id" => ['required'],
+            "template_category_id" => ['required'],
+            "message_content" => ['required'],
         ];
     }
 }

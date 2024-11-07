@@ -42,7 +42,7 @@ class TemplateCategoryController extends Controller
     {
         $createTemplateCategory = $this->templateCategoryRepository->store($request);
 
-        return redirect()->back()->with('success', 'Form submitted successfully');
+        return redirect()->route('template-categories.index')->with('success', 'Form submitted successfully');
     }
 
     /**

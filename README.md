@@ -43,6 +43,11 @@ yarn install
 // フロントエンドサーバー立ち上げ
 yarn dev
 ```
+// Open Next Tab In Terminal 
+php artisan reverb:start --port=8081
+
+php artisan queue:work
+
 下記URLからアクセス  
 [http://localhost:80](http://localhost:80)
 

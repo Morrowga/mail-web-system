@@ -53,7 +53,7 @@ const copyToClipboard = (text) => {
                 <td>
                     <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">Copy</span>
                     <span class="text-[#1b5d9b] font-[500]"> | </span>
-                    <ConfirmDialog :item="item" :routeUrl="props?.link" />
+                    <ConfirmDialog :item="item" :routeUrl="'/templates'" />
                     <!-- <span class="text-red font-bold cursor-pointer" @click="confirmDelete">Delete</span> -->
                 </td>
             </tr>
