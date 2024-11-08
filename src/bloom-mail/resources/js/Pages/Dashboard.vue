@@ -53,6 +53,7 @@ onMounted(() => {
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
+        console.log(event);
         if(event.mails != null)
         {
             const newMails = Array.isArray(event.mails) ? event.mails : [event.mails];

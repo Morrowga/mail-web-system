@@ -12,5 +12,6 @@ Artisan::command('inspire', function () {
 
 Artisan::command('mail-fetching', function () {
     ProcessMails::dispatch();
+    Log::info('ran');
 })->purpose('Running Realtime')->everyFifteenSeconds();
 

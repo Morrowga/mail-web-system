@@ -8,10 +8,5 @@ class MailLog extends Model
 {
     protected $table = 'mail_logs';
 
-    protected $fillable = ['message_id', 'status', 'datetime', 'subject', 'sender', 'name', 'body', 'parent_id'];
-
-    public function replies()
-    {
-        return $this->hasMany(MailLog::class, 'parent_id');
-    }
+    protected $fillable = ['message_id', 'status'];
 }

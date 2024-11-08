@@ -48,6 +48,7 @@ class MailRepository implements MailRepositoryInterface
         $existingLogs = MailLog::whereIn('message_id', $messageIds)->get()->keyBy('message_id');
 
         $emails = $messages->map(function ($message) use ($existingLogs) {
+
             $messageId = $message->getMessageId()[0];
 
             $mailLog = $existingLogs[$messageId] ?? MailLog::create(["message_id" => $messageId, "status" => "new"]);
@@ -110,7 +111,7 @@ class MailRepository implements MailRepositoryInterface
                 'datetime' => $newMessage->getDate()[0]->toDateTimeString(),
                 'name' => $newMessage->getFrom()[0]->personal, // Sender's name
                 'body' => $newMessage->getHTMLBody() ?? $newMessage->getTextBody(),
-                'status' => $mailLog->status // Include the status from the database
+                'status' => $mailLog->status
             ];
 
             return $email;
