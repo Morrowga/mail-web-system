@@ -7,6 +7,7 @@ use App\Models\MailLog;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Webklex\IMAP\Facades\Client;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Interfaces\MailRepositoryInterface;
 use Webklex\IMAP\Exceptions\ConnectionFailedException;
@@ -82,6 +83,10 @@ class MailRepository implements MailRepositoryInterface
             'message_content' => $request->message_content,
             'template_id' => $request->template_id,
         ];
+
+        Log::info('Sending email using the following configuration:', [
+            'MAIL_MAILER' => config('mail.mailers.smtp'),
+        ]);
 
         Mail::to($data['to'])
             ->cc($data['cc'])

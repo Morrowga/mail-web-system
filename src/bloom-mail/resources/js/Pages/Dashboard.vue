@@ -31,7 +31,7 @@ onMounted(() => {
     Echo.channel('mails')
   .listen('.mail-fetched', (event) => {
     console.log('Fetched Emails: ', event.mails);
-    mails.value = event.mails;
+    mails.value = event.mails?.data;
   })
   .error((error) => {
     console.error('Broadcast error:', error);

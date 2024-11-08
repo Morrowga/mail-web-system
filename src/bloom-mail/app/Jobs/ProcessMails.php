@@ -25,7 +25,7 @@ class ProcessMails implements ShouldQueue
 
         broadcast(new TakingMail($emails));
 
-        ProcessMails::dispatch()->delay(now()->addSeconds((int) env('JOB_INTERVAL_TIME')));
+        ProcessMails::dispatch()->delay(now()->addSeconds(30));
 
         Log::info('worked');
     }

@@ -2,7 +2,7 @@
 
 // Function to get the color based on the status
 export function getStatusColor(status) {
-    let fixedStatus = status.toLowerCase();
+    let fixedStatus = status;
     // Define a mapping of statuses to colors
     const statusColors = {
         'new': '#fc0214',
@@ -15,5 +15,5 @@ export function getStatusColor(status) {
     };
 
     // Return the color associated with the status or a default color if the status is unknown
-    return statusColors[status] || '#000000';
+    return statusColors[fixedStatus] || '#000000';
 }
