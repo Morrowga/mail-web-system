@@ -23,14 +23,13 @@ class MailController extends Controller
     public function index()
     {
         $mails = $this->mailRepository->inbox();
+
         $templates = $this->templateRepository->getOnlyTemplates();
 
         $from = env('IMAP_USERNAME');
 
-        ProcessMails::dispatch();
-
         return Inertia::render('Dashboard', [
-            "mails" => $mails['data'],
+            "mails" => $mails,
             "templates" => $templates['data'],
             "from" => $from
         ]);

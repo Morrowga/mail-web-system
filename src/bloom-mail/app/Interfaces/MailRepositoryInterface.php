@@ -8,5 +8,7 @@ interface MailRepositoryInterface
 {
     public function inbox();
 
+    public function newMessage();
+
     public function store(Request $request);
 }

@@ -4,22 +4,44 @@ import FloatMailButton from '@/PageComponents/FloatMailButton.vue';
 import MailCreationDialog from '@/PageComponents/MailCreationDialog.vue';
 import MailDetail from '@/PageComponents/MailDetail.vue';
 import MailTable from '@/PageComponents/MailTable.vue';
+import Pagination from '@/PageComponents/Pagination.vue';
 import { Head,router } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const createDialogVisible = ref(false);
 
 const props = defineProps(['mails', 'templates', 'from'])
 
-const isVisibleFloatButton = ref(false);
-
 const mails = ref(props?.mails);
 
+const itemsPerPage = 10;
+
 const selectedMail = ref(null);
+
+const page = ref(1);
+
+const totalPages = computed(() => Math.ceil(props?.mails?.length / itemsPerPage));
+
+const isVisibleFloatButton = ref(false);
+
+const handlePageChange = (newPage) => {
+  page.value = newPage;
+  console.log(page.value);
+};
+
+const paginatedMails = computed(() => {
+  const start = (page.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return mails.value.slice(start, end);
+});
 
 const handleRowSelected = (row) => {
   selectedMail.value = row;
 };
+
+const  isActiveRoute = (name) =>  {
+    return route().current(name);
+}
 
 
 const removeRow = (row) => {
@@ -28,14 +50,29 @@ const removeRow = (row) => {
 
 
 onMounted(() => {
-    Echo.channel('mails')
-  .listen('.mail-fetched', (event) => {
-    console.log('Fetched Emails: ', event.mails);
-    mails.value = event.mails?.data;
-  })
-  .error((error) => {
-    console.error('Broadcast error:', error);
-  });
+  Echo.channel('mails')
+    .listen('.mail-fetched', (event) => {
+        console.log(event.mails);
+        if(event.mails != null)
+        {
+            const newMails = Array.isArray(event.mails) ? event.mails : [event.mails];
+
+            mails.value = [...newMails, ...mails.value];
+
+            console.log(mails.value);
+
+            totalPages.value = Math.ceil(mails.value.length / itemsPerPage);
+        }
+    })
+    .error((error) => {
+      console.error('Broadcast error:', error);
+    });
+});
+
+
+onUnmounted(() => {
+    Echo.leaveChannel('mails');
+    console.log('disconnected')
 });
 </script>
 
@@ -52,7 +89,9 @@ onMounted(() => {
                         <VRow>
                             <VCol cols="12" lg="2">
                                 <div class="my-5 cursor-pointer">
-                                    <p>Inbox ( 100 )</p>
+                                    <p :class="{ 'active-route': isActiveRoute('dashboard') }">
+                                        Inbox ( {{ mails?.length ?? 0  }} )
+                                    </p>
                                     <!-- <div class="folder-path">
                                         <p class="folder-item">├ Folder 1 (50)</p>
                                         <div class="sub-folder">
@@ -89,7 +128,12 @@ onMounted(() => {
 
                                 <div>
                                 <VCard style="border-radius: 20px;">
-                                    <MailTable :data="mails" @rowSelected="handleRowSelected" />
+                                    <MailTable :data="paginatedMails" @rowSelected="handleRowSelected" />
+                                    <Pagination
+                                        :totalPages="totalPages"
+                                        :currentPage="page"
+                                        @pageChanged="handlePageChange"
+                                    />
                                 </VCard>
                                 </div>
                             </VCol>
@@ -132,5 +176,11 @@ onMounted(() => {
 
 .transition-all {
   transition: all 0.5s ease-in-out;
+}
+
+.active-route
+{
+    font-weight: bold;
+    color: #4891dc;
 }
 </style>

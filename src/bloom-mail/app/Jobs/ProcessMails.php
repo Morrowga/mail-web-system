@@ -21,11 +21,9 @@ class ProcessMails implements ShouldQueue
     {
         $mailRepository = app(MailRepository::class);
 
-        $emails = $mailRepository->inbox();
+        $emails = $mailRepository->newMessage();
 
         broadcast(new TakingMail($emails));
-
-        ProcessMails::dispatch()->delay(now()->addSeconds(30));
 
         Log::info('worked');
     }

@@ -11,6 +11,7 @@ const showingNavigationDropdown = ref(false);
 
 const { props } = usePage();
 
+
 </script>
 
 <template>
@@ -44,9 +45,6 @@ const { props } = usePage();
                                 as="button"
                             >
                                 <span>{{ $t('nav.inbox') }}</span>
-                                <v-badge color="red":content="'99+'" class="badge-adjust" style="margin-left: 5px;">
-                                    <VIcon icon="mdi-home"></VIcon>
-                                </v-badge>
                             </NavLink>
                             <NavLink
                                 :active="route().current('templinates')"

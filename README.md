@@ -43,6 +43,27 @@ yarn install
 // フロントエンドサーバー立ち上げ
 yarn dev
 ```
+php artisan install:reverb
+
+// Put these email config to .env
+
+MAIL_MAILER=smtp
+MAIL_HOST=sv8713.xserver.jp
+MAIL_PORT=465
+MAIL_USERNAME=thihaaung@voyager-web.com
+MAIL_PASSWORD=t5ShxELk
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=thihaaung@voyager-web.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+IMAP_HOST=sv8713.xserver.jp
+IMAP_PORT=993
+IMAP_ENCRYPTION=ssl
+IMAP_VALIDATE_CERT=true
+IMAP_USERNAME=thihaaung@voyager-web.com
+IMAP_PASSWORD=t5ShxELk
+IMAP_PROTOCOL=imap
+
 // Open Next Tab In Terminal 
 php artisan reverb:start --port=8081
 

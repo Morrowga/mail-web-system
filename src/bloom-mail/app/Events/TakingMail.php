@@ -25,7 +25,7 @@ class TakingMail implements ShouldBroadcast
      */
     public function __construct($mails)
     {
-        $this->mails = $mails; // Call the method to fetch emails
+        $this->mails = $mails;
     }
 
     /**

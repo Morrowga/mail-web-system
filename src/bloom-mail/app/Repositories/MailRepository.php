@@ -43,17 +43,13 @@ class MailRepository implements MailRepositoryInterface
 
         $messages = $inbox->messages()->all()->get();
 
-        // Collect all message IDs from the emails
         $messageIds = $messages->map(fn($message) => $message->getMessageId()[0])->toArray();
 
-        // Fetch existing logs for these message IDs in bulk
         $existingLogs = MailLog::whereIn('message_id', $messageIds)->get()->keyBy('message_id');
 
-        // Now map over messages and use $existingLogs to check each message
         $emails = $messages->map(function ($message) use ($existingLogs) {
             $messageId = $message->getMessageId()[0];
 
-            // Check if the message ID already exists in $existingLogs; if not, create a new entry
             $mailLog = $existingLogs[$messageId] ?? MailLog::create(["message_id" => $messageId, "status" => "new"]);
 
             return [
@@ -62,14 +58,67 @@ class MailRepository implements MailRepositoryInterface
                 'sender' => $message->getFrom()[0]->mail,
                 'date' => $message->getDate()[0]->toDateString(),
                 'time' => $message->getDate()[0]->toTimeString(),
+                'datetime' => $message->getDate()[0]->toDateTimeString(),
                 'name' => $message->getFrom()[0]->personal, // Sender's name
                 'body' => $message->getHTMLBody() ?? $message->getTextBody(),
                 'status' => $mailLog->status // Include the status from the database
             ];
-        })->all();
+        })
+        ->sortByDesc('datetime')
+        ->values()
+        ->all();
 
-        return $this->success('Fetched Emails', $emails);
+
+        return $emails;
     }
+
+    public function newMessage()
+    {
+        $inbox = $this->client->getFolder('INBOX');
+
+        $messages = $inbox->messages()->all()->get();
+
+        // Collect all message IDs from the emails
+        $messageIds = $messages->map(fn($message) => $message->getMessageId()[0])->toArray();
+
+        // Fetch existing logs for these message IDs in bulk
+        $existingLogs = MailLog::whereIn('message_id', $messageIds)->get()->keyBy('message_id');
+
+        // Find the first new message that is not in the existing logs
+        $newMessage = $messages->first(function ($message) use ($existingLogs) {
+            $messageId = $message->getMessageId()[0];
+            return !isset($existingLogs[$messageId]);
+        });
+
+        // If there is a new message, create a log and format the response
+        if ($newMessage) {
+            $messageId = $newMessage->getMessageId()[0];
+
+            // Create a new log entry for this message
+            $mailLog = MailLog::create([
+                "message_id" => $messageId,
+                "status" => "new"
+            ]);
+
+            // Prepare the response for the single new message
+            $email = [
+                'id' => $messageId,
+                'subject' => $newMessage->getSubject()[0],
+                'sender' => $newMessage->getFrom()[0]->mail,
+                'date' => $newMessage->getDate()[0]->toDateString(),
+                'time' => $newMessage->getDate()[0]->toTimeString(),
+                'datetime' => $newMessage->getDate()[0]->toDateTimeString(),
+                'name' => $newMessage->getFrom()[0]->personal, // Sender's name
+                'body' => $newMessage->getHTMLBody() ?? $newMessage->getTextBody(),
+                'status' => $mailLog->status // Include the status from the database
+            ];
+
+            return $email;
+        }
+
+        return null;
+    }
+
 
 
     public function store(Request $request)

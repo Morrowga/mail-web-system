@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ProcessMails;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -10,10 +11,6 @@ Artisan::command('inspire', function () {
 
 
 Artisan::command('mail-fetching', function () {
-    $mailRepository = app(MailRepository::class);
-
-    $emails = $mailRepository->inbox();
-
-    broadcast(new TakingMail($emails));
-})->purpose('Running Realtime')->hourly();
+    ProcessMails::dispatch();
+})->purpose('Running Realtime')->everyFifteenSeconds();
 
