@@ -13,8 +13,16 @@ return new class extends Migration
     {
         Schema::create('mail_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('message_id');
-            $table->enum('status', ['new', 'read','confirming','pending', 'replying', 'confirmed', 'corresponding'])->default('new');
+            $table->integer('uid')->nullable();
+            $table->string('message_id')->nullable();
+            $table->string('subject')->nullable();
+            $table->string('sender')->nullable();
+            $table->string('name')->nullable();
+            $table->longText('body')->nullable();
+            $table->dateTime('datetime')->nullable();
+            $table->string('parent_message_id')->nullable();
+            $table->enum('status', ['new', 'read', 'confirming', 'pending', 'replying', 'confirmed', 'corresponding'])->default('new');
+
             $table->timestamps();
         });
     }

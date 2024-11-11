@@ -10,5 +10,7 @@ interface MailRepositoryInterface
 
     public function newMessage();
 
+    public function markAsRead($uid);
+
     public function store(Request $request);
 }

@@ -6,7 +6,7 @@ export function getStatusColor(status) {
     // Define a mapping of statuses to colors
     const statusColors = {
         'new': '#fc0214',
-        'read': '#fc0214',
+        'read': '#df517e',
         'confirming': '#fc0214',
         'confirmed': '#fc0214',
         'corresponding': '#fc0214',

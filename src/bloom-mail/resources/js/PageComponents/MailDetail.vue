@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import MailThread from './MailThread.vue';
 
 const props = defineProps({
     mail: Object,
@@ -39,13 +40,12 @@ const handleRemoveClick = () => {
             </VCol>
             <VCol cols="12" lg="4">
                 <div>
-                    <p>{{ props?.mail?.date }},</p>
-                    <p>{{ props?.mail?.time }},</p>
+                    <p>{{ props?.mail?.datetime }}</p>
                 </div>
             </VCol>
         </VRow>
         <div class="my-4 mx-3">
-            <p class="mail-subject">RE: {{ props?.mail?.subject }}</p>
+            <p class="mail-subject">{{ props?.mail?.subject }}</p>
             <div class="my-2">
                 <p>{{ props?.mail?.name }}</p>
                 <p >
@@ -55,6 +55,7 @@ const handleRemoveClick = () => {
                     <p>
                         Attn:
                         <br>
+                        <br>
                         <span v-html="props?.mail?.body"></span>
                     </p>
                     <div>
@@ -63,58 +64,8 @@ const handleRemoveClick = () => {
                 </div>
             </div>
             <hr style="opacity: 0.3;">
-            <!-- <div class="mt-3" style="margin-bottom: 3vh;">
-                <div class="d-flex justify-between">
-                    <div>
-                        <p>
-                            Attn:
-                            <br>
-                            MACHINO
-                        </p>
-                        <p class="ml-2">
-                            Mr.Okada
-                        </p>
-                    </div>
-                    <div>
-                       <p>
-                        Auguest 10,
-                        <br />
-                        10:07
-                       </p>
-                    </div>
-                </div>
-                <div class="ml-2 mt-5">
-                    <p>Machino</p>
-                    <p>Reservation Accpeted</p>
-                </div>
-            </div>
-            <div class="my-2">
-                <div class="d-flex justify-between">
-                    <div>
-                        <p>Toshiyuki Okada</p>
-                        <p >
-                            {{ incomingEmail }}
-                        </p>
-                    </div>
-                    <div>
-                       <p>
-                        Auguest 10,
-                        <br />
-                        10:07
-                       </p>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <p>
-                        I would like to make an <br>
-                        appointment for Auguest 20.
-                        <br>
-                        <br>
-                        rice field in the charge of a nominal <br>
-                        holder ( ritsuryo system )
-                    </p>
-                </div>
-            </div> -->
+
+            <MailThread v-for="reply in props.mail.all_replies" :key="reply.id" :reply="reply" />
         </div>
     </VCardText>
 </template>

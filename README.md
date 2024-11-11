@@ -69,6 +69,8 @@ php artisan reverb:start --port=8081
 
 php artisan queue:work
 
+php artisan schedule:run
+
 下記URLからアクセス  
 [http://localhost:80](http://localhost:80)
 

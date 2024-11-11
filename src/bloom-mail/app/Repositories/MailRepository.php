@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Models\Reply;
 use App\Mail\SendMail;
 use App\Models\MailLog;
+use Webklex\PHPIMAP\IMAP;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Webklex\IMAP\Facades\Client;
@@ -39,87 +41,155 @@ class MailRepository implements MailRepositoryInterface
      */
     public function inbox()
     {
-        $inbox = $this->client->getFolder('INBOX');
+        // Step 1: Get all messages from the inbox
+        // $inbox = $this->client->getFolder('INBOX');
+        // $messages = $inbox->messages()->all()->get();
 
-        $messages = $inbox->messages()->all()->get();
+        // foreach ($messages as $message) {
+        //     // Step 2: Extract necessary headers and details
+        //     $uid = $message->getUid();
+        //     $body = $message->getHTMLBody();
+        //     $dateSent = $message->getDate();
+        //     $subject = $message->getSubject()[0];
+        //     $senderArray = $message->getFrom();
+        //     $senderName = strval($senderArray[0]->personal);
+        //     $senderEmail = $senderArray[0]->mail;
 
-        $messageIds = $messages->map(fn($message) => $message->getMessageId()[0])->toArray();
+        //     // Message headers for threading
+        //     $header = $message->getHeader();
+        //     $messageId = $header->message_id[0];
+        //     $inReplyTo = $header->get('in-reply-to');
+        //     $references = $header->get('references');
 
-        $existingLogs = MailLog::whereIn('message_id', $messageIds)->get()->keyBy('message_id');
+        //     // Determine parent_message_id (if this message is a reply)
+        //     $parentMessageId = null;
+        //     if ($inReplyTo) {
+        //         $parentMessageId = trim($inReplyTo[0], '<>');
+        //     } elseif ($references) {
+        //         // Use the last message ID in references as the immediate parent
+        //         $referencesList = explode(' ', trim($references[0]));
+        //         $parentMessageId = trim(end($referencesList), '<>');
+        //     }
 
-        $emails = $messages->map(function ($message) use ($existingLogs) {
+        //     // Step 3: Save the email to the database
+        //     MailLog::firstOrCreate(
+        //         ['message_id' => $messageId],
+        //         [
+        //             'uid' => $uid,
+        //             'message_id' => $messageId,
+        //             'subject' => $subject,
+        //             'sender' => $senderEmail,
+        //             'name' => $senderName,
+        //             'body' => $body,
+        //             'datetime' => $dateSent[0]->toDateTimeString(),
+        //             'parent_message_id' => $parentMessageId,
+        //             'status' => 'new',
+        //         ]
+        //     );
+        // }
 
-            $messageId = $message->getMessageId()[0];
+        // Step 4: Fetch the original messages and build the threads
+        $threads = MailLog::whereNull('parent_message_id')
+                    ->orderBy('datetime', 'desc')
+                    ->with('allReplies')
+                    ->paginate(10);
 
-            $mailLog = $existingLogs[$messageId] ?? MailLog::create(["message_id" => $messageId, "status" => "new"]);
-
-            return [
-                'id' => $messageId,
-                'subject' => $message->getSubject()[0],
-                'sender' => $message->getFrom()[0]->mail,
-                'date' => $message->getDate()[0]->toDateString(),
-                'time' => $message->getDate()[0]->toTimeString(),
-                'datetime' => $message->getDate()[0]->toDateTimeString(),
-                'name' => $message->getFrom()[0]->personal, // Sender's name
-                'body' => $message->getHTMLBody() ?? $message->getTextBody(),
-                'status' => $mailLog->status // Include the status from the database
-            ];
-        })
-        ->sortByDesc('datetime')
-        ->values()
-        ->all();
-
-
-        return $emails;
+        return $threads;
     }
+
+
+    public function getThreadReplies($mailLog)
+    {
+        $replies = MailLog::where('parent_message_id', $mailLog->message_id)->get();
+
+        foreach ($replies as $reply) {
+            // Recursively get replies to each reply
+            $reply->replies = $this->getThreadReplies($reply);
+        }
+
+        return $replies;
+    }
+
+
 
     public function newMessage()
     {
         $inbox = $this->client->getFolder('INBOX');
-
         $messages = $inbox->messages()->all()->get();
 
-        // Collect all message IDs from the emails
-        $messageIds = $messages->map(fn($message) => $message->getMessageId()[0])->toArray();
+        $newEmails = [];
 
-        // Fetch existing logs for these message IDs in bulk
-        $existingLogs = MailLog::whereIn('message_id', $messageIds)->get()->keyBy('message_id');
+        foreach ($messages as $message) {
+            $uid = $message->getUid();
+            $body = $message->getHTMLBody();
+            $dateSent = $message->getDate();
+            $subject = $message->getSubject()[0];
+            $senderArray = $message->getFrom();
+            $senderName = strval($senderArray[0]->personal);
+            $senderEmail = $senderArray[0]->mail;
 
-        // Find the first new message that is not in the existing logs
-        $newMessage = $messages->first(function ($message) use ($existingLogs) {
-            $messageId = $message->getMessageId()[0];
-            return !isset($existingLogs[$messageId]);
-        });
+            $header = $message->getHeader();
+            $messageId = $header->message_id[0];
+            $inReplyTo = $header->get('in-reply-to');
+            $references = $header->get('references');
 
-        // If there is a new message, create a log and format the response
-        if ($newMessage) {
-            $messageId = $newMessage->getMessageId()[0];
+            $flags = $message->getFlags();
 
-            // Create a new log entry for this message
-            $mailLog = MailLog::create([
-                "message_id" => $messageId,
-                "status" => "new"
-            ]);
+            $isRead = $flags->has('\\Seen');
 
-            // Prepare the response for the single new message
-            $email = [
-                'id' => $messageId,
-                'subject' => $newMessage->getSubject()[0],
-                'sender' => $newMessage->getFrom()[0]->mail,
-                'date' => $newMessage->getDate()[0]->toDateString(),
-                'time' => $newMessage->getDate()[0]->toTimeString(),
-                'datetime' => $newMessage->getDate()[0]->toDateTimeString(),
-                'name' => $newMessage->getFrom()[0]->personal, // Sender's name
-                'body' => $newMessage->getHTMLBody() ?? $newMessage->getTextBody(),
-                'status' => $mailLog->status
-            ];
+            $parentMessageId = null;
+            if ($inReplyTo) {
+                $parentMessageId = trim($inReplyTo[0], '<>');
+            } elseif ($references) {
+                $referencesList = explode(' ', trim($references[0]));
+                $parentMessageId = trim(end($referencesList), '<>');
+            }
 
-            return $email;
+            $existingMail = MailLog::where('message_id', $messageId)->first();
+
+            if (!$existingMail) {
+                $newMail = MailLog::create([
+                    'uid' => $uid,
+                    'message_id' => $messageId,
+                    'subject' => $subject,
+                    'sender' => $senderEmail,
+                    'name' => $senderName,
+                    'body' => $body,
+                    'datetime' => $dateSent[0]->toDateTimeString(),
+                    'parent_message_id' => $parentMessageId,
+                    'status' => $isRead ? 'read' : 'new',
+                ]);
+
+                $newEmails[] = $newMail;
+            }
         }
 
-        return null;
+        return $newEmails;
     }
 
+    public function markAsRead($uid)
+    {
+        $inbox = $this->client->getFolder('INBOX');
+        $message = $inbox->query()->getMessageByUid($uid);
+
+        if ($message) {
+            $message->setFlag(['\Seen']);
+
+            $messageId = $message->getMessageId();
+
+            $mailLog = MailLog::where('message_id', $messageId)->first();
+            if ($mailLog) {
+                $mailLog->status = 'read';
+                $mailLog->save();
+            }
+
+            $this->client->disconnect();
+
+            return response()->json(['status' => 'success', 'message' => 'Email marked as read and updated in database.']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
+    }
 
 
     public function store(Request $request)

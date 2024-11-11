@@ -7,12 +7,15 @@ import MailTable from '@/PageComponents/MailTable.vue';
 import Pagination from '@/PageComponents/Pagination.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import axios from 'axios';
 
 const createDialogVisible = ref(false);
 
-const props = defineProps(['mails', 'templates', 'from'])
+const props = defineProps(['templates', 'from'])
 
-const mails = ref(props?.mails);
+const loading = ref(false);  // Loading status
+
+const mails = ref({});
 
 const itemsPerPage = 10;
 
@@ -20,23 +23,21 @@ const selectedMail = ref(null);
 
 const page = ref(1);
 
-const totalPages = computed(() => Math.ceil(props?.mails?.length / itemsPerPage));
+const totalPages = ref(1);
 
 const isVisibleFloatButton = ref(false);
 
 const handlePageChange = (newPage) => {
   page.value = newPage;
-  console.log(page.value);
+  fetchEmails(newPage);
 };
-
-const paginatedMails = computed(() => {
-  const start = (page.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return mails.value.slice(start, end);
-});
 
 const handleRowSelected = (row) => {
   selectedMail.value = row;
+  if(row?.status == 'new')
+  {
+    markAsRead(row?.uid)
+  }
 };
 
 const  isActiveRoute = (name) =>  {
@@ -48,21 +49,52 @@ const removeRow = (row) => {
   selectedMail.value = null;
 };
 
+const fetchEmails = async (pageNumber = 1) => {
+  loading.value = true;
+
+  try {
+    const response = await axios.get(`/mails/inbox`, {
+      params: {
+        page: pageNumber,
+      },
+    });
+
+    mails.value = response.data.data;
+    totalPages.value = response.data.last_page;
+    page.value = response.data.current_page;
+  } catch (error) {
+    console.error('Error fetching emails:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+
+const markAsRead = async (uid) => {
+    try {
+        const response = await axios.post(`/mails/mark-as-read/${uid}`);
+        if (response.data.status === 'success') {
+            const mailItem = mails.value.find(mail => mail.uid === uid);
+            console.log(mailItem);
+            if (mailItem) {
+                mailItem.status = 'read'; // Update status locally
+            }
+        }
+    } catch (error) {
+        console.error('Failed to mark as read:', error);
+    }
+};
+
 
 onMounted(() => {
+  fetchEmails()
+
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
-        console.log(event);
-        if(event.mails != null)
+        if(event.mails.length > 0 && page.value == 1)
         {
-            const newMails = Array.isArray(event.mails) ? event.mails : [event.mails];
-
-            mails.value = [...newMails, ...mails.value];
-
-            console.log(mails.value);
-
-            totalPages.value = Math.ceil(mails.value.length / itemsPerPage);
+            mails.value = [...event.mails, ...mails.value];
         }
     })
     .error((error) => {
@@ -89,7 +121,7 @@ onUnmounted(() => {
                     <div class="py-6 text-gray-900" style="height: 100%;">
                         <VRow>
                             <VCol cols="12" lg="2">
-                                <div class="my-5 cursor-pointer">
+                                <div class="mb-5 cursor-pointer">
                                     <p :class="{ 'active-route': isActiveRoute('dashboard') }">
                                         Inbox ( {{ mails?.length ?? 0  }} )
                                     </p>
@@ -114,9 +146,9 @@ onUnmounted(() => {
                                     <p>Trash Can</p>
                                 </div>
                             </VCol>
-                            <VCol cols="12" :lg="selectedMail ? 6 : 10"
+                            <VCol cols="12" :lg="selectedMail ? 5 : 10"
                             >
-                                <div class="mt-5 mb-3">
+                                <div class="mb-3">
                                 <MailCreationDialog
                                     :createDialog="createDialogVisible"
                                     :floatButton="isVisibleFloatButton"
@@ -129,7 +161,7 @@ onUnmounted(() => {
 
                                 <div>
                                 <VCard style="border-radius: 20px;">
-                                    <MailTable :data="paginatedMails" @rowSelected="handleRowSelected" />
+                                    <MailTable :loading="loading" :data="mails" @rowSelected="handleRowSelected" />
                                     <Pagination
                                         :totalPages="totalPages"
                                         :currentPage="page"
@@ -142,7 +174,7 @@ onUnmounted(() => {
                             <VCol
                                 v-if="selectedMail"
                                 cols="12"
-                                lg="4"
+                                lg="5"
                             >
                                 <VCard class="mt-5" style="border-radius: 20px;">
                                 <MailDetail :mail="selectedMail" @handleRemoveRow="removeRow" />
