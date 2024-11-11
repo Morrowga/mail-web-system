@@ -22,7 +22,7 @@ const tableHeaders = ref([
 </script>
 
 <template>
-    <Head title="Folders" />
+    <Head :title="$t('nav.folders')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -32,7 +32,7 @@ const tableHeaders = ref([
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <VBtn color="primary" @click="router.get(route('folders.create'))">Folder</VBtn>
+                            <VBtn color="primary" @click="router.get(route('folders.create'))">{{ $t('') }}</VBtn>
                             <div class="my-5">
                                 <CustomizeTable
                                     :link="routeUrl"

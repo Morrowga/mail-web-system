@@ -8,8 +8,66 @@
     "nav": {
         "inbox": "受信トレイ",
         "template": "テンプレート",
-        "folder": "フォルダ",
+        "folders": "フォルダ",
         "profile": "プロフィール",
         "logout": "ログアウト"
+    },
+    "buttons": {
+        "tempalte_registration": "Template Registration",
+        "category_list": "Category List",
+        "registration": "Registration",
+        "create_category": "Create New Category",
+        "create_folder": "Create Folder",
+        "mailbox": "Mail Box",
+        "save": "Save",
+        "saved": "Saved",
+        "spam_signup": "Spam Signups",
+        "spam": "Spam",
+        "trash": "Trash",
+        "send": "Send"
+    },
+    "input": {
+        "name": "Name",
+        "email": "Email",
+        "current_password": "Current Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "search_character": "Search Character",
+        "method": "Method",
+        "details": "Details",
+        "title": "Title",
+        "subject": "Subject",
+        "folder": "Folder",
+        "select_folder": "Select Folder",
+        "select_category": "Select Category",
+        "message_content": "Message Content",
+        "address": "Address",
+        "from": "From",
+        "to": "To",
+        "attach_to_og": "Attach the original email",
+        "template": "Template",
+        "template_category": "Template Category",
+        "cc": "CC",
+        "bcc": "BCC",
+        "sent_datetime": "Sent Date and Time",
+        "person_in_charge": "Person In Charge",
+        "status": "Status"
+    },
+    "table": {
+        "status": "Status",
+        "sender": "Sender",
+        "subject": "Subject",
+        "datetime": "Datetime",
+        "name": "Name",
+        "description": "Description",
+        "copy": "Copy",
+        "delete": "Delete"
+    },
+   "other": {
+        "create_category_text": "Create a new template category",
+        "profile_information": "Profile Information",
+        "update_profile_text": "Update your account's profile information and email address.",
+        "update_password": "Update Password",
+        "update_password_text": "Ensure your account is using a long, random password to stay secure."
     }
 }

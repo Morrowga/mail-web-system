@@ -60,7 +60,7 @@ const { props } = usePage();
                                 :href="route('folders.index')"
                                 class="mx-5 layout-nav-text"
                             >
-                                {{ $t('nav.folder') }}
+                                {{ $t('nav.folders') }}
                             </NavLink>
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
