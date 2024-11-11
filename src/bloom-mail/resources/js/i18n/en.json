@@ -28,7 +28,10 @@
         "spam_signup": "Spam Signups",
         "spam": "Spam",
         "trash": "Trash",
-        "send": "Send"
+        "send": "Send",
+        "close": "Close",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
     },
     "input": {
         "name": "Name",
@@ -65,11 +68,17 @@
         "name": "Name",
         "description": "Description",
         "copy": "Copy",
-        "delete": "Delete"
+        "delete": "Delete",
+        "search": "Search",
+        "method": "Method"
     },
     "other": {
         "create_category_text": "Create a new template category",
         "profile_information": "Profile Information",
-        "update_profile_text": "Update your account's profile information and email address."
+        "update_profile_text": "Update your account's profile information and email address.",
+        "text_copied": "Text copied to clipboard !",
+        "failed_copy": "Failed to copy text.",
+        "delete_text": "Are you sure want to delete it ?",
+        "confirmation": "Confirmation"
     }
 }

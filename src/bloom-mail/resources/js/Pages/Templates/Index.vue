@@ -3,9 +3,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ConfirmDialog from '@/PageComponents/ConfirmDialog.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps(['template_categories']);
 
+const { t, locale } = useI18n();
 
 const snackbarVisible = ref(false);
 const snackbarMessage = ref("");
@@ -32,12 +34,12 @@ const toggleCollapse = (index) => {
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => {
-      snackbarMessage.value = "Text copied to clipboard!";
-      snackbarVisible.value = true;
+        snackbarMessage.value = t('other.text_copied');
+        snackbarVisible.value = true;
     })
     .catch((error) => {
-      snackbarMessage.value = "Failed to copy text.";
-      snackbarVisible.value = true;
+        snackbarMessage.value = t('other.failed_copy');
+        snackbarVisible.value = true;
       console.error('Error copying text: ', error);
     });
 }
@@ -76,12 +78,11 @@ const copyToClipboard = (text) => {
                                     <VExpandTransition>
                                         <VCardText v-if="!isCollapsed[index]" style="padding: 0;">
                                             <div
-                                            @click="router.get(route('templates.edit', template?.id))"
                                             v-for="(template, index) in category?.templates"
                                             :key="index"
                                             :class="['d-flex', 'justify-between', 'cursor-pointer', index % 2 === 0 ? 'self-card-text' : 'self-card-text-white']"
                                             >
-                                            <div>
+                                            <div @click="router.get(route('templates.edit', template?.id))">
                                                 <a class="a-underline-none font-bold">
                                                 {{ template?.title }}
                                                 </a>

@@ -68,7 +68,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="search" value="Search Character"/>
+                                                        <InputLabel for="search" :value="$t('input.search_character')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VTextField
@@ -87,7 +87,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="method" value="Method"/>
+                                                        <InputLabel for="method" :value="$t('input.method')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <v-radio-group
@@ -108,7 +108,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">Registration</VBtn>
+                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>

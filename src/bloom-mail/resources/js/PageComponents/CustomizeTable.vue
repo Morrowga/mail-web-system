@@ -2,6 +2,7 @@
 import { defineProps, ref } from 'vue';
 import { Head,router } from '@inertiajs/vue3';
 import ConfirmDialog from './ConfirmDialog.vue';
+import { useI18n } from 'vue-i18n';
 
 // Define the props that this component accepts
 const props = defineProps({
@@ -19,6 +20,7 @@ const props = defineProps({
   }
 });
 
+const { t, locale } = useI18n();
 const snackbarVisible = ref(false);
 const snackbarMessage = ref("");
 
@@ -26,11 +28,11 @@ const snackbarMessage = ref("");
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => {
-      snackbarMessage.value = "Text copied to clipboard!";
+      snackbarMessage.value = t('other.text_copied');
       snackbarVisible.value = true;
     })
     .catch((error) => {
-      snackbarMessage.value = "Failed to copy text.";
+      snackbarMessage.value = t('other.failed_copy');
       snackbarVisible.value = true;
       console.error('Error copying text: ', error);
     });
@@ -51,7 +53,7 @@ const copyToClipboard = (text) => {
                     {{ item[header.val] }} <!-- Assuming keys are in lower case -->
                 </td>
                 <td>
-                    <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">Copy</span>
+                    <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">{{ $t('table.copy') }}</span>
                     <span class="text-[#1b5d9b] font-[500]"> | </span>
                     <ConfirmDialog :item="item" :routeUrl="'/templates'" />
                     <!-- <span class="text-red font-bold cursor-pointer" @click="confirmDelete">Delete</span> -->
@@ -62,7 +64,7 @@ const copyToClipboard = (text) => {
     <VSnackbar v-model="snackbarVisible" :timeout="3000" color="info">
       {{ snackbarMessage }}
       <template v-slot:actions>
-        <VBtn text @click="snackbarVisible = false">Close</VBtn>
+        <VBtn text @click="snackbarVisible = false">{{ $t('buttons.close') }}</VBtn>
       </template>
     </VSnackbar>
 </template>

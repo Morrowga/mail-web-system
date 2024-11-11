@@ -51,13 +51,17 @@
         "bcc": "BCC",
         "sent_datetime": "Sent Date and Time",
         "person_in_charge": "Person In Charge",
-        "status": "Status"
+        "status": "Status",
+        "close": "Close",
+        "confirm": "Confirm"
     },
     "table": {
         "status": "Status",
         "sender": "Sender",
         "subject": "Subject",
         "datetime": "Datetime",
+        "search": "Search",
+        "method": "Method",
         "name": "Name",
         "description": "Description",
         "copy": "Copy",
@@ -68,6 +72,10 @@
         "profile_information": "Profile Information",
         "update_profile_text": "Update your account's profile information and email address.",
         "update_password": "Update Password",
-        "update_password_text": "Ensure your account is using a long, random password to stay secure."
+        "update_password_text": "Ensure your account is using a long, random password to stay secure.",
+        "text_copied": "Text copied to clipboard !",
+        "failed_copy": "Failed to copy text.",
+        "delete_text": "Are you sure want to delete it ?",
+        "confirmation": "Confirmation"
     }
 }
