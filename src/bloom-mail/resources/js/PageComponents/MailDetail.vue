@@ -1,12 +1,22 @@
 <script setup>
 import { ref } from 'vue';
 import MailThread from './MailThread.vue';
+import ReplyForwardDialog from './ReplyForwardDialog.vue';
 
 const props = defineProps({
     mail: Object,
 });
 
 const emit = defineEmits();
+
+const mailType = ref(null);
+
+const createDialogVisible = ref(false);
+
+const openDialog = (type) => {
+    mailType.value = type;
+    createDialogVisible.value = true;
+}
 
 const handleRemoveClick = () => {
   emit('handleRemoveRow');
@@ -25,7 +35,7 @@ const handleRemoveClick = () => {
             <VCol cols="12" lg="6">
                 <div class="icon-container">
                 <div class="icon-wrapper">
-                    <VIcon icon="mdi-arrow-left-top" class="icon-size" />
+                    <VIcon icon="mdi-arrow-left-top" @click="openDialog('reply')" class="icon-size cursor-pointer" />
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper">
@@ -33,7 +43,7 @@ const handleRemoveClick = () => {
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper">
-                    <VIcon icon="mdi-arrow-right-top" class="icon-size" />
+                    <VIcon icon="mdi-arrow-right-top" @click="openDialog('forward')" class="icon-size cursor-pointer" />
                     <div class="underline"></div>
                 </div>
                 </div>
@@ -66,6 +76,12 @@ const handleRemoveClick = () => {
             <hr style="opacity: 0.3;">
 
             <MailThread v-for="reply in props.mail.all_replies" :key="reply.id" :reply="reply" />
+            <ReplyForwardDialog
+                :createDialog="createDialogVisible"
+                @update:dialog="createDialogVisible = $event"
+                :type="mailType"
+                :from="props?.from"
+            />
         </div>
     </VCardText>
 </template>
