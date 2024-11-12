@@ -55,7 +55,7 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="email" value="$t('input.email')" />
+                <InputLabel for="email" :value="$t('input.email')" />
 
                 <TextInput
                     id="email"

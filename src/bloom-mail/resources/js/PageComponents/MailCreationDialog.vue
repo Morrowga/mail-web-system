@@ -93,8 +93,10 @@ onMounted(() => {
             <VCard>
                 <!-- Card Header with Icons -->
                 <VCardTitle class="d-flex justify-end align-center">
-                    <VSpacer></VSpacer>
-
+                    <div class="text-right">
+                        <VBtn class="spamtrashbtn">Spam</VBtn>
+                        <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
+                    </div>
                     <!-- Minimize Icon -->
                     <div class="icon-border d-flex justify-center align-items-center">
                         <VIcon
@@ -119,14 +121,14 @@ onMounted(() => {
                 <!-- Card Content -->
                 <VCardText>
                     <VRow dense>
-                        <VCol cols="12" md="12" sm="6">
+                        <!-- <VCol cols="12" md="12" sm="6">
                             <VDivider />
                             <div class="pb-2 pt-1 text-right">
                                 <VBtn class="spamtrashbtn">Spam</VBtn>
                                 <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
                             </div>
                             <VDivider />
-                        </VCol>
+                        </VCol> -->
                         <VCol cols="12" md="12" sm="6">
                             <VRow>
                                 <VCol cols="8">
@@ -223,7 +225,7 @@ onMounted(() => {
                             <VRow >
                                 <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
                             </VRow>
-                            <VDivider class="mt-2" />
+                            <VDivider class="" />
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
@@ -312,7 +314,7 @@ onMounted(() => {
                             </VRow>
                             <VDivider class="mt-2" />
                             <VRow>
-                                <VCol cols="12" class="mt-3">
+                                <VCol cols="10" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
                                         <div style="width: 100%;">
                                             <InputLabel value="Message Content" class="mb-3" for="message" />
@@ -324,18 +326,17 @@ onMounted(() => {
                                         </div>
                                     </div>
                                 </VCol>
+                                <VCol cols="2">
+                                    <div class="mx-5 my-5 d-flex justify-center" style="align-items: center; height: 100%;">
+                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
+                                    </div>
+                                </VCol>
                             </VRow>
                         </VCol>
                     </VRow>
                 </VCardText>
 
                 <!-- Card Actions -->
-                <VCardActions>
-                    <VSpacer></VSpacer>
-                    <!-- <VBtn text="Close" variant="plain" @click="dialog = false"></VBtn> -->
-                    <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important;"></VBtn>
-
-                </VCardActions>
                 </VCard>
         </VForm>
     </VDialog>

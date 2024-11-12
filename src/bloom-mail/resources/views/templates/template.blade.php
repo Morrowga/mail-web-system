@@ -7,7 +7,6 @@
     <title>{{ $data['subject'] }}</title>
 </head>
 <body>
-    <h1>{{ $data['message_content'] }}</h1>
-    <p>{{ $data['message_content'] }}</p>
+    <div>{{ $data['message_content'] }}</div>
 </body>
 </html>

@@ -121,12 +121,18 @@ class MailRepository implements MailRepositoryInterface
 
         foreach ($messages as $message) {
             $uid = $message->getUid();
-            $body = $message->getHTMLBody();
+            $body = $message->getHTMLBody() ?? $message->getTextBody();
             $dateSent = $message->getDate();
             $subject = $message->getSubject()[0];
             $senderArray = $message->getFrom();
-            $senderName = strval($senderArray[0]->personal);
-            $senderEmail = $senderArray[0]->mail;
+
+            if (!empty($senderArray) && isset($senderArray[0])) {
+                $senderName = strval($senderArray[0]->personal);
+                $senderEmail = $senderArray[0]->mail;
+            } else {
+                $senderName = 'Unknown Sender';
+                $senderEmail = 'unknown@example.com';
+            }
 
             $header = $message->getHeader();
             $messageId = $header->message_id[0];
@@ -163,8 +169,6 @@ class MailRepository implements MailRepositoryInterface
                 $newEmails[] = $newMail;
             }
         }
-
-        return $newEmails;
     }
 
     public function markAsRead($uid)

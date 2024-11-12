@@ -56,7 +56,7 @@ const handleRemoveClick = () => {
                         Attn:
                         <br>
                         <br>
-                        <span v-html="props?.mail?.body"></span>
+                        <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
                     </p>
                     <div>
                         <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
