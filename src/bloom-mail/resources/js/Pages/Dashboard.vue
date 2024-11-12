@@ -86,6 +86,8 @@ const removeRow = (row) => {
 };
 
 const fetchEmails = async () => {
+  removeRow()
+
   loading.value = true;
 
   try {

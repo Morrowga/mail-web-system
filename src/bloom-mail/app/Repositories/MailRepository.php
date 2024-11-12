@@ -184,7 +184,7 @@ class MailRepository implements MailRepositoryInterface
                 $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
-                $body = $threadMessage->getHTMLBody();
+                $body = $threadMessage->getHTMLBody() ?? $threadMessage->getTextBody();
 
                 $dateSent = $threadMessage->getDate()[0] ?? now();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
