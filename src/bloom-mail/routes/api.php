@@ -11,9 +11,12 @@ use App\Http\Controllers\Axio\MailController;
 use App\Http\Controllers\TemplateCategoryController;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('mails/inbox', [MailController::class, 'index'])
-        ->name('inbox-mails');
+    Route::get('mails/fetch', [MailController::class, 'index'])
+        ->name('fetch-mails');
 
-    Route::post('mails/mark-as-read/{uid}', [MailController::class, 'markAsRead'])
+    Route::get('mails/histories/{id}', [MailController::class, 'getHistories'])
+        ->name('histories');
+
+    Route::post('mails/mark-as-read/{id}', [MailController::class, 'markAsRead'])
         ->name('inbox-mark-as-read');
 });

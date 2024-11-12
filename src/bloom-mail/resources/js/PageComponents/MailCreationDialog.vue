@@ -62,6 +62,7 @@ const formSubmit = () => {
     form.post(route('mails.store'), {
         onSuccess: () => {
             form.reset();
+            emit('fetchMail')
             onClose();
         },
         onError: (error) => {

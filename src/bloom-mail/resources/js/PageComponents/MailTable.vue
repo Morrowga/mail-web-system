@@ -7,6 +7,11 @@ const props = defineProps({
     type: Array,
     required: true
   },
+  headers: {
+    type: Array,
+    required: true 
+  },
+  pageType: String,
   loading: Boolean,
 });
 
@@ -21,34 +26,33 @@ const handleRowClick = (row) => {
   <VTable class="status-table">
     <thead>
       <tr>
-        <th class="header-cell">Status</th>
-        <th class="header-cell">Sender</th>
-        <th class="header-cell">Subject</th>
-        <th>Date Time</th>
+        <th class="header-cell" v-for="header in headers" :key="header.value">
+          {{ header.name }}
+        </th>
       </tr>
     </thead>
+
     <tbody class="tbody-container">
-      <!-- Show a no data message if no emails are present -->
-      <tr v-if="!props.data.length && !loading">
-        <td colspan="4" class="text-center pt-5">
+      <tr v-if="!data.length && !loading">
+        <td :colspan="headers.length" class="text-center pt-5">
           No data available
         </td>
       </tr>
 
-      <!-- Show the email data if it exists -->
-      <tr v-else v-for="(email, index) in props.data" :key="index" @click="handleRowClick(email)" class="cursor-pointer">
-        <td>
-          <VChip :style="'background:' + getStatusColor(email.status) + '; color: #fff;'">
-            {{ email.status }}
-          </VChip>
+      <tr v-else v-for="(email, index) in data" :key="index" @click="handleRowClick(email)" class="cursor-pointer">
+        <td v-for="header in headers" :key="header.value" :style="{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }">
+          <template v-if="header.value === 'status' && pageType === 'inbox'">
+            <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
+              {{ email[header.value] }}
+            </VChip>
+          </template>
+          <template v-else>
+            {{ email[header.value] }}
+          </template>
         </td>
-        <td style="word-break: break-word; white-space: pre-wrap;">
-          {{ email.sender }}
-        </td>
-        <td>{{ email.subject }}</td>
-        <td>{{ email.datetime }}</td>
       </tr>
     </tbody>
+
     <!-- Overlay for Loading Spinner -->
     <div v-if="loading" class="loading-overlay">
       <v-progress-circular indeterminate color="blue"></v-progress-circular>

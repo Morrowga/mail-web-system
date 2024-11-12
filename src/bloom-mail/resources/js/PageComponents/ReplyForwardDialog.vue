@@ -1,15 +1,28 @@
 <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import { useForm } from '@inertiajs/vue3';
-import { onMounted, ref, watch } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed, onMounted, ref, watch } from 'vue';
+import MailThread from './MailThread.vue';
+
+const page = usePage();
 
 const props = defineProps({
     createDialog: Boolean,
     from: String,
     type: String,
-    mailData: Object
+    mailData: Object,
+    threads: Array
 });
+
+// Reactive reference for mail type
+const mail_type_value = computed(() => props.type);
+
+// Watch for changes in props.type and update mail_type_value accordingly
+watch(() => props.type, (newType) => {
+    mail_type_value.value = newType;
+});
+
 
 const formattedDateTime = ref(null);
 
@@ -21,13 +34,15 @@ const minimizeDialog = () => {
 
 const onClose = () => {
     emit('update:dialog', false);
-}
+};
 
 const form = useForm({
-    subject: "",
-    from: props?.from,
-    to: "",
-    message_content: ""
+    subject: props?.mailData?.subject,
+    from: page?.props?.from,
+    to: props?.mailData?.sender,
+    message_content: "",
+    og_message_id: props?.mailData?.message_id,
+    type: mail_type_value
 });
 
 const formatDateTime = () => {
@@ -38,7 +53,7 @@ const formatDateTime = () => {
 };
 
 const formSubmit = () => {
-    form.post(route('mails.store'), {
+    form.post(route('mails.reply-forward', props?.mailData?.id), {
         onSuccess: () => {
             form.reset();
             onClose();
@@ -52,7 +67,6 @@ const formSubmit = () => {
 onMounted(() => {
   formatDateTime();
 });
-
 </script>
 
 <template>
@@ -89,7 +103,7 @@ onMounted(() => {
                             </div>
                             <VDivider />
                         </VCol> -->
-                        <VCol cols="12" md="12" sm="6">
+                        <VCol cols="12" md="12" lg="12" sm="12">
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
@@ -164,6 +178,7 @@ onMounted(() => {
                                                 density="compact"
                                                 type="email"
                                                 required
+                                                readonly
                                                 hide-details
                                                 v-model="form.to"
                                             ></VTextField>
@@ -176,50 +191,22 @@ onMounted(() => {
                                         <div style="width: 50%; align-self: flex-end;">
                                             <span class="font-bold">Status</span>
                                         </div>
-                                        <div style="width: 50%; align-self: flex-end;">
-                                            ちは
+                                        <div style="width: 50%; align-self: flex-end;" class="text-capitalize">
+                                            {{ props?.mailData?.status }}
                                         </div>
                                     </div>
                                 </VCol>
                             </VRow>
-                            <VRow >
+                            <!-- <VRow >
                                 <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
-                            </VRow>
+                            </VRow> -->
+                            <VDivider class="mt-2" />
+                            <VCol cols="12" md="12" lg="12" sm="12" style="height: 40vh; overflow-y: auto;" >
+                                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
+                            </VCol>
                             <VDivider class="mt-2" />
                             <VRow>
-                                <VCol cols="8" class="mt-3">
-                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
-                                            <InputLabel value="To" for="to" />
-                                        </div>
-                                        <div style="width: 90%;">
-                                            <VTextField
-                                            v-model="form.to"
-                                            variant="outlined" density="compact" required hide-details
-                                            ></VTextField>
-                                        </div>
-                                    </div>
-                                </VCol>
-                            </VRow>
-                            <VDivider class="mt-2" />
-                            <VRow>
-                                <VCol cols="8" class="mt-3">
-                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
-                                            <InputLabel value="Subject" for="subject" />
-                                        </div>
-                                        <div style="width: 90%;">
-                                            <VTextField
-                                            v-model="form.subject"
-                                            variant="outlined" density="compact" hide-details
-                                            ></VTextField>
-                                        </div>
-                                    </div>
-                                </VCol>
-                            </VRow>
-                            <VDivider class="mt-2" />
-                            <VRow>
-                                <VCol cols="10" class="mt-3">
+                                <VCol cols="9" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
                                         <div style="width: 100%;">
                                             <InputLabel value="Message Content" class="mb-3" for="message" />
@@ -231,7 +218,7 @@ onMounted(() => {
                                         </div>
                                     </div>
                                 </VCol>
-                                <VCol cols="2">
+                                <VCol cols="3">
                                     <div class="mx-5 my-5 d-flex justify-center" style="align-items: center; height: 100%;">
                                         <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
                                     </div>

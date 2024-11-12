@@ -22,9 +22,16 @@ class MailController extends Controller
         return response()->json($mails);
     }
 
-    public function markAsRead(Request $request,$uid)
+    public function markAsRead(Request $request,$id)
     {
-        $response = $this->mailRepository->markAsRead($uid);
+        $response = $this->mailRepository->markAsRead($id);
+
+        return $response;
+    }
+
+    public function getHistories(Request $request,$id)
+    {
+        $response = $this->mailRepository->getHistories($id);
 
         return $response;
     }

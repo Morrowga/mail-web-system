@@ -23,8 +23,6 @@ class ProcessMails implements ShouldQueue
 
         $emails = $mailRepository->newMessage();
 
-        broadcast(new TakingMail($emails));
-
         Log::info('worked');
     }
 

@@ -20,8 +20,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/inbox',[MailController::class, 'index'])->name('dashboard');
+    Route::get('/home',[MailController::class, 'index'])->name('dashboard');
     Route::post('/mails',[MailController::class, 'store'])->name('mails.store');
+    Route::post('/mails/reply-forward/{mail_log}',[MailController::class, 'replyForward'])->name('mails.reply-forward');
+    Route::delete('/mails/delete/{mail_log}',[MailController::class, 'destroy'])->name('mails.delete');
+    Route::delete('/mails/sent/delete/{sent_mail}',[MailController::class, 'sentDestroy'])->name('mails.sent.delete');
 
 
     Route::get('/templates', function () {

@@ -2,25 +2,57 @@
 import { ref } from 'vue';
 import MailThread from './MailThread.vue';
 import ReplyForwardDialog from './ReplyForwardDialog.vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import MailConfirmDialog from './MailConfirmDialog.vue';
 
 const props = defineProps({
     mail: Object,
+    threads: Array,
+    threadLoading: Boolean,
+    pageType: String
 });
+
+const confirmDialog = ref(false);
 
 const emit = defineEmits();
 
 const mailType = ref(null);
+const form = useForm({});
 
 const createDialogVisible = ref(false);
 
 const openDialog = (type) => {
     mailType.value = type;
+    console.log(mailType.value)
     createDialogVisible.value = true;
 }
 
 const handleRemoveClick = () => {
   emit('handleRemoveRow');
 };
+
+const openConfirmDialog = () => {
+    confirmDialog.value = true
+}
+
+const handleDelete = async () => {
+    try {
+        let url = props?.pageType == 'inbox' ? `/mails/delete/${props?.mail?.id}` : `/mails/sent/delete/${props?.mail?.id}`;
+
+        form.delete(url, {
+            onSuccess: () => {
+                emit('handleRemoveRow');
+                emit('fetchagain');
+            },
+            onError: (error) => {
+                console.error("Form submission error:", error);
+            },
+        });
+    } catch (error) {
+        console.error('Failed to mark as read:', error);
+    }
+}
+
 </script>
 
 <template>
@@ -30,9 +62,9 @@ const handleRemoveClick = () => {
         </div>
         <VRow>
             <VCol cols="12" lg="2">
-                <VIcon icon="mdi-trash-can-outline" />
+                <VIcon icon="mdi-trash-can-outline" @click="openConfirmDialog()" />
             </VCol>
-            <VCol cols="12" lg="6">
+            <VCol cols="12" lg="6" v-if="props?.pageType == 'inbox'">
                 <div class="icon-container">
                 <div class="icon-wrapper">
                     <VIcon icon="mdi-arrow-left-top" @click="openDialog('reply')" class="icon-size cursor-pointer" />
@@ -54,34 +86,44 @@ const handleRemoveClick = () => {
                 </div>
             </VCol>
         </VRow>
-        <div class="my-4 mx-3">
+        <div class="my-4 mx-3" style="height: 70vh; overflow-y: auto;">
             <p class="mail-subject">{{ props?.mail?.subject }}</p>
             <div class="my-2">
-                <p>{{ props?.mail?.name }}</p>
-                <p >
-                    {{ props?.mail?.from }}
-                </p>
+
                 <div class="d-flex justify-between">
-                    <p>
+                    <div>
+                        <p>{{ props?.mail?.name }}</p>
+                        <p >
+                            {{ props?.mail?.from }}
+                        </p>
+                    </div>
+                    <!-- <p>
                         Attn:
                         <br>
                         <br>
                         <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
-                    </p>
-                    <div>
-                        <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
+                    </p> -->
+                    <div class="mb-2">
+                        <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
                     </div>
                 </div>
             </div>
             <hr style="opacity: 0.3;">
-
-            <MailThread v-for="reply in props.mail.all_replies" :key="reply.id" :reply="reply" />
+            <div v-if="threadLoading" class="loading-overlay d-flex justify-center my-5">
+                <v-progress-circular indeterminate color="blue"></v-progress-circular>
+            </div>
+            <div v-if="props?.pageType == 'inbox'">
+                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
+            </div>
             <ReplyForwardDialog
                 :createDialog="createDialogVisible"
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
+                :mailData="props?.mail"
+                :threads="props?.threads"
                 :from="props?.from"
             />
+            <MailConfirmDialog @handleDelete="handleDelete" :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
         </div>
     </VCardText>
 </template>

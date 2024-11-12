@@ -91,7 +91,7 @@ const form = useForm({
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">{{ $t('buttons.name')}}</PrimaryButton>
+                <PrimaryButton :disabled="form.processing">{{ $t('buttons.save')}}</PrimaryButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

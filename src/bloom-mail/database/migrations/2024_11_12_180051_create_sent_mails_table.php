@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mail_logs', function (Blueprint $table) {
+        Schema::create('sent_mails', function (Blueprint $table) {
             $table->id();
             $table->integer('uid')->nullable();
             $table->string('message_id')->nullable();
@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->longText('body')->nullable();
             $table->dateTime('datetime')->nullable();
-            $table->enum('status', ['new', 'read', 'confirming', 'pending', 'replying', 'confirmed', 'corresponding', 'deleted'])->default('new');
-
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mail_logs');
+        Schema::dropIfExists('sent_mails');
     }
 };

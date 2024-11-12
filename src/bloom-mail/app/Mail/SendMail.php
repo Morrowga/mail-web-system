@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class SendMail extends Mailable
@@ -15,9 +12,10 @@ class SendMail extends Mailable
 
     public $data;
 
-     /**
+    /**
      * Create a new message instance.
      *
+     * @param  array  $data
      * @return void
      */
     public function __construct($data)
@@ -26,40 +24,25 @@ class SendMail extends Mailable
     }
 
     /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: $this->data['subject'], // Set dynamic subject
-            from: $this->data['fromAddress'], // Set dynamic sender
-            to: $this->data['to'], // Set dynamic recipient
-            cc: $this->data['cc'], // Set cc if exists
-            bcc: $this->data['bcc'] // Set bcc if exists
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'templates.template', // Specify the view name
-            with: [
-                'message_content' => $this->data['message_content'],
-                'template_id' => $this->data['template_id'],
-            ]
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
+     * Build the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return \Illuminate\Mail\Mailable
      */
-    public function attachments(): array
+    public function build()
     {
-        return []; // Return attachments if needed
+        return $this->view('templates.template')
+                    ->subject($this->data['subject'])
+                    ->from($this->data['fromAddress'])
+                    ->to($this->data['to'])
+                    ->cc($this->data['cc'] ?? [])
+                    ->bcc($this->data['bcc'] ?? []) 
+                    ->with([
+                        'message_content' => $this->data['message_content'],
+                        'template_id' => $this->data['template_id'],
+                    ])
+                    // Add custom headers such as Message-ID
+                    ->withSwiftMessage(function ($message) {
+                        $message->getHeaders()->addTextHeader('Message-ID', $this->data['message_id']);
+                    });
     }
 }

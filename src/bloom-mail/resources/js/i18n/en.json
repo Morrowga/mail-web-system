@@ -78,6 +78,8 @@
         "update_profile_text": "Update your account's profile information and email address.",
         "text_copied": "Text copied to clipboard !",
         "failed_copy": "Failed to copy text.",
+        "update_password": "Change Password",
+        "update_password_text": "To keep your account secure, make sure you use a long, random password.",
         "delete_text": "Are you sure want to delete it ?",
         "confirmation": "Confirmation"
     }

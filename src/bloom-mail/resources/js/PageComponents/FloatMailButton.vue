@@ -18,7 +18,7 @@ const handleClick = () => {
 
       <!-- Floating Button -->
       <VBtn class="floating-button" @click="handleClick">
-        RE: [Ginza] xxx
+        New Message
       </VBtn>
     </div>
   </template>

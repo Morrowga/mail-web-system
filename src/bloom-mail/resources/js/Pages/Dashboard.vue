@@ -13,13 +13,53 @@ const createDialogVisible = ref(false);
 
 const props = defineProps(['templates', 'from'])
 
+const pageType = ref('inbox');
+
 const loading = ref(false);  // Loading status
 
 const mails = ref({});
 
+const headers = ref({
+    inbox: [
+        {
+            name: "Status",
+            value: "status"
+        },
+        {
+            name: "Sender",
+            value: "sender"
+        },
+        {
+            name: "Subject",
+            value: "subject"
+        },
+        {
+            name: "Datetime",
+            value: "datetime"
+        }
+    ],
+    sent: [
+        {
+            name: "Sender",
+            value: "sender"
+        },
+        {
+            name: "Subject",
+            value: "subject"
+        },
+        {
+            name: "Datetime",
+            value: "datetime"
+        }
+    ],
+});
+const countData = ref({})
+
 const itemsPerPage = 10;
 
 const selectedMail = ref(null);
+const selectedHistories = ref({})
+const threadLoading = ref(false);
 
 const page = ref(1);
 
@@ -34,34 +74,32 @@ const handlePageChange = (newPage) => {
 
 const handleRowSelected = (row) => {
   selectedMail.value = row;
+  getHistories(row.id)
   if(row?.status == 'new')
   {
-    markAsRead(row?.uid)
+    markAsRead(row?.id)
   }
 };
-
-const  isActiveRoute = (name) =>  {
-    return route().current(name);
-}
-
 
 const removeRow = (row) => {
   selectedMail.value = null;
 };
 
-const fetchEmails = async (pageNumber = 1) => {
+const fetchEmails = async () => {
   loading.value = true;
 
   try {
-    const response = await axios.get(`/mails/inbox`, {
+    const response = await axios.get(`/mails/fetch`, {
       params: {
-        page: pageNumber,
+        page: page.value ?? 1,
+        page_type: pageType.value
       },
     });
 
-    mails.value = response.data.data;
-    totalPages.value = response.data.last_page;
-    page.value = response.data.current_page;
+    mails.value = response.data.data.data;
+    totalPages.value = response.data.data.last_page;
+    page.value = response.data.data.current_page;
+    countData.value = response.data
   } catch (error) {
     console.error('Error fetching emails:', error);
   } finally {
@@ -70,11 +108,11 @@ const fetchEmails = async (pageNumber = 1) => {
 };
 
 
-const markAsRead = async (uid) => {
+const markAsRead = async (id) => {
     try {
-        const response = await axios.post(`/mails/mark-as-read/${uid}`);
+        const response = await axios.post(`/mails/mark-as-read/${id}`);
         if (response.data.status === 'success') {
-            const mailItem = mails.value.find(mail => mail.uid === uid);
+            const mailItem = mails.value.find(mail => mail.id === id);
             console.log(mailItem);
             if (mailItem) {
                 mailItem.status = 'read'; // Update status locally
@@ -85,6 +123,37 @@ const markAsRead = async (uid) => {
     }
 };
 
+const getHistories = async (id) => {
+
+  if(pageType.value != 'inbox')
+  {
+    return;
+  }
+
+  selectedHistories.value = {}
+  threadLoading.value = true;
+
+    try {
+        const response = await axios.get(`/mails/histories/${id}`);
+        if (response.data.status === 'success') {
+            selectedHistories.value = response.data.data;
+        }
+    } catch (error) {
+        console.error('Failed to get histories:', error);
+    } finally {
+        threadLoading.value = false;
+    }
+};
+
+const setPageType = (type) => {
+  pageType.value = type;
+  mails.value = {}
+  fetchEmails()
+};
+
+const goToSpam = () => {
+  router.get('/spams');
+};
 
 onMounted(() => {
   fetchEmails()
@@ -92,9 +161,9 @@ onMounted(() => {
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
-        if(event.mails.length > 0 && page.value == 1)
+        if(event.mails.length > 0 && page.value == 1 && pageType.value == 'inbox')
         {
-            mails.value = [...event.mails, ...mails.value];
+            fetchEmails()
         }
     })
     .error((error) => {
@@ -121,29 +190,33 @@ onUnmounted(() => {
                     <div class="py-6 text-gray-900" style="height: 100%;">
                         <VRow>
                             <VCol cols="12" lg="2">
-                                <div class="mb-5 cursor-pointer">
-                                    <p :class="{ 'active-route': isActiveRoute('dashboard') }">
-                                        Inbox ( {{ mails?.length ?? 0  }} )
+                               <!-- Inbox -->
+                                <div class="mb-5 cursor-pointer" @click="setPageType('inbox')">
+                                    <p :class="{ 'active-route': pageType === 'inbox' }">
+                                        Inbox ( {{ countData?.inbox ?? 0 }} )
                                     </p>
-                                    <!-- <div class="folder-path">
-                                        <p class="folder-item">├ Folder 1 (50)</p>
-                                        <div class="sub-folder">
-                                        <p class="folder-item">　├ Folder 2 (30)</p>
-                                        <p class="folder-item">　└ Folder 3 (20)</p>
-                                        </div>
-                                    </div> -->
                                 </div>
-                                <div class="my-10 cursor-pointer">
-                                    <p>Sent Mail</p>
+
+                                <!-- Sent Mail -->
+                                <div class="my-10 cursor-pointer" @click="setPageType('sent')">
+                                    <p :class="{ 'active-route': pageType === 'sent' }">
+                                        Sent Mail ( {{ countData?.sent ?? 0 }} )
+                                     </p>
                                 </div>
-                                <div class="my-10 cursor-pointer">
-                                    <p>Draf Email</p>
+
+                                <!-- Draft Email -->
+                                <div class="my-10 cursor-pointer" @click="setPageType('draft')">
+                                    <p :class="{ 'active-route': pageType === 'draft' }">Draft Email</p>
                                 </div>
-                                <div class="my-10 cursor-pointer">
-                                    <p @click="router.get('/spams')" style="cursor: pointer;">Spam</p>
+
+                                <!-- Spam: Navigates to Spam route -->
+                                <div class="my-10 cursor-pointer" @click="goToSpam">
+                                    <p :class="{ 'active-route': pageType === 'spam' }">Spam</p>
                                 </div>
-                                <div class="my-10 cursor-pointer">
-                                    <p>Trash Can</p>
+
+                                <!-- Trash Can -->
+                                <div class="my-10 cursor-pointer" @click="setPageType('trash')">
+                                    <p :class="{ 'active-route': pageType === 'trash' }">Trash Can</p>
                                 </div>
                             </VCol>
                             <VCol cols="12" :lg="selectedMail ? 5 : 10"
@@ -156,12 +229,13 @@ onUnmounted(() => {
                                     @update:visibleFloat="isVisibleFloatButton = $event"
                                     :templates="props?.templates"
                                     :from="props?.from"
+                                    @fetchMail="fetchEmails"
                                 />
                                 </div>
 
                                 <div>
                                 <VCard style="border-radius: 20px;">
-                                    <MailTable :loading="loading" :data="mails" @rowSelected="handleRowSelected" />
+                                    <MailTable :headers="headers[pageType]" :pageType="pageType" :loading="loading" :data="mails" @rowSelected="handleRowSelected" />
                                     <Pagination
                                         :totalPages="totalPages"
                                         :currentPage="page"
@@ -177,7 +251,7 @@ onUnmounted(() => {
                                 lg="5"
                             >
                                 <VCard class="mt-5" style="border-radius: 20px;">
-                                <MailDetail :mail="selectedMail" @handleRemoveRow="removeRow" />
+                                    <MailDetail :pageType="pageType" :threads="selectedHistories" :threadLoading="threadLoading" :mail="selectedMail" @handleRemoveRow="removeRow" @fetchagain="fetchEmails" />
                                 </VCard>
                             </VCol>
                         </VRow>

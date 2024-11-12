@@ -12,9 +12,8 @@ import { createI18n } from 'vue-i18n';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-
 const i18n = createI18n({
-    locale: 'en',
+    locale: import.meta.env.VITE_APP_LOCALE,
     messages: {
         en,
         jp
