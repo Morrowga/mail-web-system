@@ -7,6 +7,6 @@
     <title>{{ $data['subject'] }}</title>
 </head>
 <body>
-    <div>{{ $data['message_content'] }}</div>
+    <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $data['message_content'] !!}</span>
 </body>
 </html>

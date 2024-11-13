@@ -8,13 +8,14 @@ const props = defineProps({
 createDialog: Boolean,
 floatButton: Boolean,
 templates: Array,
-from: String
+from: String,
+label: String
 });
 
 const dialog = ref(props.createDialog);
 const formattedDateTime = ref(null);
 
-const emit = defineEmits(['update:dialog', 'update:visibleFloat']);
+const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue']);
 
 watch(() => props.createDialog, (newVal) => {
     dialog.value = newVal;
@@ -47,6 +48,10 @@ const form = useForm({
     bcc: "",
     message_content: ""
 })
+
+const handleSubjectChange = (event) => {
+  emit('update:labelValue', event.target.value);
+};
 
 const formatDateTime = () => {
   const currentDate = new Date();
@@ -143,6 +148,7 @@ onMounted(() => {
                                                 density="compact"
                                                 required
                                                 v-model="form.subject"
+                                                 @change="handleSubjectChange"
                                                 hide-details
                                             ></VTextField>
                                             <InputError class="mt-1" :message="form.errors.subject" />

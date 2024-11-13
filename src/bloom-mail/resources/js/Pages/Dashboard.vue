@@ -15,6 +15,8 @@ const props = defineProps(['templates', 'from'])
 
 const pageType = ref('inbox');
 
+const label = ref('New Message');
+
 const loading = ref(false);  // Loading status
 
 const mails = ref({});
@@ -225,6 +227,8 @@ onUnmounted(() => {
                             >
                                 <div class="mb-3">
                                 <MailCreationDialog
+                                    :label="label"
+                                    @update:labelValue="label = $event"
                                     :createDialog="createDialogVisible"
                                     :floatButton="isVisibleFloatButton"
                                     @update:dialog="createDialogVisible = $event"
@@ -261,6 +265,7 @@ onUnmounted(() => {
                 </div>
             </div>
             <FloatMailButton
+                :label="label"
                 v-if="isVisibleFloatButton"
                 @update:onOpenDialog="createDialogVisible = $event"
                 @update:hideFloat="isVisibleFloatButton = $event"

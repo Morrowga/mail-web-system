@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 const props = defineProps({
+    label: String
 });
 
 const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat']);
@@ -9,16 +10,17 @@ const handleClick = () => {
     emit('update:onOpenDialog', true);
     emit('update:hideFloat', false);
 };
+
+const truncatedLabel = computed(() => {
+  return props.label && props.label.length > 20 ? props.label.slice(0, 20) + '...' : props.label;
+});
 </script>
 
 
 <template>
     <div>
-      <!-- Your other content goes here -->
-
-      <!-- Floating Button -->
       <VBtn class="floating-button" @click="handleClick">
-        New Message
+        {{ truncatedLabel }}
       </VBtn>
     </div>
   </template>
