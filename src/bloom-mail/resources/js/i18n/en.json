@@ -88,6 +88,7 @@
         "update_password": "Change Password",
         "update_password_text": "To keep your account secure, make sure you use a long, random password.",
         "delete_text": "Are you sure want to delete it ?",
-        "confirmation": "Confirmation"
+        "confirmation": "Confirmation",
+        "new_message": "New Message"
     }
 }

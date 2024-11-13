@@ -18,7 +18,7 @@ const { t, locale } = useI18n();
 
 const pageType = ref('inbox');
 
-const label = ref('New Message');
+const label = ref(t('other.new_message'));
 
 const loading = ref(false);  // Loading status
 

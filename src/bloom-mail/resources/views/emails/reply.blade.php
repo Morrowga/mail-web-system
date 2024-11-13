@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
 </head>
 <body>
-    <p>{{ $emailData['message_content'] }}</p>
+    <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $emailData['message_content'] !!}</span>
 
     <hr>
 

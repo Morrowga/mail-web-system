@@ -274,27 +274,36 @@ class MailRepository implements MailRepositoryInterface
 
     public function forward(Request $request, MailLog $mail_log)
     {
-        $emailData = [
-            'subject' => "Fwd: " . $mail_log->subject,
-            'from' => $request->from,
-            'to' => $request->to,
-            'message_content' => $request->message_content,
-        ];
+        try {
+            $emailData = [
+                'subject' => "Fwd: " . $mail_log->subject,
+                'from' => $request->from,
+                'to' => $request->to,
+                'message_content' => $request->message_content,
+            ];
 
-        $originalEmail = [
-            'sender' => $mail_log->sender,
-            'datetime' => $mail_log->datetime,
-            'subject' => $mail_log->subject,
-            'body' => $this->cleanHtmlContent($mail_log->body),
-        ];
+            $originalEmail = [
+                'sender' => $mail_log->sender,
+                'datetime' => $mail_log->datetime,
+                'subject' => $mail_log->subject,
+                'body' => $this->cleanHtmlContent($mail_log->body),
+            ];
 
-        Mail::send('emails.forward', compact('emailData', 'originalEmail'), function ($message) use ($emailData) {
-            $message->from($emailData['from'])
-                    ->to($emailData['to'])
-                    ->subject($emailData['subject']);
-        });
+            // Logging to check if data is correct
+            Log::info('Sending forward email', $emailData);
 
-        return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
+            Mail::send('emails.forward', compact('emailData', 'originalEmail'), function ($message) use ($emailData) {
+                $message->from($emailData['from'])
+                        ->to($emailData['to'])
+                        ->subject($emailData['subject']);
+            });
+
+            return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
+        } catch (\Exception $e) {
+            // Log the error if email sending fails
+            Log::error('Error sending forward email: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
+        }
     }
 
     public function deleteForever(MailLog $mailLog)

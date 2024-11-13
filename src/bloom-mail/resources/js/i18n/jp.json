@@ -7,7 +7,7 @@
     },
     "nav": {
         "inbox": "受信トレイ",
-        "home": "ホームページ",
+        "home": "ホーム",
         "template": "テンプレート",
         "folders": "フォルダ",
         "profile": "プロフィール",
@@ -90,6 +90,7 @@
         "text_copied": "テキストがクリップボードにコピーされました！",
         "failed_copy": "テキストのコピーに失敗しました。",
         "delete_text": "本当にこれを削除されますか?",
-        "confirmation": "確認"
+        "confirmation": "確認",
+        "new_message": "新しいメッセージ"
     }
 }

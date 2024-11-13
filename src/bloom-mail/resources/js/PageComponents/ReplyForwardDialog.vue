@@ -76,22 +76,27 @@ onMounted(() => {
     <VDialog v-model="props.createDialog" max-width="1250" @update:modelValue="(val) => emit('update:dialog', val)">
         <VForm @submit.prevent="formSubmit">
             <VCard>
-                <VCardTitle class="d-flex justify-end align-center">
-                    <div class="icon-border d-flex justify-center align-items-center">
-                        <VIcon
-                            icon="mdi-minus"
-                            class="minimize-icon"
-                            style="color: #a5a5a5; font-weight: bold;"
-                            @click="minimizeDialog"
-                        ></VIcon>
-                    </div>
-                    <div class="icon-border text-center">
-                        <VIcon
-                            icon="mdi-close"
-                            class="close-icon"
-                            style="color: #a5a5a5; font-weight: bold;"
-                            @click="onClose"
-                        ></VIcon>
+                <VCardTitle class="d-flex justify-between align-center">
+                    <h3>
+                        {{ mail_type_value == 'reply' ? 'Reply Form' : 'Forward Form'}}
+                    </h3>
+                    <div class="d-flex justify-end">
+                        <div class="icon-border d-flex justify-center align-items-center">
+                            <VIcon
+                                icon="mdi-minus"
+                                class="minimize-icon"
+                                style="color: #a5a5a5; font-weight: bold;"
+                                @click="minimizeDialog"
+                            ></VIcon>
+                        </div>
+                        <div class="icon-border text-center">
+                            <VIcon
+                                icon="mdi-close"
+                                class="close-icon"
+                                style="color: #a5a5a5; font-weight: bold;"
+                                @click="onClose"
+                            ></VIcon>
+                        </div>
                     </div>
                 </VCardTitle>
 
