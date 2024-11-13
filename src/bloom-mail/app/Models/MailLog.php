@@ -11,4 +11,9 @@ class MailLog extends Model
 
     protected $fillable = ['message_id', 'status', 'body', 'sender', 'subject','name','uid', 'datetime'];
 
+
+    public function mail_histories()
+    {
+        return $this->hasMany(SentMail::class, 'parent_id');
+    }
 }

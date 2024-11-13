@@ -35,6 +35,10 @@ const handleRemoveClick = () => {
   emit('handleRemoveRow');
 };
 
+const loadThread = (id) => {
+    emit('getThreads', id)
+}
+
 const openConfirmDialog = () => {
     confirmDialog.value = true
 }
@@ -75,7 +79,7 @@ const handleDelete = async () => {
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper">
-                    <VIcon icon="mdi-sync" class="icon-size" />
+                    <VIcon icon="mdi-sync" class="icon-size" @click="loadThread(props?.mail?.id)" />
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper">
@@ -126,6 +130,7 @@ const handleDelete = async () => {
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
                 :mailData="props?.mail"
+                @handleLoadThread="loadThread(props?.mail?.id)"
                 :threads="props?.threads"
                 :from="props?.from"
             />

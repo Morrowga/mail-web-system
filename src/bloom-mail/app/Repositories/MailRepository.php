@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use DateTime;
 use Carbon\Carbon;
 use App\Models\Reply;
 use App\Mail\SendMail;
@@ -58,7 +59,7 @@ class MailRepository implements MailRepositoryInterface
 
         switch ($pageType) {
             case 'sent':
-                $data = SentMail::orderBy('datetime', 'desc')->paginate(10);
+                $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->paginate(10);
                 break;
 
             case 'inbox':
@@ -168,6 +169,7 @@ class MailRepository implements MailRepositoryInterface
     public function getHistories($id)
     {
         $mailLog = MailLog::find($id);
+
         $inbox = $this->client->getFolder('INBOX');
         $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
@@ -176,6 +178,7 @@ class MailRepository implements MailRepositoryInterface
         if ($message) {
             $threadMessages = $message->thread($inbox);
 
+            // Collect thread message data
             foreach ($threadMessages as $threadMessage) {
                 $uid = $threadMessage->getUid();
                 $messageId = $threadMessage->getMessageId()[0];
@@ -184,12 +187,14 @@ class MailRepository implements MailRepositoryInterface
                 $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
+                // Check if the message has an HTML body, otherwise use plain text
                 if ($threadMessage->hasHTMLBody()) {
                     $body = $threadMessage->getHTMLBody();
                 } else {
                     $body = $threadMessage->getTextBody();
                 }
 
+                // Get the date the message was sent, fallback to current time if not available
                 $dateSent = $threadMessage->getDate()[0] ?? now();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
 
@@ -205,10 +210,18 @@ class MailRepository implements MailRepositoryInterface
                 ];
             }
 
+            $systemMailHistories = $mailLog->mail_histories->toArray();
+
+            $mergedHistories = array_merge($histories, $systemMailHistories);
+
+            usort($mergedHistories, function ($a, $b) {
+                return strtotime($a['datetime']) - strtotime($b['datetime']);
+            });
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Email histories fetched successfully.',
-                'data' => $histories,
+                'data' => $mergedHistories,
             ]);
         } else {
             return response()->json([
@@ -217,40 +230,30 @@ class MailRepository implements MailRepositoryInterface
             ], 404);
         }
     }
+
+
     public function reply(Request $request, MailLog $mail_log)
     {
-        // Validate the incoming request
-        $validated = $request->validate([
-            'og_message_id' => 'required|exists:mail_logs,message_id',
-            'subject' => 'required|string',
-            'from' => 'required|email',
-            'to' => 'required|email',
-            'message_content' => 'required|string',
-        ]);
+        $originalEmail = MailLog::where('message_id', $request->og_message_id)->first();
 
-        // Fetch the original email details
-        $originalEmail = MailLog::where('message_id', $request->og_message_id)->first(); // Using message_id, assuming it's unique
-
-        // Ensure the original email exists
         if (!$originalEmail) {
             return $this->error('Original email not found.');
         }
 
-        // Prepare email data
         $emailData = [
-            'subject' => $request->subject, // Prefix "Re: " for the reply subject
+            'subject' => $request->subject,
             'from' => $request->from,
             'to' => $request->to,
             'message_content' => $request->message_content,
-            'in_reply_to' => $originalEmail->message_id, // Use the message_id of the original email
-            'references' => $originalEmail->message_id, // Add references to the original message
+            'in_reply_to' => $originalEmail->message_id,
+            'references' => $originalEmail->message_id,
         ];
 
         try {
             // Send the reply email
             Mail::send('emails.reply', [
                 'emailData' => $emailData,
-                'originalEmail' => $originalEmail, // Pass original email to the view
+                'originalEmail' => $originalEmail,
             ], function ($message) use ($emailData) {
                 $message->from($emailData['from'])
                         ->to($emailData['to'])
@@ -260,12 +263,19 @@ class MailRepository implements MailRepositoryInterface
                         ->addTextHeader('References', '<' . $emailData['references'] . '>');
             });
 
+            SentMail::create([
+                'subject' => $emailData['subject'],
+                'sender' => $emailData['from'],
+                'body' => $emailData['message_content'],
+                'parent_id' => $originalEmail->id,
+                'type' => 'reply',
+                'datetime' => Carbon::now(),
+            ]);
+
             return $this->success('Email Sent.');
         } catch (\Exception $e) {
-            // Log the error if mail fails
             \Log::error('Error sending reply email: ' . $e->getMessage());
 
-            // Return failure response
             return $this->error('Failed to send reply email.');
         }
     }
@@ -289,7 +299,6 @@ class MailRepository implements MailRepositoryInterface
                 'body' => $this->cleanHtmlContent($mail_log->body),
             ];
 
-            // Logging to check if data is correct
             Log::info('Sending forward email', $emailData);
 
             Mail::send('emails.forward', compact('emailData', 'originalEmail'), function ($message) use ($emailData) {
@@ -297,6 +306,30 @@ class MailRepository implements MailRepositoryInterface
                         ->to($emailData['to'])
                         ->subject($emailData['subject']);
             });
+
+            $forwardedBody = "
+            <div style='margin: 0; padding: 0;'>
+                <p style='margin: 0; padding: 0;'><strong>Forwarded message</strong></p>
+                <p style='margin: 5px 0; padding: 0;'><strong>From:</strong> " . e($from) . "</p>
+                <p style='margin: 5px 0; padding: 0;'><strong>Date:</strong> " . e($mail_log->datetime) . "</p>
+                <p style='margin: 5px 0; padding: 0;'><strong>Subject:</strong> " . e($mail_log->subject) . "</p>
+                <p style='margin: 5px 0; padding: 0;'><strong>Body:</strong></p>
+                <div style='margin: 0; padding: 0;'>" . e($this->cleanHtmlContent($mail_log->body)) . "</div>
+            </div>
+            <hr>
+            <div style='margin: 0; padding: 0;'>
+                <p>" . e($request->message_content) . "</p>
+            </div>";
+
+
+            SentMail::create([
+                'subject' => $emailData['subject'],
+                'sender' => $emailData['from'],
+                'body' => $forwardedBody,
+                'parent_id' => $mail_log->id,
+                'type' => 'forward',
+                'datetime' => now(),
+            ]);
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
         } catch (\Exception $e) {
@@ -376,6 +409,7 @@ class MailRepository implements MailRepositoryInterface
                 'name' => $request->from_name ?? env('IMAP_USERNAME'),
                 'body' => $data['message_content'],
                 'datetime' => now(),
+                'type' => 'sent',
                 'message_id' => $messageId,
             ]);
 

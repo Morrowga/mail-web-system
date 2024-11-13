@@ -260,7 +260,7 @@ onUnmounted(() => {
                                 lg="5"
                             >
                                 <VCard class="mt-5" style="border-radius: 20px;">
-                                    <MailDetail :pageType="pageType" :threads="selectedHistories" :threadLoading="threadLoading" :mail="selectedMail" @handleRemoveRow="removeRow" @fetchagain="fetchEmails" />
+                                    <MailDetail @getThreads="getHistories" :pageType="pageType" :threads="selectedHistories" :threadLoading="threadLoading" :mail="selectedMail" @handleRemoveRow="removeRow" @fetchagain="fetchEmails" />
                                 </VCard>
                             </VCol>
                         </VRow>

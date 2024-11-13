@@ -20,6 +20,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->longText('body')->nullable();
             $table->dateTime('datetime')->nullable();
+            $table->foreignId('parent_id')
+            ->nullable()
+            ->references('id')
+            ->on('mail_logs')->onDelete('cascade');
+            $table->enum('type', ['sent', 'reply', 'forward']);
             $table->timestamps();
         });
     }

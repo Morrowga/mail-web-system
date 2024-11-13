@@ -35,6 +35,7 @@ const minimizeDialog = () => {
 };
 
 const onClose = () => {
+    emit('handleLoadThread', props?.mailData?.id)
     emit('update:dialog', false);
 };
 
