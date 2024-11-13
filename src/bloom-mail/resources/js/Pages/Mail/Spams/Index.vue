@@ -3,14 +3,17 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps(['spams'])
 
 const routeUrl = ref('/spams')
 
+const { t, locale } = useI18n();
+
 const tableHeaders = ref([
    {
-     header: "Address",
+     header: t('input.address'),
      val: "mail_address"
    }
 ]);

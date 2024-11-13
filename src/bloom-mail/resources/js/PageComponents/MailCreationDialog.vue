@@ -130,14 +130,6 @@ onMounted(() => {
                 <!-- Card Content -->
                 <VCardText>
                     <VRow dense>
-                        <!-- <VCol cols="12" md="12" sm="6">
-                            <VDivider />
-                            <div class="pb-2 pt-1 text-right">
-                                <VBtn class="spamtrashbtn">Spam</VBtn>
-                                <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
-                            </div>
-                            <VDivider />
-                        </VCol> -->
                         <VCol cols="12" md="12" sm="6">
                             <VRow>
                                 <VCol cols="8">
@@ -221,7 +213,7 @@ onMounted(() => {
                                         </div>
                                     </div>
                                 </VCol>
-                                <VCol cols="4">
+                                <!-- <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
                                             <span class="font-bold">{{ $t('input.status') }}</span>
@@ -230,10 +222,7 @@ onMounted(() => {
                                             ちは
                                         </div>
                                     </div>
-                                </VCol>
-                            </VRow>
-                            <VRow >
-                                <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
+                                </VCol> -->
                             </VRow>
                             <VDivider class="" />
                             <VRow>

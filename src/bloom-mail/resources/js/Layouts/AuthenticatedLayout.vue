@@ -23,20 +23,23 @@ const { props } = usePage();
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 50%;">
-                            <VTextField
-                                :loading="loading"
-                                prepend-inner-icon="mdi-magnify"
-                                density="compact"
-                                variant="solo"
-                                hide-details
-                                single-line
-                                @click:append-inner="onClick"
-                            ></VTextField>
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 10%;">
+                            <h5 style="color: #fff;">メールボックス</h5>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 50%;">
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-center" style="width: 90%;">
                             <!-- Settings Dropdown -->
+                            <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 55%;">
+                                <VTextField
+                                    :loading="loading"
+                                    prepend-inner-icon="mdi-magnify"
+                                    density="compact"
+                                    variant="solo"
+                                    hide-details
+                                    single-line
+                                    @click:append-inner="onClick"
+                                ></VTextField>
+                            </div>
 
                             <NavLink
                                 class="mx-5 layout-nav-text d-flex align-center"
@@ -162,16 +165,36 @@ const { props } = usePage();
                         class="border-t border-gray-200 pb-1"
                     >
                     <div class="space-y-1">
-                            <!-- <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink> -->
                             <ResponsiveNavLink
+                                class="layout-nav-text"
+                                :href="route('dashboard')"
+                            >
+                                {{ $t('nav.inbox') }}
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="layout-nav-text"
+                                :href="route('templates.index')"
+                            >
+                                {{ $t('nav.template') }}
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="layout-nav-text"
+                                :href="route('folders.index')"
+                            >
+                                {{ $t('nav.folders') }}
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="layout-nav-text"
+                                :href="route('profile.edit')"
+                            >
+                                {{ $t('nav.profile') }}
+                            </ResponsiveNavLink>
+                            <!-- <ResponsiveNavLink
                                 class="layout-nav-text"
                                 :href="route('dashboard')"
                                 as="button"
                             >
-                                <!-- Dashboard -->
-                            </ResponsiveNavLink>
+                            </ResponsiveNavLink> -->
                         </div>
 
                         <div class="px-4">
@@ -213,7 +236,7 @@ const { props } = usePage();
             </header>
 
             <!-- Page Content -->
-            <main style="padding-top: 8vh;">
+            <main style="padding-top: 8vh; padding-left: 2vh; padding-right: 2vh;">
                 <slot />
             </main>
         </div>
@@ -222,6 +245,7 @@ const { props } = usePage();
 
 <style>
 .layout-nav-text{
-    color: #fff;
+    color: #fff !important;
+    text-decoration: none !important;
 }
 </style>

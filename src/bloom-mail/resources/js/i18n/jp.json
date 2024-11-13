@@ -2,7 +2,7 @@
     "auth": {
         "login_id": "ログイン識別",
         "password": "パスワード",
-        "remember_me": "私を覚えてますか",
+        "remember_me": "ログイン状態を保持",
         "login": "ログイン"
     },
     "nav": {
@@ -23,7 +23,7 @@
         "registration": "登録",
         "create_category": "新規カテゴリ追加",
         "create_folder": "フォルダー登録",
-        "mailbox": "メールボックス",
+        "mailbox": "新規メール",
         "save": "更新",
         "saved": "更新されました",
         "spam_signup": "迷惑メール登録",
