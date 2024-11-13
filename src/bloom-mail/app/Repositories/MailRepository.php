@@ -54,7 +54,7 @@ class MailRepository implements MailRepositoryInterface
 
         $pageType = request()->query('page_type');
 
-        $sent = SentMail::orderBy('datetime', 'desc')->count();
+        $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
         $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
 
         switch ($pageType) {

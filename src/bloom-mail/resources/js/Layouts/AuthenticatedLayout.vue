@@ -23,11 +23,11 @@ const { props } = usePage();
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 10%;">
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 8%;">
                             <h5 style="color: #fff;">メールボックス</h5>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-center" style="width: 90%;">
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-center" style="width: 92%;">
                             <!-- Settings Dropdown -->
                             <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 55%;">
                                 <VTextField
