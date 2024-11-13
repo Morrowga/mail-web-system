@@ -97,16 +97,16 @@ const handleDelete = async () => {
                             {{ props?.mail?.from }}
                         </p>
                     </div>
-                    <!-- <p>
-                        Attn:
-                        <br>
-                        <br>
-                        <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
-                    </p> -->
                     <div class="mb-2">
                         <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
                     </div>
                 </div>
+                <p v-if="props?.pageType == 'sent'" class="my-3">
+                    Attn:
+                    <br>
+                    <br>
+                    <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
+                </p>
             </div>
             <hr style="opacity: 0.3;">
             <div v-if="threadLoading" class="loading-overlay d-flex justify-center my-5">

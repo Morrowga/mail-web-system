@@ -57,7 +57,7 @@ const copyToClipboard = (text) => {
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <VBtn class="text-capitalize" color="primary" @click="router.get(route('templates.create'))">Template Registration</VBtn>
+                            <VBtn class="text-capitalize" color="primary" @click="router.get(route('templates.create'))">{{$t('buttons.template_registration')}}</VBtn>
                             <VBtn color="primary" class="mx-2 text-capitalize" @click="router.get('/template-categories')">Category List</VBtn>
                             <div class="my-5" v-for="(category, index) in props?.template_categories" :key="category?.id">
                                 <VCard>
