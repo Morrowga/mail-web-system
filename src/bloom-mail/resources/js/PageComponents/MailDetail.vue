@@ -4,6 +4,8 @@ import MailThread from './MailThread.vue';
 import ReplyForwardDialog from './ReplyForwardDialog.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import MailConfirmDialog from './MailConfirmDialog.vue';
+import { useI18n } from 'vue-i18n';
+import { getTranslatedStatus } from '@/Helper/status';
 
 const props = defineProps({
     mail: Object,
@@ -13,6 +15,8 @@ const props = defineProps({
 });
 
 const confirmDialog = ref(false);
+
+const { t, locale } = useI18n();
 
 const emit = defineEmits();
 
@@ -98,7 +102,9 @@ const handleDelete = async () => {
                         </p>
                     </div>
                     <div class="mb-2">
-                        <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">{{ props?.mail?.status }}</VBtn>
+                        <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">
+                            {{ getTranslatedStatus(t, props?.mail?.status) }}
+                        </VBtn>
                     </div>
                 </div>
                 <p v-if="props?.pageType == 'sent'" class="my-3">

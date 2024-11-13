@@ -47,7 +47,7 @@ const copyToClipboard = (text) => {
 </script>
 
 <template>
-    <Head title="Templates" />
+    <Head :title="$t('nav.template')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -58,7 +58,7 @@ const copyToClipboard = (text) => {
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
                             <VBtn class="text-capitalize" color="primary" @click="router.get(route('templates.create'))">{{$t('buttons.template_registration')}}</VBtn>
-                            <VBtn color="primary" class="mx-2 text-capitalize" @click="router.get('/template-categories')">Category List</VBtn>
+                            <VBtn color="primary" class="mx-2 text-capitalize" @click="router.get('/template-categories')">{{$t('buttons.category_list')}}</VBtn>
                             <div class="my-5" v-for="(category, index) in props?.template_categories" :key="category?.id">
                                 <VCard>
                                     <!-- Card Title -->
@@ -88,7 +88,7 @@ const copyToClipboard = (text) => {
                                                 </a>
                                             </div>
                                             <div>
-                                                <span class="text-[#1b5d9b] font-[500] cursor-pointer" @click="copyToClipboard(template.title)">Copy</span>
+                                                <span class="text-[#1b5d9b] font-[500] cursor-pointer" @click="copyToClipboard(template.title)">{{ $t('table.copy')}}</span>
                                                 <span class="text-[#1b5d9b] font-[500] cursor-pointer "> | </span>
                                                 <ConfirmDialog :item="template" :routeUrl="'/templates'" />
                                             </div>

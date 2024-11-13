@@ -1,8 +1,5 @@
-// status.js
-
-// Function to get the color based on the status
+// statusHelper.js
 export function getStatusColor(status) {
-    let fixedStatus = status;
     // Define a mapping of statuses to colors
     const statusColors = {
         'new': '#fc0214',
@@ -15,5 +12,24 @@ export function getStatusColor(status) {
     };
 
     // Return the color associated with the status or a default color if the status is unknown
-    return statusColors[fixedStatus] || '#000000';
+    return statusColors[status] || '#000000';
+}
+
+// Helper function to get translated status names
+export function getTranslatedStatus(t, statusName) {
+    const mailStatus = [
+        {
+            name: 'new',
+            value: t('table.new') // assuming `t()` is available in the component scope
+        },
+        {
+            name: 'read',
+            value: t('table.read') // assuming `t()` is available in the component scope
+        },
+        // Add more status values here as needed
+    ];
+
+    const status = mailStatus.find(status => status.name === statusName);
+    // Return the translated value if found, else return the original statusName
+    return status ? status.value : statusName;
 }

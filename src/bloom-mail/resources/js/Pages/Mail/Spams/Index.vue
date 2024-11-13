@@ -17,7 +17,7 @@ const tableHeaders = ref([
 </script>
 
 <template>
-    <Head title="Templates" />
+    <Head :title="$t('nav.spam')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -28,7 +28,7 @@ const tableHeaders = ref([
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
                             <VBtn color="primary" @click="router.get(route('spams.create'))">
-                                Spam Signups
+                                {{ $t('buttons.spam_signup') }}
                             </VBtn>
                             <div class="my-5">
                                 <CustomizeTable

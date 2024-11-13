@@ -32,7 +32,7 @@ const formSubmit = () => {
 </script>
 
 <template>
-    <Head title="Templates" />
+    <Head :title="$t('input.template_category')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -42,13 +42,13 @@ const formSubmit = () => {
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <h1>Template Category</h1>
+                            <h1>{{ $t('input.template_category') }}</h1>
                             <VForm @submit.prevent="formSubmit">
                                 <VRow>
                                     <VCol cols="12" lg="5">
-                                        <h3 class="mt-2">Create a new template category</h3>
+                                        <h3 class="mt-2">{{ $t('other.create_category_text')  }}</h3>
                                         <div class="mt-4">
-                                            <InputLabel for="name" value="Name"/>
+                                            <InputLabel for="name" :value="$t('input.name')"/>
                                             <VTextField
                                                 density="compact"
                                                 variant="outlined"
@@ -62,7 +62,7 @@ const formSubmit = () => {
                                             <InputError class="mb-2" :message="form.errors.name" />
                                         </div>
                                         <div>
-                                            <InputLabel for="description" value="Details" />
+                                            <InputLabel for="description" :value="$t('input.details')" />
                                             <VTextarea
                                                 variant="outlined"
                                                 id="name"
@@ -75,7 +75,7 @@ const formSubmit = () => {
                                             <InputError class="mb-2" :message="form.errors.detail" />
                                         </div>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">Create New Category</VBtn>
+                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.create_category') }}</VBtn>
                                         </div>
                                     </VCol>
                                     <VCol cols="12" lg="7">
@@ -90,8 +90,8 @@ const formSubmit = () => {
                                                         <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
                                                         </div>
                                                     </th>
-                                                    <th>Name</th>
-                                                    <th>Description</th>
+                                                    <th>{{ $t('table.name') }}</th>
+                                                    <th>{{ $t('table.description') }}</th>
                                                     </tr>
                                                 </thead>
 
@@ -120,8 +120,8 @@ const formSubmit = () => {
                                                         <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
                                                         </div>
                                                     </th>
-                                                    <th>Name</th>
-                                                    <th>Description</th>
+                                                    <th>{{ $t('table.name') }}</th>
+                                                    <th>{{ $t('table.description') }}</th>
                                                     </tr>
                                                 </tfoot>
                                                 </table>

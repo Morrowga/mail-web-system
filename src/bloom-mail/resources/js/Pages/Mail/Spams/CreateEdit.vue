@@ -28,7 +28,7 @@ const formSubmit = () => {
 </script>
 
 <template>
-    <Head title="Folders - Modification" />
+    <Head :title="$t('nav.spam')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -38,7 +38,7 @@ const formSubmit = () => {
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <h2 class="font-medium">{{ props?.spam ? 'Edit' : 'Create' }} Spam</h2>
+                            <h2 class="font-medium">{{ props?.spam ? $t('other.edit_spam') : $t('other.create_spam') }}</h2>
                             <VForm @submit.prevent="formSubmit">
                                 <VCard class="ma-4">
                                     <VCardText>
@@ -46,7 +46,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="address" value="Address"/>
+                                                        <InputLabel for="address" :value="$t('input.address')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VTextField
@@ -64,7 +64,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">Registration</VBtn>
+                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>

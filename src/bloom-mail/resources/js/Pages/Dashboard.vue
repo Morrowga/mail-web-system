@@ -8,10 +8,13 @@ import Pagination from '@/PageComponents/Pagination.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
+import { useI18n } from 'vue-i18n';
 
 const createDialogVisible = ref(false);
 
 const props = defineProps(['templates', 'from'])
+
+const { t, locale } = useI18n();
 
 const pageType = ref('inbox');
 
@@ -24,33 +27,33 @@ const mails = ref({});
 const headers = ref({
     inbox: [
         {
-            name: "Status",
+            name: t('table.status'),
             value: "status"
         },
         {
-            name: "Sender",
+            name: t('table.sender'),
             value: "sender"
         },
         {
-            name: "Subject",
+            name: t('table.subject'),
             value: "subject"
         },
         {
-            name: "Datetime",
+            name: t('table.datetime'),
             value: "datetime"
         }
     ],
     sent: [
         {
-            name: "Sender",
+            name: t('table.sender'),
             value: "sender"
         },
         {
-            name: "Subject",
+            name: t('table.subject'),
             value: "subject"
         },
         {
-            name: "Datetime",
+            name: t('table.datetime'),
             value: "datetime"
         }
     ],
@@ -183,7 +186,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Head title="Inbox" />
+    <Head :title="$t('nav.home')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6]">
@@ -197,30 +200,30 @@ onUnmounted(() => {
                                <!-- Inbox -->
                                 <div class="mb-5 cursor-pointer" @click="setPageType('inbox')">
                                     <p :class="{ 'active-route': pageType === 'inbox' }">
-                                        Inbox ( {{ countData?.inbox ?? 0 }} )
+                                        {{ $t('nav.inbox') }} ( {{ countData?.inbox ?? 0 }} )
                                     </p>
                                 </div>
 
                                 <!-- Sent Mail -->
                                 <div class="my-10 cursor-pointer" @click="setPageType('sent')">
                                     <p :class="{ 'active-route': pageType === 'sent' }">
-                                        Sent Mail ( {{ countData?.sent ?? 0 }} )
+                                        {{ $t('nav.sent') }}  ( {{ countData?.sent ?? 0 }} )
                                      </p>
                                 </div>
 
                                 <!-- Draft Email -->
                                 <div class="my-10 cursor-pointer" @click="setPageType('draft')">
-                                    <p :class="{ 'active-route': pageType === 'draft' }">Draft Email</p>
+                                    <p :class="{ 'active-route': pageType === 'draft' }">{{ $t('nav.draft') }} </p>
                                 </div>
 
                                 <!-- Spam: Navigates to Spam route -->
                                 <div class="my-10 cursor-pointer" @click="goToSpam">
-                                    <p :class="{ 'active-route': pageType === 'spam' }">Spam</p>
+                                    <p :class="{ 'active-route': pageType === 'spam' }">{{$t('nav.spam')}}</p>
                                 </div>
 
                                 <!-- Trash Can -->
                                 <div class="my-10 cursor-pointer" @click="setPageType('trash')">
-                                    <p :class="{ 'active-route': pageType === 'trash' }">Trash Can</p>
+                                    <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash')}}</p>
                                 </div>
                             </VCol>
                             <VCol cols="12" :lg="selectedMail ? 5 : 10"

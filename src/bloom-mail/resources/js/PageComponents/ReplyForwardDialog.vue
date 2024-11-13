@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import MailThread from './MailThread.vue';
+import { useI18n } from 'vue-i18n';
 
 const page = usePage();
 
@@ -17,6 +18,7 @@ const props = defineProps({
 
 // Reactive reference for mail type
 const mail_type_value = computed(() => props.type);
+const { t, locale } = useI18n();
 
 // Watch for changes in props.type and update mail_type_value accordingly
 watch(() => props.type, (newType) => {
@@ -108,7 +110,7 @@ onMounted(() => {
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 10%; align-self: flex-end;">
-                                            <InputLabel value="Subject" for="subject" />
+                                            <InputLabel :value="$t('input.subject')" for="subject" />
                                         </div>
                                         <div style="width: 90%;">
                                             <VTextField
@@ -125,7 +127,7 @@ onMounted(() => {
                                 <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
-                                            <span class="font-bold">Sent date & time</span>
+                                            <span class="font-bold">{{ $t('input.sent_datetime') }}</span>
                                         </div>
                                         <div style="width: 50%; align-self: flex-end;">
                                             {{formattedDateTime}}
@@ -138,7 +140,7 @@ onMounted(() => {
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 10%; align-self: flex-end;">
-                                            <InputLabel value="From" for="from" />
+                                            <InputLabel :value="$t('input.from')" for="from" />
                                         </div>
                                         <div style="width: 90%;">
                                             <VTextField
@@ -157,7 +159,7 @@ onMounted(() => {
                                 <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
-                                            <span class="font-bold">Person in charge</span>
+                                            <span class="font-bold">{{ $t('input.person_in_charge') }}</span>
                                         </div>
                                         <div style="width: 50%; align-self: flex-end;">
                                             ちは
@@ -170,7 +172,7 @@ onMounted(() => {
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 10%; align-self: flex-end;">
-                                            <InputLabel value="To" for="to" />
+                                            <InputLabel :value="$t('input.to')" for="to" />
                                         </div>
                                         <div style="width: 90%;">
                                             <VTextField
@@ -189,7 +191,7 @@ onMounted(() => {
                                 <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
-                                            <span class="font-bold">Status</span>
+                                            <span class="font-bold">{{ $t('input.status') }}</span>
                                         </div>
                                         <div style="width: 50%; align-self: flex-end;" class="text-capitalize">
                                             {{ props?.mailData?.status }}
@@ -209,7 +211,7 @@ onMounted(() => {
                                 <VCol cols="9" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
                                         <div style="width: 100%;">
-                                            <InputLabel value="Message Content" class="mb-3" for="message" />
+                                            <InputLabel :value="$t('input.message_content')" class="mb-3" for="message" />
                                             <VTextarea
                                             v-model="form.message_content"
                                             variant="outlined" density="compact" required hide-details
@@ -220,7 +222,7 @@ onMounted(() => {
                                 </VCol>
                                 <VCol cols="3">
                                     <div class="mx-5 my-5 d-flex justify-center" style="align-items: center; height: 100%;">
-                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" text="Send" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
+                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" :text="$t('buttons.send')" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
                                     </div>
                                 </VCol>
                             </VRow>

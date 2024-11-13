@@ -1,6 +1,7 @@
 <script setup>
-import { getStatusColor } from '@/Helper/status';
+import { getStatusColor, getTranslatedStatus } from '@/Helper/status';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   data: {
@@ -9,11 +10,13 @@ const props = defineProps({
   },
   headers: {
     type: Array,
-    required: true 
+    required: true
   },
   pageType: String,
   loading: Boolean,
 });
+
+const { t, locale } = useI18n();
 
 const emit = defineEmits();
 
@@ -43,7 +46,7 @@ const handleRowClick = (row) => {
         <td v-for="header in headers" :key="header.value" :style="{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }">
           <template v-if="header.value === 'status' && pageType === 'inbox'">
             <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
-              {{ email[header.value] }}
+              {{ getTranslatedStatus(t, email[header.value]) }}
             </VChip>
           </template>
           <template v-else>

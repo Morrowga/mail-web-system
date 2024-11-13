@@ -7,6 +7,7 @@
     },
     "nav": {
         "inbox": "Inbox",
+        "home": "Home",
         "template": "Template",
         "folders": "Folders",
         "profile": "Profile",
@@ -17,7 +18,7 @@
         "sent": "Sent Email"
     },
     "buttons": {
-        "tempalte_registration": "Template Registration",
+        "template_registration": "Template Registration",
         "category_list": "Category List",
         "registration": "Registration",
         "create_category": "Create New Category",
@@ -70,9 +71,15 @@
         "copy": "Copy",
         "delete": "Delete",
         "search": "Search",
-        "method": "Method"
+        "method": "Method",
+        "new": "New",
+        "read": "Read"
     },
     "other": {
+        "edit_spam": "Edit Spam",
+        "create_spam": "Create Spam",
+        "template_create": "Create Template",
+        "template_update": "Edit Template",
         "create_category_text": "Create a new template category",
         "profile_information": "Profile Information",
         "update_profile_text": "Update your account's profile information and email address.",

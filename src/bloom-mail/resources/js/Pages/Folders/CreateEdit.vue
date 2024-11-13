@@ -51,7 +51,7 @@ const formSubmit = () => {
 </script>
 
 <template>
-    <Head title="Folders - Modification" />
+    <Head :title="$t('nav.folders')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">

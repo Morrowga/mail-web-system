@@ -33,7 +33,7 @@ const formSubmit = () => {
 </script>
 
 <template>
-    <Head title="Folders - Modification" />
+    <Head :title="$t('nav.template')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -43,7 +43,7 @@ const formSubmit = () => {
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <h2 class="font-medium">Template Editing</h2>
+                            <h2 class="font-medium">{{ props?.template == null ? $t('other.template_create') : $t('other.template_update') }}</h2>
                             <VForm @submit.prevent="formSubmit">
                                 <VCard class="ma-4">
                                     <VCardText>
@@ -51,7 +51,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="Title" value="Title"/>
+                                                        <InputLabel for="Title" :value="$t('input.title')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VTextField
@@ -70,7 +70,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="subject" value="Subject"/>
+                                                        <InputLabel for="subject" :value="$t('input.subject')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VTextField
@@ -90,7 +90,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="folder" value="Folder"/>
+                                                        <InputLabel for="folder" :value="$t('input.folder')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VSelect
@@ -109,7 +109,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0 mt-5">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="template_category_id" value="Template Category"/>
+                                                        <InputLabel for="template_category_id" :value="$t('input.template_category')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VSelect
@@ -128,7 +128,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0 mt-5">
                                                 <div>
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="message_content" value="Message Content"/>
+                                                        <InputLabel for="message_content" :value="$t('input.message_content')"/>
                                                     </div>
                                                     <div style="width: 100%;">
                                                         <VTextarea
@@ -146,7 +146,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">Registration</VBtn>
+                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>
