@@ -184,7 +184,11 @@ class MailRepository implements MailRepositoryInterface
                 $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
-                $body = $threadMessage->getHTMLBody() ?? $threadMessage->getTextBody();
+                if ($threadMessage->hasHTMLBody()) {
+                    $body = $threadMessage->getHTMLBody();
+                } else {
+                    $body = $threadMessage->getTextBody();
+                }
 
                 $dateSent = $threadMessage->getDate()[0] ?? now();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
@@ -213,29 +217,60 @@ class MailRepository implements MailRepositoryInterface
             ], 404);
         }
     }
-
     public function reply(Request $request, MailLog $mail_log)
     {
+        // Validate the incoming request
+        $validated = $request->validate([
+            'og_message_id' => 'required|exists:mail_logs,message_id',
+            'subject' => 'required|string',
+            'from' => 'required|email',
+            'to' => 'required|email',
+            'message_content' => 'required|string',
+        ]);
+
+        // Fetch the original email details
+        $originalEmail = MailLog::where('message_id', $request->og_message_id)->first(); // Using message_id, assuming it's unique
+
+        // Ensure the original email exists
+        if (!$originalEmail) {
+            return $this->error('Original email not found.');
+        }
+
+        // Prepare email data
         $emailData = [
-            'subject' => $request->subject,
+            'subject' => $request->subject, // Prefix "Re: " for the reply subject
             'from' => $request->from,
             'to' => $request->to,
             'message_content' => $request->message_content,
-            'in_reply_to' => $request->og_message_id,
-            'references' => $request->og_message_id,
+            'in_reply_to' => $originalEmail->message_id, // Use the message_id of the original email
+            'references' => $originalEmail->message_id, // Add references to the original message
         ];
 
-        Mail::send('emails.reply', ['emailData' => $emailData], function ($message) use ($emailData) {
-            $message->from($emailData['from'])
-                    ->to($emailData['to'])
-                    ->subject($emailData['subject']);
+        try {
+            // Send the reply email
+            Mail::send('emails.reply', [
+                'emailData' => $emailData,
+                'originalEmail' => $originalEmail, // Pass original email to the view
+            ], function ($message) use ($emailData) {
+                $message->from($emailData['from'])
+                        ->to($emailData['to'])
+                        ->subject($emailData['subject'])
+                        ->getHeaders()
+                        ->addTextHeader('In-Reply-To', '<' . $emailData['in_reply_to'] . '>')
+                        ->addTextHeader('References', '<' . $emailData['references'] . '>');
+            });
 
-            $message->getHeaders()->addTextHeader('In-Reply-To', '<' . $emailData['in_reply_to'] . '>');
-            $message->getHeaders()->addTextHeader('References', '<' . $emailData['references'] . '>');
-        });
+            return $this->success('Email Sent.');
+        } catch (\Exception $e) {
+            // Log the error if mail fails
+            \Log::error('Error sending reply email: ' . $e->getMessage());
 
-        return $this->success('Email Sent.');
+            // Return failure response
+            return $this->error('Failed to send reply email.');
+        }
     }
+
+
 
     public function forward(Request $request, MailLog $mail_log)
     {

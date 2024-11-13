@@ -13,6 +13,6 @@
     <p><strong>From:</strong> {{ $originalEmail['sender'] }}</p>
     <p><strong>Sent:</strong> {{ $originalEmail['datetime'] }}</p>
     <p><strong>Subject:</strong> {{ $originalEmail['subject'] }}</p>
-    <p>{!! nl2br(e($originalEmail['body'])) !!}</p>
+    <p>{!! $originalEmail['body'] !!}</p>
 </body>
 </html>
