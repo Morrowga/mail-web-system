@@ -16,11 +16,9 @@ const props = defineProps({
     threads: Array
 });
 
-// Reactive reference for mail type
 const mail_type_value = computed(() => props.type);
 const { t, locale } = useI18n();
 
-// Watch for changes in props.type and update mail_type_value accordingly
 watch(() => props.type, (newType) => {
     mail_type_value.value = newType;
 });
@@ -30,11 +28,8 @@ const formattedDateTime = ref(null);
 
 const emit = defineEmits(['update:dialog']);
 
-const minimizeDialog = () => {
-    emit('update:dialog', false);
-};
-
 const onClose = () => {
+    emit('cancelStatus');
     emit('handleLoadThread', props?.mailData?.id)
     emit('update:dialog', false);
 };
@@ -74,7 +69,7 @@ onMounted(() => {
 
 <template>
     <!-- Bind VDialog with props.createDialog and emit update on close -->
-    <VDialog v-model="props.createDialog" max-width="1250" @update:modelValue="(val) => emit('update:dialog', val)">
+    <VDialog v-model="props.createDialog" max-width="1250" @update:modelValue="(val) => emit('update:dialog', val)" persistent>
         <VForm @submit.prevent="formSubmit">
             <VCard>
                 <VCardTitle class="d-flex justify-between align-center">
@@ -82,14 +77,6 @@ onMounted(() => {
                         {{ mail_type_value == 'reply' ? 'Reply Form' : 'Forward Form'}}
                     </h3>
                     <div class="d-flex justify-end">
-                        <div class="icon-border d-flex justify-center align-items-center">
-                            <VIcon
-                                icon="mdi-minus"
-                                class="minimize-icon"
-                                style="color: #a5a5a5; font-weight: bold;"
-                                @click="minimizeDialog"
-                            ></VIcon>
-                        </div>
                         <div class="icon-border text-center">
                             <VIcon
                                 icon="mdi-close"

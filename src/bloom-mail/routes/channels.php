@@ -9,3 +9,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('mails', function ($user) {
     return true;
 });
+
+Broadcast::channel('mail-status', function ($user) {
+    return true;
+});

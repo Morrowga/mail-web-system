@@ -19,4 +19,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('mails/mark-as-read/{id}', [MailController::class, 'markAsRead'])
         ->name('inbox-mark-as-read');
+
+    Route::post('mails/change-status/{mail_Log}', [MailController::class, 'changeStatus'])
+        ->name('change-status');
+
+    Route::post('mails/cancel-status/{mail_Log}', [MailController::class, 'cancelReply'])
+        ->name('cancel-status');
 });

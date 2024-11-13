@@ -19,6 +19,10 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/connection-error', function(){
+    return Inertia::render('Errors/ConnectionError');
+})->name('connection-error');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/home',[MailController::class, 'index'])->name('dashboard');
     Route::post('/mails',[MailController::class, 'store'])->name('mails.store');

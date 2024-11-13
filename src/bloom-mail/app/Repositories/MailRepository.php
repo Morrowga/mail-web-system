@@ -26,7 +26,6 @@ class MailRepository implements MailRepositoryInterface
     use CRUDResponses;
 
     protected $client;
-    protected $isConnected = false;
 
     /**
      * MailRepository constructor.
@@ -37,10 +36,12 @@ class MailRepository implements MailRepositoryInterface
 
         try {
             $this->client->connect();
-            $this->isConnected = true;
-        } catch (ConnectionFailedException $e) {
-            $this->isConnected = false;
-            logger()->error("IMAP connection failed: " . $e->getMessage());
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                "connection" => false
+            ]);
         }
     }
 
@@ -51,7 +52,6 @@ class MailRepository implements MailRepositoryInterface
      */
     public function inbox()
     {
-
         $pageType = request()->query('page_type');
 
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();

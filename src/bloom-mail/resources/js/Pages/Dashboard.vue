@@ -78,6 +78,11 @@ const handlePageChange = (newPage) => {
 };
 
 const handleRowSelected = (row) => {
+  if(row?.status == 'replying')
+  {
+    cancelMailStatus(row?.id)
+  }
+
   selectedMail.value = row;
   getHistories(row.id)
   if(row?.status == 'new')
@@ -152,6 +157,29 @@ const getHistories = async (id) => {
     }
 };
 
+
+const cancelMailStatus = (id) => {
+  axios
+    .post(`/mails/cancel-status/${id}`)
+    .then((response) => {
+      console.log('Status canceled successfully', response.data);
+    })
+    .catch((error) => {
+      console.error('Error canceling status', error);
+    });
+};
+
+const changeMailStatus = (id) => {
+  axios
+    .post(`/mails/change-status/${id}`)
+    .then((response) => {
+      console.log('Status changed successfully', response.data);
+    })
+    .catch((error) => {
+      console.error('Error changing status', error);
+    });
+};
+
 const setPageType = (type) => {
   pageType.value = type;
   mails.value = {}
@@ -172,6 +200,24 @@ onMounted(() => {
         {
             fetchEmails()
         }
+    })
+    .error((error) => {
+      console.error('Broadcast error:', error);
+    });
+
+    Echo.channel('mail-status')
+    .listen('.mail-status-changed', (event) => {
+      console.log('Mail status changed:', event);
+      const { mail_id, new_status } = event;
+
+      const mail = mails.value.find(mail => mail.id === mail_id);
+
+      if (mail) {
+        mail.status = new_status;
+        selectedMail.value.status = new_status
+      }
+
+      console.log(`Mail ${mail_id} status changed to ${new_status}`);
     })
     .error((error) => {
       console.error('Broadcast error:', error);
@@ -260,7 +306,17 @@ onUnmounted(() => {
                                 lg="5"
                             >
                                 <VCard class="mt-5" style="border-radius: 20px;">
-                                    <MailDetail @getThreads="getHistories" :pageType="pageType" :threads="selectedHistories" :threadLoading="threadLoading" :mail="selectedMail" @handleRemoveRow="removeRow" @fetchagain="fetchEmails" />
+                                    <MailDetail
+                                        @getThreads="getHistories"
+                                        :pageType="pageType"
+                                        :threads="selectedHistories"
+                                        :threadLoading="threadLoading"
+                                        :mail="selectedMail"
+                                        @handleRemoveRow="removeRow"
+                                        @fetchagain="fetchEmails"
+                                        @changeMailStatus="changeMailStatus"
+                                        @cancelMailStatus="cancelMailStatus"
+                                    />
                                 </VCard>
                             </VCol>
                         </VRow>

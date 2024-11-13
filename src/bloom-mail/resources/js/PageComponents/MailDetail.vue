@@ -1,11 +1,12 @@
 <script setup>
-import { ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 import MailThread from './MailThread.vue';
 import ReplyForwardDialog from './ReplyForwardDialog.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import MailConfirmDialog from './MailConfirmDialog.vue';
 import { useI18n } from 'vue-i18n';
 import { getTranslatedStatus } from '@/Helper/status';
+import axios from 'axios';
 
 const props = defineProps({
     mail: Object,
@@ -26,9 +27,14 @@ const form = useForm({});
 const createDialogVisible = ref(false);
 
 const openDialog = (type) => {
+    emit('changeMailStatus', props?.mail?.id)
+
     mailType.value = type;
-    console.log(mailType.value)
     createDialogVisible.value = true;
+}
+
+const cancelStatus = () => {
+    emit('cancelMailStatus', props?.mail?.id)
 }
 
 const handleRemoveClick = () => {
@@ -60,6 +66,7 @@ const handleDelete = async () => {
         console.error('Failed to mark as read:', error);
     }
 }
+
 
 </script>
 
@@ -130,6 +137,7 @@ const handleDelete = async () => {
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
                 :mailData="props?.mail"
+                @cancelStatus="cancelStatus"
                 @handleLoadThread="loadThread(props?.mail?.id)"
                 :threads="props?.threads"
                 :from="props?.from"

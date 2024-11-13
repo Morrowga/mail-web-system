@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->longText('body')->nullable();
             $table->dateTime('datetime')->nullable();
+            $table->string('previous_status')->nullable();
             $table->enum('status', ['new', 'read', 'confirming', 'pending', 'replying', 'confirmed', 'corresponding', 'deleted'])->default('new');
 
             $table->timestamps();
