@@ -25,4 +25,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('mails/cancel-status/{mail_Log}', [MailController::class, 'cancelReply'])
         ->name('cancel-status');
+
+    Route::post('mails/change-confirmed/{mail_Log}', [MailController::class, 'changeConfirmed'])
+        ->name('change-confirmed');
 });

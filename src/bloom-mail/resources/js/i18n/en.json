@@ -86,6 +86,8 @@
         "no_data": "No Data Available"
     },
     "other": {
+        "forward_form": "Forward Form",
+        "reply_form": "Reply Form",
         "edit_spam": "Edit Spam",
         "create_spam": "Create Spam",
         "template_create": "Create Template",

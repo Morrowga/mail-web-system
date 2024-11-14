@@ -1,8 +1,8 @@
 <script setup>
+import { ref, watch, computed, onMounted, defineEmits, defineProps } from 'vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
 import MailThread from './MailThread.vue';
 import { useI18n } from 'vue-i18n';
 import { getTranslatedStatus } from '@/Helper/status';
@@ -17,23 +17,7 @@ const props = defineProps({
     threads: Array
 });
 
-const mail_type_value = computed(() => props.type);
-const { t, locale } = useI18n();
-
-watch(() => props.type, (newType) => {
-    mail_type_value.value = newType;
-});
-
-
-const formattedDateTime = ref(null);
-
-const emit = defineEmits(['update:dialog']);
-
-const onClose = () => {
-    emit('cancelStatus');
-    emit('handleLoadThread', props?.mailData?.id)
-    emit('update:dialog', false);
-};
+const { t } = useI18n();
 
 const form = useForm({
     subject: props?.mailData?.subject,
@@ -41,8 +25,17 @@ const form = useForm({
     to: props?.mailData?.sender,
     message_content: "",
     og_message_id: props?.mailData?.message_id,
-    type: mail_type_value
+    type: props?.type // Initialize with the computed value of type
 });
+
+const formattedDateTime = ref(null);
+const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent']);
+
+const onClose = () => {
+    emit('cancelStatus');
+    emit('handleLoadThread', props?.mailData?.id);
+    emit('update:dialog', false);
+};
 
 const formatDateTime = () => {
   const currentDate = new Date();
@@ -55,8 +48,9 @@ const formSubmit = () => {
     form.post(route('mails.reply-forward', props?.mailData?.id), {
         onSuccess: () => {
             form.reset();
-            emit('handleLoadThread', props?.mailData?.id)
+            emit('handleLoadThread', props?.mailData?.id);
             emit('update:dialog', false);
+            emit('update:mailTypeEevent', null)
         },
         onError: (error) => {
             console.error("Form submission error:", error);
@@ -67,6 +61,10 @@ const formSubmit = () => {
 onMounted(() => {
   formatDateTime();
 });
+
+watch(() => props.type, (newType) => {
+    form.type = newType;
+});
 </script>
 
 <template>
@@ -76,7 +74,7 @@ onMounted(() => {
             <VCard>
                 <VCardTitle class="d-flex justify-between align-center">
                     <h3>
-                        {{ mail_type_value == 'reply' ? 'Reply Form' : 'Forward Form'}}
+                        {{ mail_type_value == 'reply' ? $t('other.reply_form') : $t('other.forward_form')}}
                     </h3>
                     <div class="d-flex justify-end">
                         <div class="icon-border text-center">

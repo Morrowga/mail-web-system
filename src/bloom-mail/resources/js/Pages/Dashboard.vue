@@ -159,7 +159,9 @@ const getHistories = async (id) => {
 
 
 const cancelMailStatus = (id) => {
-  axios
+  if(selectedMail.value.status != 'resolved' || selectedMail.value.status == 'confirmed')
+  {
+    axios
     .post(`/mails/cancel-status/${id}`)
     .then((response) => {
       console.log('Status canceled successfully', response.data);
@@ -167,6 +169,7 @@ const cancelMailStatus = (id) => {
     .catch((error) => {
       console.error('Error canceling status', error);
     });
+  }
 };
 
 const changeMailStatus = (id) => {

@@ -273,9 +273,12 @@ class MailRepository implements MailRepositoryInterface
                 'datetime' => Carbon::now(),
             ]);
 
-            $mail_log->status = 'resolved';
-            $mail_log->previous_status = null;
-            $mail_log->update();
+            if($mail_log->status != 'confirmed' || $mail_log->status != 'resolved')
+            {
+                $mail_log->status = 'resolved';
+                $mail_log->previous_status = null;
+                $mail_log->update();
+            }
 
             broadcast(new EmailStatusUpdated($mail_log, 'resolved'));
 
@@ -291,7 +294,7 @@ class MailRepository implements MailRepositoryInterface
 
     public function forward(Request $request, MailLog $mail_log)
     {
-        try {
+        // try {
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
                 'from' => $request->from,
@@ -317,11 +320,11 @@ class MailRepository implements MailRepositoryInterface
             $forwardedBody = "
             <div style='margin: 0; padding: 0;'>
                 <p style='margin: 0; padding: 0;'><strong>Forwarded message</strong></p>
-                <p style='margin: 5px 0; padding: 0;'><strong>From:</strong> " . e($from) . "</p>
+                <p style='margin: 5px 0; padding: 0;'><strong>From:</strong> " . e($emailData['from']) . "</p>
                 <p style='margin: 5px 0; padding: 0;'><strong>Date:</strong> " . e($mail_log->datetime) . "</p>
                 <p style='margin: 5px 0; padding: 0;'><strong>Subject:</strong> " . e($mail_log->subject) . "</p>
                 <p style='margin: 5px 0; padding: 0;'><strong>Body:</strong></p>
-                <div style='margin: 0; padding: 0;'>" . e($this->cleanHtmlContent($mail_log->body)) . "</div>
+                <div style='margin: 0; padding: 0;'>" . $mail_log->body . "</div> <!-- Don't escape here -->
             </div>
             <hr>
             <div style='margin: 0; padding: 0;'>
@@ -339,11 +342,11 @@ class MailRepository implements MailRepositoryInterface
             ]);
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
-        } catch (\Exception $e) {
-            // Log the error if email sending fails
-            Log::error('Error sending forward email: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     // Log the error if email sending fails
+        //     Log::error('Error sending forward email: ' . $e->getMessage());
+        //     return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
+        // }
     }
 
     public function deleteForever(MailLog $mailLog)

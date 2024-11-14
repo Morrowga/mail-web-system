@@ -52,6 +52,19 @@ class MailController extends Controller
         ]);
     }
 
+    public function changeConfirmed(Request $request, MailLog $mail_Log)
+    {
+        $mail_Log->update([
+            'status' => 'confirmed'
+        ]);
+
+        broadcast(new EmailStatusUpdated($mail_Log, 'confirmed'));
+
+        return response()->json([
+            "message" => "success"
+        ]);
+    }
+
     public function cancelReply(MailLog $mail_Log)
     {
         $previousStatus = $mail_Log->previous_status;

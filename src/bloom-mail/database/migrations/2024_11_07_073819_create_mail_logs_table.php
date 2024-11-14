@@ -21,7 +21,7 @@ return new class extends Migration
             $table->longText('body')->nullable();
             $table->dateTime('datetime')->nullable();
             $table->string('previous_status')->nullable();
-            $table->enum('status', ['new', 'read', 'resolved', 'pending', 'replying', 'confirmed'])->default('new');
+            $table->enum('status', ['new', 'read', 'resolved', 'pending', 'replying', 'confirmed', 'deleted'])->default('new');
 
             $table->timestamps();
         });

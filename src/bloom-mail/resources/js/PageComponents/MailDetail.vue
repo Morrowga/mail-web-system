@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import MailThread from './MailThread.vue';
 import ReplyForwardDialog from './ReplyForwardDialog.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
@@ -35,9 +35,8 @@ const form = useForm({});
 const createDialogVisible = ref(false);
 
 const openDialog = (type) => {
-    if(type == 'reply')
-    {
-        emit('changeMailStatus', props?.mail?.id)
+    if (type === 'reply' && props?.mail?.status !== 'resolved' && props?.mail?.status !== 'confirmed') {
+        emit('changeMailStatus', props?.mail?.id);
     }
 
     mailType.value = type;
@@ -60,9 +59,9 @@ const openConfirmDialog = () => {
     confirmDialog.value = true
 }
 
-const selectStatus = (status) => {
-  selectedStatus.value = status;
-};
+watch(() => props?.mail?.status, (newStatus) => {
+  selectedStatus.value = t('table.' + newStatus);
+});
 
 const handleDelete = async () => {
     try {
@@ -82,8 +81,19 @@ const handleDelete = async () => {
     }
 }
 
-const handleStatusChange = (newStatus) => {
-  console.log('Selected Status:', newStatus);
+const changeConfirmed = () => {
+  axios
+    .post(`/mails/change-confirmed/${props?.mail?.id}`)
+    .then((response) => {
+      console.log('Status confirmed successfully', response.data);
+    })
+    .catch((error) => {
+      console.error('Error canceling status', error);
+    });
+};
+
+const handleStatusChange = () => {
+  changeConfirmed()
 };
 
 </script>
@@ -130,12 +140,11 @@ const handleStatusChange = (newStatus) => {
                             {{ props?.mail?.from }}
                         </p>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status != 'confirmed'">
                         <VSelect
-                        v-if="props?.pageType == 'inbox'"
                         v-model="selectedStatus"
                         :items="statusOptions"
-                        @change="handleStatusChange"
+                        @update:modelValue="handleStatusChange"
                         variant="outlined"
                         density="compact"
                         required
@@ -143,11 +152,11 @@ const handleStatusChange = (newStatus) => {
                         >
                         </VSelect>
                     </div>
-                    <!-- <div class="mb-2">
-                        <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">
+                    <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status == 'confirmed'">
+                        <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">
                             {{ getTranslatedStatus(t, props?.mail?.status) }}
                         </VBtn>
-                    </div> -->
+                    </div>
                 </div>
                 <p v-if="props?.pageType == 'sent'" class="my-3">
                     Attn:
@@ -167,6 +176,7 @@ const handleStatusChange = (newStatus) => {
                 :createDialog="createDialogVisible"
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
+                @update:mailTypeEevent="mailType = $event"
                 :mailData="props?.mail"
                 @cancelStatus="cancelStatus"
                 @handleLoadThread="loadThread(props?.mail?.id)"
