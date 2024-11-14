@@ -82,6 +82,9 @@
         "delete": "削除",
         "new": "新規",
         "read": "既読",
+        "replying": "返信処理中",
+        "resolved": "対応済み",
+        "confirmed": "確定",
         "no_data": "データがありません"
     },
    "other": {

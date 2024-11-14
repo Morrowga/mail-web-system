@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Webklex\PHPIMAP\Message;
 use App\Traits\CRUDResponses;
 use Webklex\IMAP\Facades\Client;
+use App\Events\EmailStatusUpdated;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mime\Part\TextPart;
@@ -273,6 +274,10 @@ class MailRepository implements MailRepositoryInterface
             ]);
 
             $mail_log->status = 'resolved';
+            $mail_log->previous_status = null;
+            $mail_log->update();
+
+            broadcast(new EmailStatusUpdated($mail_log, 'resolved'));
 
             return $this->success('Email Sent.');
         } catch (\Exception $e) {

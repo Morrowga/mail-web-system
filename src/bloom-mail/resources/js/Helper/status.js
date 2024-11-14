@@ -4,10 +4,9 @@ export function getStatusColor(status) {
     const statusColors = {
         'new': '#fc0214',
         'read': '#df517e',
-        'confirming': '#fc0214',
-        'confirmed': '#fc0214',
-        'corresponding': '#fc0214',
-        'replying': '#fc0214',
+        'resolved': '#6fa7dc',
+        'confirmed': '#0004fb',
+        'replying': '#a600fe',
         'pending': '#186dc1',
     };
 
@@ -26,10 +25,20 @@ export function getTranslatedStatus(t, statusName) {
             name: 'read',
             value: t('table.read') // assuming `t()` is available in the component scope
         },
-        // Add more status values here as needed
+        {
+            name: 'replying',
+            value: t('table.replying')
+        },
+        {
+            name: 'resolved',
+            value: t('table.resolved')
+        },
+        {
+            name: 'confirmed',
+            value: t('table.confirmed')
+        }
     ];
 
     const status = mailStatus.find(status => status.name === statusName);
-    // Return the translated value if found, else return the original statusName
     return status ? status.value : statusName;
 }

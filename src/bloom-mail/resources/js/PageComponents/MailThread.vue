@@ -1,5 +1,5 @@
 <template>
-    <VCard :class="reply?.uid == null ? 'border-red mt-2' : 'border-green mt-2'">
+    <VCard :class="reply?.uid == null ? 'border-green mt-2' : 'border-red mt-2'">
         <VCardText>
             <div class="reply-item">
                 <div class="reply-content">

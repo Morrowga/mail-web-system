@@ -22,6 +22,14 @@ const { t, locale } = useI18n();
 const emit = defineEmits();
 
 const mailType = ref(null);
+
+const statusOptions = ref([
+  t('table.confirmed'),
+  t('table.' + props?.mail?.status),
+]);
+
+const selectedStatus = ref(t('table.' + props?.mail?.status) || '');
+
 const form = useForm({});
 
 const createDialogVisible = ref(false);
@@ -52,6 +60,10 @@ const openConfirmDialog = () => {
     confirmDialog.value = true
 }
 
+const selectStatus = (status) => {
+  selectedStatus.value = status;
+};
+
 const handleDelete = async () => {
     try {
         let url = props?.pageType == 'inbox' ? `/mails/delete/${props?.mail?.id}` : `/mails/sent/delete/${props?.mail?.id}`;
@@ -70,6 +82,9 @@ const handleDelete = async () => {
     }
 }
 
+const handleStatusChange = (newStatus) => {
+  console.log('Selected Status:', newStatus);
+};
 
 </script>
 
@@ -116,10 +131,23 @@ const handleDelete = async () => {
                         </p>
                     </div>
                     <div class="mb-2">
+                        <VSelect
+                        v-if="props?.pageType == 'inbox'"
+                        v-model="selectedStatus"
+                        :items="statusOptions"
+                        @change="handleStatusChange"
+                        variant="outlined"
+                        density="compact"
+                        required
+                        hide-details
+                        >
+                        </VSelect>
+                    </div>
+                    <!-- <div class="mb-2">
                         <VBtn v-if="props?.pageType == 'inbox'" prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">
                             {{ getTranslatedStatus(t, props?.mail?.status) }}
                         </VBtn>
-                    </div>
+                    </div> -->
                 </div>
                 <p v-if="props?.pageType == 'sent'" class="my-3">
                     Attn:

@@ -80,6 +80,9 @@
         "method": "Method",
         "new": "New",
         "read": "Read",
+        "replying": "Replying",
+        "resolved": "Resolved",
+        "confirmed": "対応済み",
         "no_data": "No Data Available"
     },
     "other": {

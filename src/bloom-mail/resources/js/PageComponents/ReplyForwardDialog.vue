@@ -5,6 +5,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import MailThread from './MailThread.vue';
 import { useI18n } from 'vue-i18n';
+import { getTranslatedStatus } from '@/Helper/status';
 
 const page = usePage();
 
@@ -54,7 +55,8 @@ const formSubmit = () => {
     form.post(route('mails.reply-forward', props?.mailData?.id), {
         onSuccess: () => {
             form.reset();
-            onClose();
+            emit('handleLoadThread', props?.mailData?.id)
+            emit('update:dialog', false);
         },
         onError: (error) => {
             console.error("Form submission error:", error);
@@ -187,7 +189,7 @@ onMounted(() => {
                                             <span class="font-bold">{{ $t('input.status') }}</span>
                                         </div>
                                         <div style="width: 50%; align-self: flex-end;" class="text-capitalize">
-                                            {{ props?.mailData?.status }}
+                                            {{ getTranslatedStatus(t, props?.mailData?.status)}}
                                         </div>
                                     </div>
                                 </VCol>

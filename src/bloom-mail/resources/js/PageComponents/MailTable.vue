@@ -38,7 +38,7 @@ const handleRowClick = (row) => {
     <tbody class="tbody-container">
       <tr v-if="!data.length && !loading">
         <td :colspan="headers.length" class="text-center pt-5">
-          No data available
+          {{ $t('table.no_data') }}
         </td>
       </tr>
 
