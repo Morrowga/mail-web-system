@@ -93,14 +93,6 @@ watch(() => props.type, (newType) => {
 
                 <VCardText>
                     <VRow dense>
-                        <!-- <VCol cols="12" md="12" sm="6">
-                            <VDivider />
-                            <div class="pb-2 pt-1 text-right">
-                                <VBtn class="spamtrashbtn">Spam</VBtn>
-                                <VBtn class="mx-2 spamtrashbtn">Trash</VBtn>
-                            </div>
-                            <VDivider />
-                        </VCol> -->
                         <VCol cols="12" md="12" lg="12" sm="12">
                             <VRow>
                                 <VCol cols="8">
