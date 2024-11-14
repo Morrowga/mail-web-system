@@ -235,6 +235,16 @@ class MailRepository implements MailRepositoryInterface
         }
     }
 
+    private function decodeSubject($subject)
+    {
+        try {
+            return iconv_mime_decode($subject, 0, 'UTF-8') ?: 'No Subject';
+        } catch (\Exception $e) {
+            logger()->error("Error decoding subject: " . $e->getMessage());
+            return 'No Subject';
+        }
+    }
+
 
     public function reply(Request $request, MailLog $mail_log)
     {
