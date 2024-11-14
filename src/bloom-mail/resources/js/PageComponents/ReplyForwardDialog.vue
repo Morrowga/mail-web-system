@@ -74,7 +74,7 @@ watch(() => props.type, (newType) => {
             <VCard>
                 <VCardTitle class="d-flex justify-between align-center">
                     <h3>
-                        {{ mail_type_value == 'reply' ? $t('other.reply_form') : $t('other.forward_form')}}
+                        {{ props?.type == 'reply' ? $t('other.reply_form') : $t('other.forward_form')}}
                     </h3>
                     <div class="d-flex justify-end">
                         <div class="icon-border text-center">
