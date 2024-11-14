@@ -234,9 +234,9 @@ class MailRepository implements MailRepositoryInterface
 
     public function reply(Request $request, MailLog $mail_log)
     {
-        $originalEmail = MailLog::where('message_id', $request->og_message_id)->first();
+        // $originalEmail = MailLog::where('message_id', $request->og_message_id)->first();
 
-        if (!$originalEmail) {
+        if (!$mail_log) {
             return $this->error('Original email not found.');
         }
 
@@ -245,15 +245,15 @@ class MailRepository implements MailRepositoryInterface
             'from' => $request->from,
             'to' => $request->to,
             'message_content' => $request->message_content,
-            'in_reply_to' => $originalEmail->message_id,
-            'references' => $originalEmail->message_id,
+            'in_reply_to' => $mail_log->message_id,
+            'references' => $mail_log->message_id,
         ];
 
         try {
             // Send the reply email
             Mail::send('emails.reply', [
                 'emailData' => $emailData,
-                'originalEmail' => $originalEmail,
+                'originalEmail' => $mail_log,
             ], function ($message) use ($emailData) {
                 $message->from($emailData['from'])
                         ->to($emailData['to'])
@@ -267,10 +267,12 @@ class MailRepository implements MailRepositoryInterface
                 'subject' => $emailData['subject'],
                 'sender' => $emailData['from'],
                 'body' => $emailData['message_content'],
-                'parent_id' => $originalEmail->id,
+                'parent_id' => $mail_log->id,
                 'type' => 'reply',
                 'datetime' => Carbon::now(),
             ]);
+
+            $mail_log->status = 'resolved';
 
             return $this->success('Email Sent.');
         } catch (\Exception $e) {
@@ -384,10 +386,10 @@ class MailRepository implements MailRepositoryInterface
     public function store(Request $request)
     {
 
-        if (!$this->isConnected) {
-            logger()->error("IMAP connection is not established. Cannot send mail.");
-            return $this->error('Connection Failed.', []);
-        }
+        // if (!$this->isConnected) {
+        //     logger()->error("IMAP connection is not established. Cannot send mail.");
+        //     return $this->error('Connection Failed.', []);
+        // }
 
         try {
             $messageId = '<' . uniqid('email-', true) . '@' . config('app.url') . '>';

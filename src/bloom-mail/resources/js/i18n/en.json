@@ -59,12 +59,18 @@
         "bcc": "BCC",
         "sent_datetime": "Sent Date and Time",
         "person_in_charge": "Person In Charge",
-        "status": "Status"
+        "status": "Status",
+        "select_template_category": "Select Template Category",
+        "exact_match": "Exact Match",
+        "partial_match": "Partial Match",
+        "front_match": "Front Match",
+        "backward_match": "Backward Match"
     },
     "table": {
         "status": "Status",
         "sender": "Sender",
         "subject": "Subject",
+        "title": "Title",
         "datetime": "Datetime",
         "name": "Name",
         "description": "Description",
@@ -73,7 +79,8 @@
         "search": "Search",
         "method": "Method",
         "new": "New",
-        "read": "Read"
+        "read": "Read",
+        "no_data": "No Data Available"
     },
     "other": {
         "edit_spam": "Edit Spam",

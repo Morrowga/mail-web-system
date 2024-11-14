@@ -27,7 +27,10 @@ const form = useForm({});
 const createDialogVisible = ref(false);
 
 const openDialog = (type) => {
-    emit('changeMailStatus', props?.mail?.id)
+    if(type == 'reply')
+    {
+        emit('changeMailStatus', props?.mail?.id)
+    }
 
     mailType.value = type;
     createDialogVisible.value = true;

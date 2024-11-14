@@ -90,7 +90,7 @@ const formSubmit = () => {
                                                         <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
                                                         </div>
                                                     </th>
-                                                    <th>{{ $t('table.name') }}</th>
+                                                    <th>{{ $t('table.title') }}</th>
                                                     <th>{{ $t('table.description') }}</th>
                                                     </tr>
                                                 </thead>
@@ -120,7 +120,7 @@ const formSubmit = () => {
                                                         <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
                                                         </div>
                                                     </th>
-                                                    <th>{{ $t('table.name') }}</th>
+                                                    <th>{{ $t('table.title') }}</th>
                                                     <th>{{ $t('table.description') }}</th>
                                                     </tr>
                                                 </tfoot>

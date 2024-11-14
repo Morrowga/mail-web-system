@@ -113,7 +113,7 @@ const formSubmit = () => {
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VSelect
-                                                            placeholder="Select Template Category"
+                                                            placeholder=""
                                                             v-model="form.template_category_id"
                                                             class="mt-1"
                                                             variant="outlined" density="compact" required hide-details

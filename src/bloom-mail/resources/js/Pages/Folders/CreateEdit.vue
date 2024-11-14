@@ -4,8 +4,10 @@ import InputLabel from '@/Components/InputLabel.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps(['folder']);
+const { t, locale } = useI18n();
 
 const form = useForm({
     search_character: props?.folder?.search_character ?? '',
@@ -14,19 +16,19 @@ const form = useForm({
 
 const methods = ref([
     {
-        name: 'Exact match',
+        name: t('input.exact_match'),
         value: 'exact_match'
     },
     {
-        name: 'Partial match',
+        name: t('input.partial_match'),
         value: 'partial_match'
     },
     {
-        name: 'Front match',
+        name: t('input.front_match'),
         value: 'front_match'
     },
     {
-        name: 'Backward match',
+        name: t('input.backward_match'),
         value: 'backward_match'
     },
 ]);
@@ -63,6 +65,9 @@ const formSubmit = () => {
                         <div style="padding: 20px;">
                             <VForm @submit.prevent="formSubmit">
                                 <VCard>
+                                    <VCardTitle>
+                                        {{ props?.folder ? $t('other.edit_folder') : $t('other.create_folder')}}
+                                    </VCardTitle>
                                     <VCardText>
                                         <VRow class="my-3">
                                             <VCol cols="12" class="py-0">
