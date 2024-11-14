@@ -19,11 +19,23 @@ class MailLog extends Model
 
     public function getSubjectAttribute($value)
     {
-        return iconv_mime_decode($value);
+        try {
+            $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
+            return $decodedValue ?: $value;
+        } catch (\Exception $e) {
+            logger()->error("Error decoding subject: " . $e->getMessage());
+            return $value;
+        }
     }
 
     public function getNameAttribute($value)
     {
-        return iconv_mime_decode($value);
+        try {
+            $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
+            return $decodedValue ?: $value;
+        } catch (\Exception $e) {
+            logger()->error("Error decoding subject: " . $e->getMessage());
+            return $value;
+        }
     }
 }
