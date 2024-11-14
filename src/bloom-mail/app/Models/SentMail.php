@@ -9,4 +9,14 @@ class SentMail extends Model
     protected $table = 'sent_mails';
 
     protected $fillable = ['message_id', 'body', 'sender', 'subject','name','uid', 'datetime', 'type', 'parent_id'];
+
+    public function getSubjectAttribute($value)
+    {
+        return iconv_mime_decode($value);
+    }
+
+    public function getNameAttribute($value)
+    {
+        return iconv_mime_decode($value);
+    }
 }

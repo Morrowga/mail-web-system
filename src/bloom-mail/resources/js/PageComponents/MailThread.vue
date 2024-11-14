@@ -5,18 +5,15 @@
                 <div class="reply-content">
                     <div class="d-flex justify-between">
                     <div>
+                        <p>{{ reply.name }} <{{ reply.sender }}></p>
+                        <br>
                         <p>
-                        Attn:
-                        <br />
                         <div v-html="formattedReplyBody"></div>
                         </p>
-                        <p class="ml-2">{{ reply.from }}</p>
                     </div>
                     <div>
                         <p>{{ reply.datetime }}</p>
                     </div>
-                    </div>
-                    <div class="ml-2 mt-5">
                     </div>
                 </div>
             </div>

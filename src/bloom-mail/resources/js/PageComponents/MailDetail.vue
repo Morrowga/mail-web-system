@@ -159,9 +159,9 @@ const handleStatusChange = () => {
                     </div>
                 </div>
                 <p v-if="props?.pageType == 'sent'" class="my-3">
-                    Attn:
+                    <!-- Attn:
                     <br>
-                    <br>
+                    <br> -->
                     <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
                 </p>
             </div>
