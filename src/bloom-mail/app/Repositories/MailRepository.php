@@ -184,7 +184,9 @@ class MailRepository implements MailRepositoryInterface
             foreach ($threadMessages as $threadMessage) {
                 $uid = $threadMessage->getUid();
                 $messageId = $threadMessage->getMessageId()[0];
-                $subject = $threadMessage->getSubject()[0] ? iconv_mime_decode($threadMessage->getSubject()[0]) : 'No Subject';
+                $subject = isset($threadMessage->getSubject()[0])
+                ? $this->decodeSubject($threadMessage->getSubject()[0])
+                : 'No Subject';
                 $senderArray = $threadMessage->getFrom();
                 $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
