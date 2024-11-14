@@ -32,7 +32,10 @@ const formattedDateTime = ref(null);
 const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent']);
 
 const onClose = () => {
-    emit('cancelStatus');
+    if(props?.type == 'reply')
+    {
+        emit('cancelStatus');
+    }
     emit('handleLoadThread', props?.mailData?.id);
     emit('update:dialog', false);
 };
