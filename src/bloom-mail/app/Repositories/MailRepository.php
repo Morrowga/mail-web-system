@@ -270,7 +270,7 @@ class MailRepository implements MailRepositoryInterface
                 'body' => $emailData['message_content'],
                 'parent_id' => $mail_log->id,
                 'type' => 'reply',
-                'datetime' => Carbon::now(),
+                'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
             ]);
 
             if($mail_log->status != 'confirmed' || $mail_log->status != 'resolved')
@@ -338,7 +338,7 @@ class MailRepository implements MailRepositoryInterface
                 'body' => $forwardedBody,
                 'parent_id' => $mail_log->id,
                 'type' => 'forward',
-                'datetime' => now(),
+                'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
             ]);
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
