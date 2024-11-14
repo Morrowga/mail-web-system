@@ -16,4 +16,14 @@ class MailLog extends Model
     {
         return $this->hasMany(SentMail::class, 'parent_id');
     }
+
+    public function getSubjectAttribute($value)
+    {
+        return iconv_mime_decode($value);
+    }
+
+    public function getNameAttribute($value)
+    {
+        return iconv_mime_decode($value);
+    }
 }
