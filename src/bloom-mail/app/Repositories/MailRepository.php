@@ -202,9 +202,9 @@ class MailRepository implements MailRepositoryInterface
                 $histories[] = [
                     'uid' => $uid,
                     'message_id' => $messageId,
-                    'subject' => iconv_mime_decode($subject),
+                    'subject' => $subject,
                     'sender' => $senderEmail,
-                    'name' => $senderName,
+                    'name' => iconv_mime_decode($senderName),
                     'body' => $body,
                     'datetime' => $dateSent->toDateTimeString(),
                     'status' => $status,
