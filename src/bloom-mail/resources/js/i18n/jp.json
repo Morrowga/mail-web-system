@@ -88,7 +88,7 @@
         "no_data": "データがありません"
     },
    "other": {
-        "forward_form": "返信フォーム",
+        "forward_form": "転送フォーム",
         "reply_form": "返信フォーム",
         "create_folder": "フォルダ登録",
         "edit_folder": "フォルダ編集",
