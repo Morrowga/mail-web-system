@@ -5,7 +5,7 @@
                 <div class="reply-content">
                     <div class="d-flex justify-between">
                     <div>
-                        <p>{{ reply.name }} <{{ reply.sender }}></p>
+                        <p> <strong class="text-capitalize">{{ reply.name }} </strong> <{{ reply.sender }}></p>
                         <br>
                         <p>
                         <div v-html="formattedReplyBody"></div>

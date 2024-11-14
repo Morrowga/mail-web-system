@@ -16,6 +16,7 @@ use App\Traits\CRUDResponses;
 use Webklex\IMAP\Facades\Client;
 use App\Events\EmailStatusUpdated;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mime\Part\TextPart;
 use App\Interfaces\MailRepositoryInterface;
@@ -268,6 +269,7 @@ class MailRepository implements MailRepositoryInterface
                 'subject' => $emailData['subject'],
                 'sender' => $emailData['from'],
                 'body' => $emailData['message_content'],
+                'name' => Auth::user()->name,
                 'parent_id' => $mail_log->id,
                 'type' => 'reply',
                 'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
