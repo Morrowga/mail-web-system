@@ -196,7 +196,7 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 // Get the date the message was sent, fallback to current time if not available
-                $dateSent = $threadMessage->getDate()[0] ?? now();
+                $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
 
                 $histories[] = [
@@ -418,7 +418,7 @@ class MailRepository implements MailRepositoryInterface
                 'sender' => $data['fromAddress'],
                 'name' => $request->from_name ?? env('IMAP_USERNAME'),
                 'body' => $data['message_content'],
-                'datetime' => now(),
+                'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
                 'type' => 'sent',
                 'message_id' => $messageId,
             ]);
