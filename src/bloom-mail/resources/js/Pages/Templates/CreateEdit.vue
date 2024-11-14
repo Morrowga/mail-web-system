@@ -94,7 +94,7 @@ const formSubmit = () => {
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VSelect
-                                                            placeholder="Select Folder"
+                                                            :placeholder="$t('input.select_folder')"
                                                             v-model="form.folder_id"
                                                             class="mt-1"
                                                             variant="outlined" density="compact" required hide-details
@@ -113,9 +113,9 @@ const formSubmit = () => {
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VSelect
-                                                            placeholder=""
                                                             v-model="form.template_category_id"
                                                             class="mt-1"
+                                                            :placeholder="$t('input.select_template_category')"
                                                             variant="outlined" density="compact" required hide-details
                                                             :items="props?.template_categories"
                                                             item-value="id"

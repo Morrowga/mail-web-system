@@ -48,7 +48,7 @@ const formSubmit = () => {
                                     <VCol cols="12" lg="5">
                                         <h3 class="mt-2">{{ $t('other.create_category_text')  }}</h3>
                                         <div class="mt-4">
-                                            <InputLabel for="name" :value="$t('input.name')"/>
+                                            <InputLabel for="name" :value="$t('input.title')"/>
                                             <VTextField
                                                 density="compact"
                                                 variant="outlined"
