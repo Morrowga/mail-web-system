@@ -64,7 +64,8 @@ IMAP_USERNAME=thihaaung@voyager-web.com
 IMAP_PASSWORD=t5ShxELk
 IMAP_PROTOCOL=imap
 
-// Open Next Tab In Terminal 
+// Open Next Tab In Terminal
+
 php artisan reverb:start --port=8081
 
 php artisan queue:work
