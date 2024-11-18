@@ -9,7 +9,7 @@ class MailLog extends Model
 {
     protected $table = 'mail_logs';
 
-    protected $fillable = ['message_id', 'status', 'body', 'sender', 'subject','name','uid', 'datetime', 'previous_status'];
+    protected $fillable = ['message_id', 'status', 'body', 'sender', 'subject','name','uid', 'datetime', 'previous_status', 'person_in_charge'];
 
 
     public function mail_histories()

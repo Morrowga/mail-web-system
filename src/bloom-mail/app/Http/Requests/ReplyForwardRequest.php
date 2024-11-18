@@ -26,6 +26,7 @@ class ReplyForwardRequest extends FormRequest
             "from" => ['required', 'email'],
             "to" => ['required', 'email'],
             "message_content" => ['required'],
+            "template_id" => ['nullable'],
             "type" => ['required'],
             "og_message_id" => ['required']
         ];

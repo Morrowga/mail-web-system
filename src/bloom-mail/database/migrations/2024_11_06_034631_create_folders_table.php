@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->text('search_character');
             $table->enum('method', ['exact_match', 'partial_match', 'front_match', 'backward_match']);
             $table->timestamps();

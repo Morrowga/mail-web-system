@@ -12,12 +12,7 @@ class SendMail extends Mailable
 
     public $data;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param  array  $data
-     * @return void
-     */
+
     public function __construct($data)
     {
         $this->data = $data;
@@ -31,14 +26,14 @@ class SendMail extends Mailable
     public function build()
     {
         return $this->view('templates.template')
-                    ->subject($this->data['subject'])
-                    ->from($this->data['fromAddress'])
-                    ->to($this->data['to'])
-                    ->cc($this->data['cc'] ?? [])
-                    ->bcc($this->data['bcc'] ?? []) 
+                    ->subject($this->data->subject)
+                    ->from($this->data->sender)
+                    ->to($this->data->mailto)
+                    ->cc($this->data->cc ?? [])
+                    ->bcc($this->data->bcc ?? [])
                     ->with([
-                        'message_content' => $this->data['message_content'],
-                        'template_id' => $this->data['template_id'],
+                        'message_content' => $this->data->body,
+                        'template' => $this->data->template,
                     ])
                     // Add custom headers such as Message-ID
                     ->withSwiftMessage(function ($message) {

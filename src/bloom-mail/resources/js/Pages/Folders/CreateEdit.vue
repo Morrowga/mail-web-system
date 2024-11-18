@@ -10,6 +10,7 @@ const props = defineProps(['folder']);
 const { t, locale } = useI18n();
 
 const form = useForm({
+    name: props?.folder?.name,
     search_character: props?.folder?.search_character ?? '',
     method: props?.folder?.method ?? '',
 })
@@ -70,6 +71,25 @@ const formSubmit = () => {
                                     </VCardTitle>
                                     <VCardText>
                                         <VRow class="my-3">
+                                            <VCol cols="12" class="py-0">
+                                                <div class="d-flex justify-start">
+                                                    <div style="width: 17%; padding: 10px;">
+                                                        <InputLabel for="name" :value="$t('input.name')"/>
+                                                    </div>
+                                                    <div style="width: 83%;">
+                                                        <VTextField
+                                                            density="compact"
+                                                            variant="outlined"
+                                                            id="name"
+                                                            type="text"
+                                                            class="mt-1 block w-full"
+                                                            v-model="form.name"
+                                                            required
+                                                        ></VTextField>
+                                                    </div>
+                                                </div>
+                                                <InputError class="mt-2" :message="form.errors.name" />
+                                            </VCol>
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">

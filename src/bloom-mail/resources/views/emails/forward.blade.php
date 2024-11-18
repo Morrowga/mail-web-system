@@ -9,6 +9,14 @@
 
     <hr>
 
+    <div style="margin-top: 10px;">
+        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">
+            {!! $forwardMailData->template?->message_content ?? '' !!}
+        </span>
+    </div>
+
+    <hr>
+
     <!-- Original Message Section -->
     <p>--- Forwarded Message ---</p>
     <p><strong>From:</strong> {{ $originalEmail['sender'] }}</p>

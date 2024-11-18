@@ -8,6 +8,14 @@
 
     <hr>
 
+    <div style="margin-top: 10px;">
+        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">
+            {!! $replyMailData->template?->message_content ?? '' !!}
+        </span>
+    </div>
+
+    <hr>
+
     <!-- Original Message Section -->
     <p>--- Original Message ---</p>
     <p><strong>From:</strong> {{ $originalEmail['sender'] }}</p>

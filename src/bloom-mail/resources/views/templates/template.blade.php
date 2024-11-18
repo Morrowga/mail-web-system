@@ -7,6 +7,14 @@
     <title>{{ $data['subject'] }}</title>
 </head>
 <body>
-    <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $data['message_content'] !!}</span>
+    <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $data->body !!}</span>
+
+    <hr>
+
+    <div style="margin-top: 10px;">
+        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">
+            {!! $data->template?->message_content ?? '' !!}
+        </span>
+    </div>
 </body>
 </html>

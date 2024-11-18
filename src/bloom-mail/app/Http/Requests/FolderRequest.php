@@ -22,6 +22,7 @@ class FolderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "name" => ['required'],
             "search_character" => ['required'],
             "method" => ['required']
         ];

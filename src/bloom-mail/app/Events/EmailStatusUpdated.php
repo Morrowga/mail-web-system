@@ -16,11 +16,13 @@ class EmailStatusUpdated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $mailId;
+    public $person_in_charge;
     public $newStatus;
 
     public function __construct(MailLog $mailLog, string $newStatus)
     {
         $this->mailId = $mailLog->id;
+        $this->person_in_charge = $mailLog->person_in_charge;
         $this->newStatus = $newStatus;
     }
 
@@ -41,6 +43,7 @@ class EmailStatusUpdated implements ShouldBroadcast
         return [
             'mail_id' => $this->mailId,
             'new_status' => $this->newStatus,
+            'person_in_charge' => $this->person_in_charge
         ];
     }
 }

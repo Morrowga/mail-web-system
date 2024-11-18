@@ -27,6 +27,7 @@ class MailRequest extends FormRequest
             "to" => ['required', 'email'],
             "cc" => ['nullable'],
             "bcc" => ['nullable'],
+            "template_id" => ['nullable'],
             "message_content" => ['required'],
         ];
     }

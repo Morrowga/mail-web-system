@@ -134,10 +134,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                        <div style="width: 10%; align-self: flex-end;">
+                                        <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.subject')" for="subject" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                                 variant="plain"
                                                 density="compact"
@@ -165,10 +165,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                        <div style="width: 10%; align-self: flex-end;">
+                                        <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.from')" for="from" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                                 v-model="form.from"
                                                 variant="plain"
@@ -197,10 +197,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                        <div style="width: 10%; align-self: flex-end;">
+                                        <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.to')" for="to" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                                 variant="plain"
                                                 density="compact"
@@ -228,10 +228,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
                                             <InputLabel :value="$t('input.template')" for="template" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VSelect
                                             placeholder="Select Template"
                                             v-model="form.template_id"
@@ -249,10 +249,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
                                             <InputLabel :value="$t('input.to')" for="to" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                             v-model="form.to"
                                             variant="outlined" density="compact" required hide-details
@@ -265,10 +265,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
                                             <InputLabel value="CC" for="cc" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                             v-model="form.cc"
                                             variant="outlined" density="compact" required hide-details
@@ -282,10 +282,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
                                             <InputLabel value="BCC" for="bcc" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                             v-model="form.bcc"
                                             variant="outlined" density="compact" hide-details
@@ -299,10 +299,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="8" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 10%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
                                             <InputLabel :value="$t('input.subject')" for="subject" />
                                         </div>
-                                        <div style="width: 90%;">
+                                        <div style="width: 80%;">
                                             <VTextField
                                             v-model="form.subject"
                                             variant="outlined" density="compact" hide-details
@@ -315,8 +315,10 @@ onMounted(() => {
                             <VRow>
                                 <VCol cols="10" class="mt-3">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
-                                        <div style="width: 100%;">
+                                        <div style="width: 16%; align-items: center;">
                                             <InputLabel :value="$t('input.message_content')" class="mb-3" for="message" />
+                                        </div>
+                                        <div style="width: 84%;">
                                             <VTextarea
                                             v-model="form.message_content"
                                             variant="outlined" density="compact" required hide-details

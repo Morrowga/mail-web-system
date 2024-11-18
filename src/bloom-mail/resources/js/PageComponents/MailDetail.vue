@@ -137,7 +137,10 @@ const handleStatusChange = () => {
                     <div>
                         <p>{{ props?.mail?.name }}</p>
                         <p >
-                            {{ props?.mail?.from }}
+                            {{ props?.mail?.sender }}
+                        </p>
+                        <p v-if="props?.mail?.status == 'resolved'" class="my-3">
+                            <{{ props?.mail?.person_in_charge }}>
                         </p>
                     </div>
                     <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status != 'confirmed'">

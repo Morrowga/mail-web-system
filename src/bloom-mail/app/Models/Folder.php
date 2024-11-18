@@ -8,5 +8,5 @@ class Folder extends Model
 {
     protected $table = 'folders';
 
-    protected $fillable = ['search_character', 'method'];
+    protected $fillable = ['search_character', 'method', 'name'];
 }

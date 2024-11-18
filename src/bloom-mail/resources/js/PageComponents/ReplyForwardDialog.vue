@@ -22,10 +22,11 @@ const { t } = useI18n();
 const form = useForm({
     subject: props?.mailData?.subject,
     from: page?.props?.from,
+    template_id: props?.mailData?.template_id,
     to: props?.mailData?.sender,
     message_content: "",
     og_message_id: props?.mailData?.message_id,
-    type: props?.type // Initialize with the computed value of type
+    type: props?.type
 });
 
 const formattedDateTime = ref(null);
@@ -194,6 +195,27 @@ watch(() => props.type, (newType) => {
                             <VCol cols="12" md="12" lg="12" sm="12" style="height: 40vh; overflow-y: auto;" >
                                 <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
                             </VCol>
+                            <VDivider class="mt-2" />
+                            <VRow>
+                                <VCol cols="8" class="mt-3">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%; align-items: center;">
+                                        <div style="width: 20%; align-items: center;">
+                                            <InputLabel :value="$t('input.template')" for="template" />
+                                        </div>
+                                        <div style="width: 80%;">
+                                            <VSelect
+                                            placeholder="Select Template"
+                                            v-model="form.template_id"
+                                            variant="outlined" density="compact" required hide-details
+                                            :items="page?.props?.templates"
+                                            item-title="title"
+                                            item-value="id"
+                                            ></VSelect>
+                                        </div>
+                                        <InputError class="mt-1" :message="form.errors.template" />
+                                    </div>
+                                </VCol>
+                            </VRow>
                             <VDivider class="mt-2" />
                             <VRow>
                                 <VCol cols="9" class="mt-3">

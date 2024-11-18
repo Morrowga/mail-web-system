@@ -211,12 +211,15 @@ onMounted(() => {
     Echo.channel('mail-status')
     .listen('.mail-status-changed', (event) => {
       console.log('Mail status changed:', event);
-      const { mail_id, new_status } = event;
+      const { mail_id, new_status, person_in_charge } = event;
 
       const mail = mails.value.find(mail => mail.id === mail_id);
 
       if (mail) {
         mail.status = new_status;
+        mail.person_in_charge = person_in_charge
+
+        selectedMail.value.person_in_charge = person_in_charge
         selectedMail.value.status = new_status
       }
 

@@ -11,6 +11,10 @@ const { t, locale } = useI18n();
 const routeUrl = ref('/folders')
 
 const tableHeaders = ref([
+    {
+     header: t('table.name'),
+     val: "name"
+   },
    {
      header: t('table.search'),
      val: "search_character"

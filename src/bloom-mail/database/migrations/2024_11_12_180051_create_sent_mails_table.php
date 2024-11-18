@@ -24,6 +24,13 @@ return new class extends Migration
             ->nullable()
             ->references('id')
             ->on('mail_logs')->onDelete('cascade');
+            $table->foreignId('template_id')
+            ->nullable()
+            ->references('id')
+            ->on('templates')->onDelete('cascade');
+            $table->string('cc')->nullable();
+            $table->string('mailto')->nullable();
+            $table->string('bcc')->nullable();
             $table->enum('type', ['sent', 'reply', 'forward']);
             $table->timestamps();
         });
