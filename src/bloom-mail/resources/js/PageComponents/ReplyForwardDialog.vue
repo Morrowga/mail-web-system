@@ -188,13 +188,6 @@ watch(() => props.type, (newType) => {
                                     </div>
                                 </VCol>
                             </VRow>
-                            <!-- <VRow >
-                                <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
-                            </VRow> -->
-                            <VDivider class="mt-2" />
-                            <VCol cols="12" md="12" lg="12" sm="12" style="height: 40vh; overflow-y: auto;" >
-                                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
-                            </VCol>
                             <VDivider class="mt-2" />
                             <VRow>
                                 <VCol cols="8" class="mt-3">
@@ -216,6 +209,13 @@ watch(() => props.type, (newType) => {
                                     </div>
                                 </VCol>
                             </VRow>
+                            <!-- <VRow >
+                                <VCheckbox label="Attach the original email" reverse hide-details></VCheckbox>
+                            </VRow> -->
+                            <VDivider class="mt-2" />
+                            <VCol cols="12" md="12" lg="12" sm="12" style="height: 40vh; overflow-y: auto;" >
+                                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
+                            </VCol>
                             <VDivider class="mt-2" />
                             <VRow>
                                 <VCol cols="9" class="mt-3">
