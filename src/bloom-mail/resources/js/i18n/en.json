@@ -67,6 +67,7 @@
         "backward_match": "Backward Match"
     },
     "table": {
+        "folder_name": "Folder Name",
         "status": "Status",
         "sender": "Sender",
         "subject": "Subject",
@@ -83,7 +84,8 @@
         "replying": "Replying",
         "resolved": "Resolved",
         "confirmed": "対応済み",
-        "no_data": "No Data Available"
+        "no_data": "No Data Available",
+        "person_in_charge_text": "Person In Charge"
     },
     "other": {
         "forward_form": "Forward Form",

@@ -12,7 +12,7 @@ const routeUrl = ref('/folders')
 
 const tableHeaders = ref([
     {
-     header: t('table.name'),
+     header: t('table.folder_name'),
      val: "name"
    },
    {

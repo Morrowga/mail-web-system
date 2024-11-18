@@ -146,6 +146,11 @@ class MailRepository implements MailRepositoryInterface
         }
     }
 
+    public function updatefolderAttachs()
+    {
+        
+    }
+
     public function markAsRead($id)
     {
         $mailLog = MailLog::find($id);

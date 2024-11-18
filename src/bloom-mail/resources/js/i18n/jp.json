@@ -66,9 +66,11 @@
         "exact_match": "完全一致",
         "partial_match": "部分一致",
         "front_match": "前方一致",
-        "backward_match": "後方一致"
+        "backward_match": "後方一致",
+        "person_in_charge_text": "担当"
     },
     "table": {
+        "folder_name": "フォルダ名",
         "status": "ステータス",
         "sender": "差出人",
         "title": "タイトル",

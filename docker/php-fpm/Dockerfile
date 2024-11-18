@@ -9,7 +9,8 @@ RUN apt-get update && \
   libpng-dev \
   libfreetype6-dev \
   libjpeg62-turbo-dev \
-  libc-client-dev  # Required for IMAP extension
+  libc-client-dev \
+  libkrb5-dev  # Required for Kerberos support in IMAP
 
 # Install ImageMagick and Imagick
 RUN apt-get install -y imagemagick libmagickwand-dev
@@ -19,8 +20,9 @@ RUN pecl install imagick && docker-php-ext-enable imagick
 RUN docker-php-ext-install pdo_mysql zip bcmath opcache gd && \
   docker-php-ext-configure gd --with-freetype --with-jpeg
 
-# Install IMAP extension
+# Install IMAP extension with Kerberos support
 RUN apt-get install -y libssl-dev libc-client-dev \
+  && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
   && docker-php-ext-install imap
 
 # Install PCNTL extension (if needed)

@@ -74,7 +74,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="name" :value="$t('input.name')"/>
+                                                        <InputLabel for="name" :value="$t('table.folder_name')"/>
                                                     </div>
                                                     <div style="width: 83%;">
                                                         <VTextField
