@@ -6,15 +6,18 @@ use DateTime;
 use Carbon\Carbon;
 use App\Models\Reply;
 use App\Mail\SendMail;
+use App\Models\Folder;
 use App\Models\MailLog;
 use App\Models\SentMail;
 use Webklex\PHPIMAP\IMAP;
 use App\Events\TakingMail;
+use App\Models\FolderMail;
 use Illuminate\Http\Request;
 use Webklex\PHPIMAP\Message;
 use App\Traits\CRUDResponses;
 use Webklex\IMAP\Facades\Client;
 use App\Events\EmailStatusUpdated;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -55,6 +58,7 @@ class MailRepository implements MailRepositoryInterface
     public function inbox()
     {
         $pageType = request()->query('page_type');
+        $folders = Folder::withCount('mails')->get();
 
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
         $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
@@ -74,6 +78,32 @@ class MailRepository implements MailRepositoryInterface
             "data" => $data,
             "inbox" => $inbox,
             "sent" => $sent,
+            "folders" => $folders
+        ];
+    }
+
+    public function inboxWithFolderId(Folder $folder)
+    {
+        $folders = Folder::withCount('mails')->get();
+
+        $folderId = $folder->id;
+
+        $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
+        $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
+
+        $data = MailLog::where('status', '!=', 'deleted')
+        ->when(isset($folderId), function ($query) use ($folderId) {
+            $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
+        })
+        ->orderBy('datetime', 'desc')
+        ->paginate(10);
+
+
+        return [
+            "data" => $data,
+            "inbox" => $inbox,
+            "sent" => $sent,
+            "folders" => $folders
         ];
     }
 
@@ -81,64 +111,118 @@ class MailRepository implements MailRepositoryInterface
     {
         try {
             $inbox = $this->client->getFolder('INBOX');
-
             $messages = $inbox->messages()->all()->get();
+
+            // Fetch all folders with their criteria
+            $folders = Folder::all();
 
             $newEmails = [];
 
-            foreach ($messages as $message) {
-                $uid = $message->getUid();
-                $messageId = $message->getMessageId();
-                $subject = $message->getSubject()[0];
-                $senderArray = $message->getFrom();
-                $dateSent = $message->getDate();
-                $body = $message->getHTMLBody() ?? $message->getTextBody();
-                $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-                $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+            // Process folders first
+            foreach ($folders as $folder) {
+                $searchCharacter = $folder->search_character;
+                $method = strtolower($folder->method); // Ensure case-insensitivity
 
-                $inReplyTo = $message->getHeader()->get('in-reply-to');
-                $references = $message->getHeader()->get('references');
+                // Loop through incoming messages
+                foreach ($messages as $message) {
+                    $uid = $message->getUid();
+                    $messageId = $message->getMessageId();
+                    $subject = $message->getSubject()[0];
 
-                // Check if it's an original email (not a reply)
-                if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-                    continue;
+                    $existingMail = MailLog::where('message_id', $messageId)->first();
+
+                    $isMatch = false;
+
+                    if (!$existingMail) {
+                        $senderArray = $message->getFrom();
+                        $dateSent = $message->getDate();
+                        $body = $message->getHTMLBody() ?? $message->getTextBody();
+                        $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+                        $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+
+                        $inReplyTo = $message->getHeader()->get('in-reply-to');
+                        $references = $message->getHeader()->get('references');
+
+                        if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
+                            continue;
+                        }
+
+                        $flags = $message->getFlags()->toArray();
+                        $status = in_array('Seen', $flags) ? 'read' : 'new';
+
+                        if ($method === 'exact_match' && $subject === $searchCharacter) {
+                            $isMatch = true;
+                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        }
+
+                        if (!$isMatch) {
+                            continue;
+                        }
+
+                        $newMail = MailLog::create([
+                            'uid' => $uid,
+                            'message_id' => $messageId,
+                            'subject' => $subject,
+                            'sender' => $senderEmail,
+                            'name' => $senderName,
+                            'body' => $body,
+                            'datetime' => $dateSent[0]->toDateTimeString(),
+                            'status' => $status,
+                        ]);
+
+                        $newEmails[] = [
+                            'uid' => $uid,
+                            'message_id' => $messageId,
+                            'subject' => $subject,
+                            'sender' => $senderEmail,
+                            'name' => $senderName,
+                            'body' => $body,
+                            'datetime' => $dateSent[0]->toDateTimeString(),
+                            'status' => $status,
+                            'folder_id' => $folder->id
+                        ];
+
+                        $mailId = $newMail->id;
+                    } else {
+                        if ($method === 'exact_match' && $subject === $searchCharacter) {
+                            $isMatch = true;
+                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        }
+
+                        $mailId = $existingMail->id;
+                    }
+
+                    if($isMatch)
+                    {
+                        DB::table('folder_mails')->updateOrInsert(
+                            ['mail_log_id' => $mailId],
+                            ['folder_id' => $folder->id]
+                        );
+                    } else {
+                        DB::table('folder_mails')
+                            ->where('mail_log_id', $mailId)
+                            ->where('folder_id', $folder->id)
+                            ->delete();
+                    }
                 }
+            }
 
-                $flags = $message->getFlags()->toArray();
-                $status = in_array('Seen', $flags) ? 'read' : 'new';
+            // Broadcast new emails
+            if (!empty($newEmails)) {
+                broadcast(new TakingMail($newEmails));
+            }
 
-                // Check if email already exists in the database
-                $existingMail = MailLog::where('message_id', $messageId)->first();
-
-                if (!$existingMail) {
-                    // Save the original email to the database
-                    MailLog::create([
-                        'uid' => $uid,
-                        'message_id' => $messageId,
-                        'subject' => $subject,
-                        'sender' => $senderEmail,
-                        'name' => $senderName,
-                        'body' => $body,
-                        'datetime' => $dateSent[0]->toDateTimeString(),
-                        'status' => $status,
-                    ]);
-
-                    // Add to the newEmails array to return
-                    $newEmails[] = [
-                        'uid' => $uid,
-                        'message_id' => $messageId,
-                        'subject' => $subject,
-                        'sender' => $senderEmail,
-                        'name' => $senderName,
-                        'body' => $body,
-                        'datetime' => $dateSent[0]->toDateTimeString(),
-                        'status' => $status,
-                    ];
-
-                    broadcast(new TakingMail($newEmails));
-                }
-        }
-
+            // Remove deleted mails
             $deletedMails = MailLog::where('status', 'deleted')->delete();
         } catch (Exception $e) {
             logger()->error("Error fetching emails: " . $e->getMessage());
@@ -148,7 +232,7 @@ class MailRepository implements MailRepositoryInterface
 
     public function updatefolderAttachs()
     {
-        
+
     }
 
     public function markAsRead($id)

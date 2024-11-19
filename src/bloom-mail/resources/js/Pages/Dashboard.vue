@@ -24,6 +24,8 @@ const loading = ref(false);  // Loading status
 
 const mails = ref({});
 
+const folders = ref({});
+
 const headers = ref({
     inbox: [
         {
@@ -64,6 +66,7 @@ const itemsPerPage = 10;
 
 const selectedMail = ref(null);
 const selectedHistories = ref({})
+const selectedFolder = ref(null);
 const threadLoading = ref(false);
 
 const page = ref(1);
@@ -109,6 +112,7 @@ const fetchEmails = async () => {
     });
 
     mails.value = response.data.data.data;
+    folders.value = response.data.folders
     totalPages.value = response.data.data.last_page;
     page.value = response.data.data.current_page;
     countData.value = response.data
@@ -118,6 +122,31 @@ const fetchEmails = async () => {
     loading.value = false;
   }
 };
+
+const fetchEmailsWithFolderId = async () => {
+  removeRow()
+
+  loading.value = true;
+
+  try {
+    const response = await axios.get(`/mails/fetch/folder/` + selectedFolder.value, {
+      params: {
+        page: page.value ?? 1
+      },
+    });
+
+    mails.value = response.data.data.data;
+    folders.value = response.data.folders
+    totalPages.value = response.data.data.last_page;
+    page.value = response.data.data.current_page;
+    countData.value = response.data
+  } catch (error) {
+    console.error('Error fetching emails:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
 
 
 const markAsRead = async (id) => {
@@ -183,10 +212,18 @@ const changeMailStatus = (id) => {
     });
 };
 
-const setPageType = (type) => {
+const setPageType = (type, folder_id = null) => {
   pageType.value = type;
   mails.value = {}
-  fetchEmails()
+  selectedFolder.value = folder_id
+
+  console.log(selectedFolder.value)
+  if(folder_id != null)
+  {
+    fetchEmailsWithFolderId()
+  } else {
+    fetchEmails()
+  }
 };
 
 const goToSpam = () => {
@@ -201,7 +238,12 @@ onMounted(() => {
         console.log(event.mails);
         if(event.mails.length > 0 && page.value == 1 && pageType.value == 'inbox')
         {
-            fetchEmails()
+            if(selectedFolder.value == null)
+            {
+                fetchEmails()
+            } else {
+                fetchEmailsWithFolderId()
+            }
         }
     })
     .error((error) => {
@@ -250,21 +292,28 @@ onUnmounted(() => {
                         <VRow>
                             <VCol cols="12" lg="2">
                                <!-- Inbox -->
-                                <div class="mb-5 cursor-pointer" @click="setPageType('inbox')">
+                                <div class="mb-5 cursor-pointer" @click="setPageType('inbox', null)">
                                     <p :class="{ 'active-route': pageType === 'inbox' }">
                                         {{ $t('nav.inbox') }} ( {{ countData?.inbox ?? 0 }} )
                                     </p>
                                 </div>
 
+                                <div v-for="folder in folders" :key="folder.id" class="ml-4">
+                                    <!-- Top-level folder -->
+                                    <div class="cursor-pointer" @click="setPageType('inbox', folder.id)" v-if="folder.mails_count > 0">
+                                        <p :class="{ 'active-route': pageType === 'inbox' && folder.id === selectedFolder }">{{ folder.name }} ( {{ folder.mails_count }} )</p>
+                                    </div>
+                                </div>
+
                                 <!-- Sent Mail -->
-                                <div class="my-10 cursor-pointer" @click="setPageType('sent')">
+                                <div class="my-10 cursor-pointer" @click="setPageType('sent', null)">
                                     <p :class="{ 'active-route': pageType === 'sent' }">
                                         {{ $t('nav.sent') }}  ( {{ countData?.sent ?? 0 }} )
                                      </p>
                                 </div>
 
                                 <!-- Draft Email -->
-                                <div class="my-10 cursor-pointer" @click="setPageType('draft')">
+                                <div class="my-10 cursor-pointer" @click="setPageType('draft', null)">
                                     <p :class="{ 'active-route': pageType === 'draft' }">{{ $t('nav.draft') }} </p>
                                 </div>
 
@@ -274,7 +323,7 @@ onUnmounted(() => {
                                 </div>
 
                                 <!-- Trash Can -->
-                                <div class="my-10 cursor-pointer" @click="setPageType('trash')">
+                                <div class="my-10 cursor-pointer" @click="setPageType('trash', null)">
                                     <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash')}}</p>
                                 </div>
                             </VCol>

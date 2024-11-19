@@ -19,23 +19,32 @@ class MailLog extends Model
 
     public function getSubjectAttribute($value)
     {
-        try {
-            $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
-            return $decodedValue ?: $value;
-        } catch (\Exception $e) {
-            logger()->error("Error decoding subject: " . $e->getMessage());
-            return $value;
-        }
+        return $this->safeDecode($value, 'subject');
     }
 
     public function getNameAttribute($value)
     {
+        return $this->safeDecode($value, 'name');
+    }
+
+    private function safeDecode($value, $attribute)
+    {
         try {
-            $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
-            return $decodedValue ?: $value;
-        } catch (\Exception $e) {
-            logger()->error("Error decoding subject: " . $e->getMessage());
+            if (preg_match('/=\?[^?]+\?/', $value)) {
+                $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
+                return $decodedValue ?: $value;
+            }
+
             return $value;
+        } catch (\Exception $e) {
+            logger()->error("Error decoding {$attribute}: " . $e->getMessage());
+            return $value; 
         }
+    }
+
+
+    public function folders()
+    {
+        return $this->belongsToMany(Folder::class, 'folder_mails', 'mail_log_id', 'folder_id');
     }
 }

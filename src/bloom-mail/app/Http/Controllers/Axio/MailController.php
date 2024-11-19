@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Axio;
 
+use App\Models\Folder;
 use App\Models\MailLog;
 use Illuminate\Http\Request;
 use App\Events\EmailStatusUpdated;
@@ -20,6 +21,13 @@ class MailController extends Controller
     public function index()
     {
         $mails = $this->mailRepository->inbox();
+
+        return response()->json($mails);
+    }
+
+    public function indexWithFolderId(Folder $folder)
+    {
+        $mails = $this->mailRepository->inboxWithFolderId($folder);
 
         return response()->json($mails);
     }

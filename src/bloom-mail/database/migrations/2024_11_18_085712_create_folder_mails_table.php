@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('folder_mails', function (Blueprint $table) {
-            $table->id();
+            $table->foreignId('mail_log_id')->constrained()->onDelete('cascade');
+            $table->foreignId('folder_id')->constrained()->onDelete('cascade');
+            $table->primary(['mail_log_id', 'folder_id']);
             $table->timestamps();
         });
     }

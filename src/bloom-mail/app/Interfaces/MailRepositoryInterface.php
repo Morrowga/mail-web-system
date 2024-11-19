@@ -2,6 +2,7 @@
 
 namespace App\Interfaces;
 
+use App\Models\Folder;
 use App\Models\MailLog;
 use App\Models\SentMail;
 use Illuminate\Http\Request;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 interface MailRepositoryInterface
 {
     public function inbox();
+
+    public function inboxWithFolderId(Folder $folder);
 
     public function newMessage();
 

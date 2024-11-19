@@ -1,6 +1,6 @@
 {
     "auth": {
-        "login_id": "ログイン識別",
+        "login_id": "ログイン ID",
         "password": "パスワード",
         "remember_me": "ログイン状態を保持",
         "login": "ログイン"

@@ -14,6 +14,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('mails/fetch', [MailController::class, 'index'])
         ->name('fetch-mails');
 
+    Route::get('mails/fetch/folder/{folder}', [MailController::class, 'indexWithFolderId'])
+        ->name('fetch-mails-with-folder-id');
+
+
     Route::get('mails/histories/{id}', [MailController::class, 'getHistories'])
         ->name('histories');
 
