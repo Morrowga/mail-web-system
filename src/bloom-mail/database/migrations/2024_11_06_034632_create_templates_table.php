@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('subject');
             $table->foreignId('folder_id')
+            ->nullable()
             ->references('id')
             ->on('folders')->onDelete('cascade');
             $table->foreignId('template_category_id')

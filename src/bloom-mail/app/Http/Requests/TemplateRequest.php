@@ -24,7 +24,7 @@ class TemplateRequest extends FormRequest
         return [
             "title" => ['required'],
             "subject" => ['required'],
-            "folder_id" => ['required'],
+            "folder_id" => ['nullable'],
             "template_category_id" => ['required'],
             "message_content" => ['required'],
         ];
