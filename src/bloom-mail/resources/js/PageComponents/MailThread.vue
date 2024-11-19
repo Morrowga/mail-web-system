@@ -8,8 +8,15 @@
                         <p> <strong class="text-capitalize">{{ reply.name }} </strong> <{{ reply.sender }}></p>
                         <br>
                         <p>
-                        <div v-html="formattedReplyBody"></div>
+                            <div v-html="formattedReplyBody"></div>
                         </p>
+                        <div v-if="reply?.uid == null">
+                            <hr class="my-2">
+                            <p>
+                                <div v-html="reply?.template?.message_content ?? ''"></div>
+                            </p>
+                        </div>
+
                     </div>
                     <div>
                         <p>{{ reply.datetime }}</p>

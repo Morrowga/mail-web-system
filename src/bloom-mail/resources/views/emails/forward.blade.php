@@ -9,10 +9,14 @@
 
     <hr>
 
-    <div style="margin-top: 10px;">
-        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">
-            {!! $forwardMailData->template?->message_content ?? '' !!}
+    <div style="margin-top: 5px;">
+        <span>
+            {{ $forwardMailData->template?->subject ?? ''}}
         </span>
+    </div>
+
+    <div style="margin-top: 3px;">
+        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $forwardMailData->template?->message_content ?? '' !!}</span>
     </div>
 
     <hr>

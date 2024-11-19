@@ -182,7 +182,7 @@ onMounted(() => {
                                         </div>
                                     </div>
                                 </VCol>
-                                <VCol cols="4">
+                                <!-- <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
                                             <span class="font-bold">{{ $t('input.person_in_charge')}}</span>
@@ -191,7 +191,7 @@ onMounted(() => {
                                             ちは
                                         </div>
                                     </div>
-                                </VCol>
+                                </VCol> -->
                             </VRow>
                             <VDivider class="mt-1" />
                             <VRow>

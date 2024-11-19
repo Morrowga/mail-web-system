@@ -11,7 +11,7 @@ const form = useForm({
     subject: props?.template?.subject ?? '',
     folder_id: props?.template?.folder_id ?? null,
     template_category_id: props?.template?.template_category_id ?? null,
-    message_content: props?.template?.message_content ?? ''
+    message_content: props?.template?.message_content ?? null
 })
 
 const formSubmit = () => {

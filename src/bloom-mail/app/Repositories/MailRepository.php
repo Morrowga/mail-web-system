@@ -65,7 +65,7 @@ class MailRepository implements MailRepositoryInterface
 
         switch ($pageType) {
             case 'sent':
-                $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->paginate(10);
+                $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->with('template')->paginate(10);
                 break;
 
             case 'inbox':

@@ -14,7 +14,7 @@ class MailLog extends Model
 
     public function mail_histories()
     {
-        return $this->hasMany(SentMail::class, 'parent_id');
+        return $this->hasMany(SentMail::class, 'parent_id')->with('template');
     }
 
     public function getSubjectAttribute($value)
@@ -38,7 +38,7 @@ class MailLog extends Model
             return $value;
         } catch (\Exception $e) {
             logger()->error("Error decoding {$attribute}: " . $e->getMessage());
-            return $value; 
+            return $value;
         }
     }
 

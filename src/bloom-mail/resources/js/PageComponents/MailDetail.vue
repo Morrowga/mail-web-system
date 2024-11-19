@@ -162,13 +162,12 @@ const handleStatusChange = () => {
                     </div>
                 </div>
                 <p v-if="props?.pageType == 'sent'" class="my-3">
-                    <!-- Attn:
-                    <br>
-                    <br> -->
-                    <span v-html="props?.mail?.body" style="white-space: pre-wrap;   word-break: break-word; overflow-wrap: break-word;"></span>
+                    <span v-html="props?.mail?.body" style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;"></span>
+                    <hr class="my-2">
+                    <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{{ props?.mail?.template?.message_content }}</span>
                 </p>
             </div>
-            <hr style="opacity: 0.3;">
+            <hr style="opacity: 0.3;" v-if="props?.pageType != 'sent'">
             <div v-if="threadLoading" class="loading-overlay d-flex justify-center my-5">
                 <v-progress-circular indeterminate color="blue"></v-progress-circular>
             </div>
