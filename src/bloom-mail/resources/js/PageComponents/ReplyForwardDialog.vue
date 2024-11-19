@@ -146,12 +146,12 @@ watch(() => props.type, (newType) => {
                                     </div>
                                 </VCol>
                                 <VCol cols="4">
-                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                    <div class="d-flex justify-between align-items-center" style="height: 100%;" v-if="props?.mailData?.status == 'resolved'">
                                         <div style="width: 50%; align-self: flex-end;">
                                             <span class="font-bold">{{ $t('input.person_in_charge') }}</span>
                                         </div>
                                         <div style="width: 50%; align-self: flex-end;">
-                                            ちは
+                                            {{ props?.mailData?.person_in_charge ?? '-'}}
                                         </div>
                                     </div>
                                 </VCol>

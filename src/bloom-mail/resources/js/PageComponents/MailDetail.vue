@@ -140,7 +140,7 @@ const handleStatusChange = () => {
                             {{ props?.mail?.sender }}
                         </p>
                         <p v-if="props?.mail?.status == 'resolved'" class="my-3">
-                            {{ $t('input.person_in_charge_text') }}: {{ props?.mail?.person_in_charge }}
+                            {{ $t('input.person_in_charge_text') }}: {{ props?.mail?.person_in_charge ?? '' }}
                         </p>
                     </div>
                     <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status != 'confirmed'">
