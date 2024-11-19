@@ -118,7 +118,7 @@ class MailRepository implements MailRepositoryInterface
             foreach ($messages as $message) {
                 $uid = $message->getUid();
                 $messageId = $message->getMessageId();
-                $subject = $message->getSubject()[0];
+                $subject = $this->decodeString($message->getSubject()[0]);
 
                 $existingMail = MailLog::where('message_id', $messageId)->first();
 
@@ -256,7 +256,7 @@ class MailRepository implements MailRepositoryInterface
                 $uid = $threadMessage->getUid();
                 $messageId = $threadMessage->getMessageId()[0];
                 $subject = isset($threadMessage->getSubject()[0])
-                ? $this->decodeSubject($threadMessage->getSubject()[0])
+                ? $this->decodeString($threadMessage->getSubject()[0])
                 : 'No Subject';
                 $senderArray = $threadMessage->getFrom();
                 $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
@@ -278,7 +278,7 @@ class MailRepository implements MailRepositoryInterface
                     'message_id' => $messageId,
                     'subject' => $subject,
                     'sender' => $senderEmail,
-                    'name' => iconv_mime_decode($senderName),
+                    'name' => $this->decodeString($senderName),
                     'body' => $body,
                     'datetime' => $dateSent->toDateTimeString(),
                     'status' => $status,
@@ -306,15 +306,21 @@ class MailRepository implements MailRepositoryInterface
         }
     }
 
-    private function decodeSubject($subject)
+    private function decodeString($value)
     {
         try {
-            return iconv_mime_decode($subject, 0, 'UTF-8') ?: 'No Subject';
+            if (preg_match('/=\?[^?]+\?/', $value)) {
+                $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
+                return $decodedValue ?: $value;
+            }
+
+            return $value;
         } catch (\Exception $e) {
-            logger()->error("Error decoding subject: " . $e->getMessage());
-            return 'No Subject';
+            logger()->error("Error decoding {$attribute}: " . $e->getMessage());
+            return $value;
         }
     }
+
 
 
     public function reply(Request $request, MailLog $mail_log)
