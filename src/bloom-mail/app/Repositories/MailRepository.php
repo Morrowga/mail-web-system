@@ -112,118 +112,100 @@ class MailRepository implements MailRepositoryInterface
         try {
             $inbox = $this->client->getFolder('INBOX');
             $messages = $inbox->messages()->all()->get();
-
-            // Fetch all folders with their criteria
-            $folders = Folder::all();
-
             $newEmails = [];
 
-            // Process folders first
+            // Step 1: Process incoming messages and add to the database
+            foreach ($messages as $message) {
+                $uid = $message->getUid();
+                $messageId = $message->getMessageId();
+                $subject = $message->getSubject()[0];
+
+                $existingMail = MailLog::where('message_id', $messageId)->first();
+
+                if (!$existingMail) {
+                    $senderArray = $message->getFrom();
+                    $dateSent = $message->getDate();
+                    $body = $message->getHTMLBody() ?? $message->getTextBody();
+                    $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+                    $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+
+                    $inReplyTo = $message->getHeader()->get('in-reply-to');
+                    $references = $message->getHeader()->get('references');
+
+                    if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
+                        continue;
+                    }
+
+                    $flags = $message->getFlags()->toArray();
+                    $status = in_array('Seen', $flags) ? 'read' : 'new';
+
+                    $newMail = MailLog::create([
+                        'uid' => $uid,
+                        'message_id' => $messageId,
+                        'subject' => $subject,
+                        'sender' => $senderEmail,
+                        'name' => $senderName,
+                        'body' => $body,
+                        'datetime' => $dateSent[0]->toDateTimeString(),
+                        'status' => $status,
+                    ]);
+
+                    $newEmails[] = [
+                        'uid' => $uid,
+                        'message_id' => $messageId,
+                        'subject' => $subject,
+                        'sender' => $senderEmail,
+                        'name' => $senderName,
+                        'body' => $body,
+                        'datetime' => $dateSent[0]->toDateTimeString(),
+                        'status' => $status,
+                    ];
+                }
+            }
+
+            // Step 2: Process folders and match emails to folders
+            $folders = Folder::all();
+
             foreach ($folders as $folder) {
                 $searchCharacter = $folder->search_character;
                 $method = strtolower($folder->method); // Ensure case-insensitivity
 
-                // Loop through incoming messages
-                foreach ($messages as $message) {
-                    $uid = $message->getUid();
-                    $messageId = $message->getMessageId();
-                    $subject = $message->getSubject()[0];
+                $allMails = MailLog::all(); // Get all mails to process for folder matching
 
-                    $existingMail = MailLog::where('message_id', $messageId)->first();
-
+                foreach ($allMails as $mail) {
+                    $subject = $mail->subject;
                     $isMatch = false;
 
-                    if (!$existingMail) {
-                        $senderArray = $message->getFrom();
-                        $dateSent = $message->getDate();
-                        $body = $message->getHTMLBody() ?? $message->getTextBody();
-                        $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-                        $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
-
-                        $inReplyTo = $message->getHeader()->get('in-reply-to');
-                        $references = $message->getHeader()->get('references');
-
-                        if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-                            continue;
-                        }
-
-                        $flags = $message->getFlags()->toArray();
-                        $status = in_array('Seen', $flags) ? 'read' : 'new';
-
-                        if ($method === 'exact_match' && $subject === $searchCharacter) {
-                            $isMatch = true;
-                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        }
-
-                        if (!$isMatch) {
-                            continue;
-                        }
-
-                        $newMail = MailLog::create([
-                            'uid' => $uid,
-                            'message_id' => $messageId,
-                            'subject' => $subject,
-                            'sender' => $senderEmail,
-                            'name' => $senderName,
-                            'body' => $body,
-                            'datetime' => $dateSent[0]->toDateTimeString(),
-                            'status' => $status,
-                        ]);
-
-                        $newEmails[] = [
-                            'uid' => $uid,
-                            'message_id' => $messageId,
-                            'subject' => $subject,
-                            'sender' => $senderEmail,
-                            'name' => $senderName,
-                            'body' => $body,
-                            'datetime' => $dateSent[0]->toDateTimeString(),
-                            'status' => $status,
-                            'folder_id' => $folder->id
-                        ];
-
-                        $mailId = $newMail->id;
-                    } else {
-                        if ($method === 'exact_match' && $subject === $searchCharacter) {
-                            $isMatch = true;
-                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        }
-
-                        $mailId = $existingMail->id;
+                    if ($method === 'exact_match' && $subject === $searchCharacter) {
+                        $isMatch = true;
+                    } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                        $isMatch = true;
+                    } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                        $isMatch = true;
+                    } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                        $isMatch = true;
                     }
 
-                    if($isMatch)
-                    {
+                    if ($isMatch) {
                         DB::table('folder_mails')->updateOrInsert(
-                            ['mail_log_id' => $mailId],
+                            ['mail_log_id' => $mail->id],
                             ['folder_id' => $folder->id]
                         );
                     } else {
                         DB::table('folder_mails')
-                            ->where('mail_log_id', $mailId)
+                            ->where('mail_log_id', $mail->id)
                             ->where('folder_id', $folder->id)
                             ->delete();
                     }
                 }
             }
 
-            // Broadcast new emails
-            if (!empty($newEmails)) {
-                broadcast(new TakingMail($newEmails));
-            }
-
-            // Remove deleted mails
             $deletedMails = MailLog::where('status', 'deleted')->delete();
+
+            $checkNew = count($newEmails) > 0 ? 1 : 0;
+
+            broadcast(new TakingMail(["new" => $checkNew]));
+
         } catch (Exception $e) {
             logger()->error("Error fetching emails: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to fetch mails.'], 500);

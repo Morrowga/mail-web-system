@@ -236,7 +236,8 @@ onMounted(() => {
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
-        if(event.mails.length > 0 && page.value == 1 && pageType.value == 'inbox')
+        let result = event.mails;
+        if(result?.new == 1 && page.value == 1 && pageType.value == 'inbox')
         {
             if(selectedFolder.value == null)
             {
