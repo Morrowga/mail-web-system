@@ -6,7 +6,7 @@ import MailDetail from '@/PageComponents/MailDetail.vue';
 import MailTable from '@/PageComponents/MailTable.vue';
 import Pagination from '@/PageComponents/Pagination.vue';
 import { Head,router } from '@inertiajs/vue3';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, initCustomFormatter, onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 
@@ -261,10 +261,14 @@ onMounted(() => {
 
       if (mail) {
         mail.status = new_status;
-        mail.person_in_charge = person_in_charge
-
-        selectedMail.value.person_in_charge = person_in_charge
         selectedMail.value.status = new_status
+
+        if(mail.status == 'resolved')
+        {
+            mail.person_in_charge = person_in_charge ?? ''
+            selectedMail.value.person_in_charge = person_in_charge ?? ''
+        }
+
       }
 
       console.log(`Mail ${mail_id} status changed to ${new_status}`);
