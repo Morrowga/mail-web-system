@@ -319,9 +319,9 @@ onUnmounted(() => {
                                 </div>
 
                                 <!-- Draft Email -->
-                                <div class="my-10 cursor-pointer" @click="setPageType('draft', null)">
+                                <!-- <div class="my-10 cursor-pointer" @click="setPageType('draft', null)">
                                     <p :class="{ 'active-route': pageType === 'draft' }">{{ $t('nav.draft') }} </p>
-                                </div>
+                                </div> -->
 
                                 <!-- Spam: Navigates to Spam route -->
                                 <div class="my-10 cursor-pointer" @click="goToSpam">
@@ -329,9 +329,9 @@ onUnmounted(() => {
                                 </div>
 
                                 <!-- Trash Can -->
-                                <div class="my-10 cursor-pointer" @click="setPageType('trash', null)">
+                                <!-- <div class="my-10 cursor-pointer" @click="setPageType('trash', null)">
                                     <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash')}}</p>
-                                </div>
+                                </div> -->
                             </VCol>
                             <VCol cols="12" :lg="selectedMail ? 5 : 10"
                             >

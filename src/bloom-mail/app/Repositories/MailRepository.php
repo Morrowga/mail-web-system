@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use DateTime;
 use Carbon\Carbon;
+use App\Models\Spam;
 use App\Models\Reply;
 use App\Mail\SendMail;
 use App\Models\Folder;
@@ -128,6 +129,15 @@ class MailRepository implements MailRepositoryInterface
                     $body = $message->getHTMLBody() ?? $message->getTextBody();
                     $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
                     $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+
+                    $spamCheck = Spam::where('mail_address', $senderEmail)->first();
+
+                    if(!empty($spamCheck))
+                    {
+                        $message->move('INBOX.Junk');
+
+                        continue;
+                    }
 
                     $inReplyTo = $message->getHeader()->get('in-reply-to');
                     $references = $message->getHeader()->get('references');

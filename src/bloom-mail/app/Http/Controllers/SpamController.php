@@ -6,6 +6,7 @@ use App\Models\Spam;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Requests\SpamRequest;
+use App\Interfaces\MailRepositoryInterface;
 use App\Interfaces\SpamRepositoryInterface;
 
 class SpamController extends Controller

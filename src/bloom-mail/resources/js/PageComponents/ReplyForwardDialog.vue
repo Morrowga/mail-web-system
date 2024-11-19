@@ -263,11 +263,4 @@ watch(() => props.type, (newType) => {
     font-size: 13px;
 }
 
-.spamtrashbtn {
-    font-size: 11px;
-    width: 20px;
-    height: 20px;
-    box-shadow: none;
-    border: 2px solid #a5a5a5;
-}
-</style>
+</style>w

@@ -102,10 +102,10 @@ onMounted(() => {
             <VCard>
                 <!-- Card Header with Icons -->
                 <VCardTitle class="d-flex justify-end align-center">
-                    <div class="text-right">
+                    <!-- <div class="text-right">
                         <VBtn class="spamtrashbtn">{{ $t('buttons.spam') }}</VBtn>
                         <VBtn class="mx-2 spamtrashbtn">{{ $t('buttons.trash') }}</VBtn>
-                    </div>
+                    </div> -->
                     <!-- Minimize Icon -->
                     <div class="icon-border d-flex justify-center align-items-center">
                         <VIcon
