@@ -62,13 +62,35 @@ const formSubmit = () => {
     });
 };
 
-const itemProps = (item) => {
+const itemProps = (item) =>  {
+    console.log(item);
     return {
-        title: item.title,
-        value: item.id,
-        subtitle: item.template_category?.name,
+        title: item.text,
+        value: item.value,
+        disabled: item.disabled
     }
 }
+
+const formatTemplates = (responses) => {
+  const categories = responses.reduce((acc, item) => {
+    const categoryName = item.template_category.name;
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+    acc[categoryName].push({ text: item.title, value: item.id });
+    return acc;
+  }, {});
+
+  const formattedData = [];
+  for (const [category, templates] of Object.entries(categories)) {
+    formattedData.push({ text: category, disabled: true });
+    formattedData.push(...templates);
+  }
+
+  return formattedData;
+};
+
+const modifiedTemplates = formatTemplates(page?.props?.templates);
 
 const onTemplateChange = (templateId) => {
     let templateSelected = page?.props?.templates.find(
@@ -218,7 +240,7 @@ watch(() => props.type, (newType) => {
                                             placeholder="Select Template"
                                             v-model="form.template_id"
                                             variant="outlined" density="compact" required hide-details
-                                            :items="page?.props?.templates"
+                                            :items="modifiedTemplates"
                                             :item-props="itemProps"
                                             @update:model-value="onTemplateChange"
                                             ></VSelect>

@@ -35,18 +35,6 @@ class MailController extends Controller
         ]);
     }
 
-    public function sentMails()
-    {
-        $templates = $this->templateRepository->getOnlyTemplates();
-
-        $from = env('IMAP_USERNAME');
-
-        return Inertia::render('Sent/Index', [
-            "templates" => $templates['data'],
-            "from" => $from
-        ]);
-    }
-
     public function replyForward(ReplyForwardRequest $request, MailLog $mail_log)
     {
         $sendRequest = $request->type == 'reply' ?  $this->mailRepository->reply($request, $mail_log) :  $this->mailRepository->forward($request, $mail_log);

@@ -49,7 +49,7 @@ const handleRowClick = (row) => {
                 <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
                 {{ getTranslatedStatus(t, email[header.value]) }}
                 </VChip>
-                <p class="px-2 py-1">{{ email.person_in_charge }}</p>
+                <p class="px-2 py-1" v-if="email.status != 'read' || email.status != 'new'">{{ email.person_in_charge }}</p>
             </div>
           </template>
           <template v-else>

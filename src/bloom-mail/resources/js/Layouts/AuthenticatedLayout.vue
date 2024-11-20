@@ -12,6 +12,10 @@ const showingNavigationDropdown = ref(false);
 const { props } = usePage();
 
 
+const onPrependClick = () => {
+    console.log("Prepend icon clicked!");
+}
+
 </script>
 
 <template>
@@ -33,6 +37,7 @@ const { props } = usePage();
                                 <VTextField
                                     :loading="loading"
                                     prepend-inner-icon="mdi-magnify"
+                                    @click:prepend-inner="onPrependClick"
                                     density="compact"
                                     variant="solo"
                                     hide-details

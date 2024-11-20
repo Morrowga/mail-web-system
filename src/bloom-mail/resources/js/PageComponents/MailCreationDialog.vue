@@ -16,6 +16,7 @@ label: String
 const { t, locale } = useI18n();
 
 const dialog = ref(props.createDialog);
+const isMenuOpen = ref(false);
 const formattedDateTime = ref(null);
 
 const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue']);
@@ -80,13 +81,40 @@ const formSubmit = () => {
     });
 };
 
-const itemProps = (item) => {
+const formatTemplates = (responses) => {
+  const categories = responses.reduce((acc, item) => {
+    const categoryName = item.template_category.name;
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+    acc[categoryName].push({ text: item.title, value: item.id }); // Template as selectable
+    return acc;
+  }, {});
+
+  const formattedData = [];
+  for (const [category, templates] of Object.entries(categories)) {
+    formattedData.push({ text: category, disabled: true }); // Category as read-only
+    formattedData.push(...templates); // Add templates under the category
+  }
+
+  return formattedData;
+};
+
+const modifiedTemplates = formatTemplates(props?.templates);
+
+onMounted(() => {
+  formatDateTime();
+});
+
+const itemProps = (item) =>  {
+    console.log(item);
     return {
-        title: item.title,
-        value: item.id,
-        subtitle: item.template_category?.name,
+        title: item.text,
+        value: item.value,
+        disabled: item.disabled
     }
 }
+
 
 const onTemplateChange = (templateId) => {
     let templateSelected = props?.templates.find(
@@ -96,12 +124,6 @@ const onTemplateChange = (templateId) => {
     form.subject = templateSelected?.subject;
     form.message_content = templateSelected?.message_content;
 }
-
-
-onMounted(() => {
-  formatDateTime();
-});
-
 
 </script>
 <template>
@@ -251,13 +273,16 @@ onMounted(() => {
                                         </div>
                                         <div style="width: 80%;">
                                             <VSelect
-                                            placeholder="Select Template"
-                                            v-model="form.template_id"
-                                            variant="outlined" density="compact" required hide-details
-                                            :items="props?.templates"
-                                            :item-props="itemProps"
-                                            @update:model-value="onTemplateChange"
-                                            >
+                                                placeholder="Select Template"
+                                                v-model="form.template_id"
+                                                variant="outlined"
+                                                density="compact"
+                                                required
+                                                hide-details
+                                                :items="modifiedTemplates"
+                                                :item-props="itemProps"
+                                                @update:model-value="onTemplateChange"
+                                                >
                                             </VSelect>
                                         </div>
                                         <InputError class="mt-1" :message="form.errors.template" />
