@@ -45,9 +45,12 @@ const handleRowClick = (row) => {
       <tr v-else v-for="(email, index) in data" :key="index" @click="handleRowClick(email)" class="cursor-pointer">
         <td v-for="header in headers" :key="header.value" :style="{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }">
           <template v-if="header.value === 'status' && pageType === 'inbox'">
-            <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
-              {{ getTranslatedStatus(t, email[header.value]) }}
-            </VChip>
+            <div class="d-flex justify-start">
+                <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
+                {{ getTranslatedStatus(t, email[header.value]) }}
+                </VChip>
+                <p class="px-2 py-1">{{ email.person_in_charge }}</p>
+            </div>
           </template>
           <template v-else>
             {{ email[header.value] }}

@@ -62,6 +62,24 @@ const formSubmit = () => {
     });
 };
 
+const itemProps = (item) => {
+    return {
+        title: item.title,
+        value: item.id,
+        subtitle: item.template_category?.name,
+    }
+}
+
+const onTemplateChange = (templateId) => {
+    let templateSelected = page?.props?.templates.find(
+        (template) => template.id === templateId
+    );
+
+    form.subject = templateSelected?.subject;
+    form.message_content = templateSelected?.message_content;
+}
+
+
 onMounted(() => {
   formatDateTime();
 });
@@ -201,8 +219,8 @@ watch(() => props.type, (newType) => {
                                             v-model="form.template_id"
                                             variant="outlined" density="compact" required hide-details
                                             :items="page?.props?.templates"
-                                            item-title="title"
-                                            item-value="id"
+                                            :item-props="itemProps"
+                                            @update:model-value="onTemplateChange"
                                             ></VSelect>
                                         </div>
                                         <InputError class="mt-1" :message="form.errors.template" />

@@ -7,6 +7,7 @@ use App\Models\MailLog;
 use Illuminate\Http\Request;
 use App\Events\EmailStatusUpdated;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Interfaces\MailRepositoryInterface;
 
 class MailController extends Controller
@@ -50,6 +51,7 @@ class MailController extends Controller
     {
         $mail_Log->update([
             'previous_status' => $mail_Log->status,
+            'person_in_charge' => Auth::user()->name,
             'status' => 'replying'
         ]);
 
@@ -63,7 +65,8 @@ class MailController extends Controller
     public function changeConfirmed(Request $request, MailLog $mail_Log)
     {
         $mail_Log->update([
-            'status' => 'confirmed'
+            'status' => 'confirmed',
+            'person_in_charge' => Auth::user()->name
         ]);
 
         broadcast(new EmailStatusUpdated($mail_Log, 'confirmed'));

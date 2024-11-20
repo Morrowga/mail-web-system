@@ -68,7 +68,9 @@ class MailRepository implements MailRepositoryInterface
             case 'sent':
                 $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->with('template')->paginate(10);
                 break;
-
+            case 'trash':
+                $data = MailLog::orderBy('datetime', 'desc')->where('status','deleted')->paginate(10);
+                break;
             case 'inbox':
             default:
                 $data = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->paginate(10);
@@ -134,7 +136,7 @@ class MailRepository implements MailRepositoryInterface
 
                     if(!empty($spamCheck))
                     {
-                        $message->move('INBOX.Junk');
+                        $message->move('Junk');
 
                         continue;
                     }
@@ -331,8 +333,6 @@ class MailRepository implements MailRepositoryInterface
         }
     }
 
-
-
     public function reply(Request $request, MailLog $mail_log)
     {
         if (!$mail_log) {
@@ -394,8 +394,6 @@ class MailRepository implements MailRepositoryInterface
             return $this->error('Failed to send reply email.');
         }
     }
-
-
 
     public function forward(Request $request, MailLog $mail_log)
     {
@@ -466,7 +464,7 @@ class MailRepository implements MailRepositoryInterface
             $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
             if ($message) {
-                $message->delete();
+                $message->delete(true);
             }
 
             $mailLog->status = 'deleted';

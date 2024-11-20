@@ -9,7 +9,6 @@ const props = defineProps(['template_categories', 'folders', 'template'])
 const form = useForm({
     title: props?.template?.title ?? '',
     subject: props?.template?.subject ?? '',
-    folder_id: props?.template?.folder_id ?? null,
     template_category_id: props?.template?.template_category_id ?? null,
     message_content: props?.template?.message_content ?? null
 })
@@ -84,25 +83,6 @@ const formSubmit = () => {
                                                             required
                                                         ></VTextField>
                                                         <InputError class="mb-2" :message="form.errors.subject" />
-                                                    </div>
-                                                </div>
-                                            </VCol>
-                                            <VCol cols="12" class="py-0">
-                                                <div class="d-flex justify-start">
-                                                    <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="folder" :value="$t('input.folder')"/>
-                                                    </div>
-                                                    <div style="width: 83%;">
-                                                        <VSelect
-                                                            :placeholder="$t('input.select_folder')"
-                                                            v-model="form.folder_id"
-                                                            class="mt-1"
-                                                            variant="outlined" density="compact" required hide-details
-                                                            :items="props?.folders"
-                                                            item-value="id"
-                                                            item-title="search_character"
-                                                        ></VSelect>
-                                                        <InputError class="my-2" :message="form.errors.folder_id" />
                                                     </div>
                                                 </div>
                                             </VCol>

@@ -24,6 +24,7 @@ watch(() => props.createDialog, (newVal) => {
     dialog.value = newVal;
 });
 
+
 const minimizeDialog = () => {
     dialog.value = false;
     emit('update:visibleFloat', true);
@@ -78,6 +79,23 @@ const formSubmit = () => {
         },
     });
 };
+
+const itemProps = (item) => {
+    return {
+        title: item.title,
+        value: item.id,
+        subtitle: item.template_category?.name,
+    }
+}
+
+const onTemplateChange = (templateId) => {
+    let templateSelected = props?.templates.find(
+        (template) => template.id === templateId
+    );
+
+    form.subject = templateSelected?.subject;
+    form.message_content = templateSelected?.message_content;
+}
 
 
 onMounted(() => {
@@ -237,9 +255,10 @@ onMounted(() => {
                                             v-model="form.template_id"
                                             variant="outlined" density="compact" required hide-details
                                             :items="props?.templates"
-                                            item-title="title"
-                                            item-value="id"
-                                            ></VSelect>
+                                            :item-props="itemProps"
+                                            @update:model-value="onTemplateChange"
+                                            >
+                                            </VSelect>
                                         </div>
                                         <InputError class="mt-1" :message="form.errors.template" />
                                     </div>

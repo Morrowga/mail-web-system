@@ -8,18 +8,6 @@
 
     <hr>
 
-    <div style="margin-top: 5px;">
-        <span>
-            {{ $replyMailData->template?->subject ?? ''}}
-        </span>
-    </div>
-
-    <div style="margin-top: 3px;">
-        <span style="white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">{!! $replyMailData->template?->message_content ?? '' !!}</span>
-    </div>
-
-    <hr>
-
     <!-- Original Message Section -->
     <p>--- Original Message ---</p>
     <p><strong>From:</strong> {{ $originalEmail['sender'] }}</p>

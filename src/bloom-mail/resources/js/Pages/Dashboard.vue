@@ -59,6 +59,20 @@ const headers = ref({
             value: "datetime"
         }
     ],
+    trash: [
+        {
+            name: t('table.sender'),
+            value: "sender"
+        },
+        {
+            name: t('table.subject'),
+            value: "subject"
+        },
+        {
+            name: t('table.datetime'),
+            value: "datetime"
+        }
+    ],
 });
 const countData = ref({})
 
@@ -261,12 +275,18 @@ onMounted(() => {
 
       if (mail) {
         mail.status = new_status;
-        selectedMail.value.status = new_status
+        if(selectedMail.value != null)
+        {
+            selectedMail.value.status = new_status
+        }
 
         if(mail.status == 'resolved')
         {
             mail.person_in_charge = person_in_charge ?? ''
-            selectedMail.value.person_in_charge = person_in_charge ?? ''
+            if(selectedMail.value != null)
+            {
+                selectedMail.value.person_in_charge = person_in_charge ?? ''
+            }
         }
 
       }

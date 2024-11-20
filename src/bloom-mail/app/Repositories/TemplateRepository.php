@@ -33,7 +33,7 @@ class TemplateRepository implements TemplateRepositoryInterface
     {
         try {
 
-            $templates = Template::get();
+            $templates = Template::with('templateCategory')->get();
 
             return $this->success('Fetched Templates', $templates);
 

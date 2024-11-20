@@ -49,7 +49,7 @@ return [
         'default' => [// account identifier
             'host'  => env('IMAP_HOST', 'sv8713.xserver.jp'),
             'port'  => env('IMAP_PORT', 993),
-            'protocol'  => env('IMAP_PROTOCOL', 'imap'),
+            'protocol'  => env('IMAP_PROTOCOL', 'legacy-imap'),
             'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
             'validate_cert' => env('IMAP_VALIDATE_CERT', false),
             'username'      => env('IMAP_USERNAME', 'thihaaung@voyager-web.com'),
