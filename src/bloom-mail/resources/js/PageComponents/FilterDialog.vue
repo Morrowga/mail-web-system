@@ -79,7 +79,7 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Status" :value="'Status'"/>
+                                        <InputLabel for="Status" :value="$t('input.status')"/>
                                     </div>
                                     <div style="width: 40%;">
                                         <VSelect
@@ -96,7 +96,7 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Date" :value="'Date'"/>
+                                        <InputLabel for="Date" :value="$t('input.date')"/>
                                     </div>
                                     <div style="width: 70%;" class="d-flex justify-start">
                                         <VTextField
@@ -127,7 +127,7 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Person In Charge" :value="'Person In Charge'"/>
+                                        <InputLabel for="Person In Charge" :value="$t('input.person_in_charge')"/>
                                     </div>
                                     <div style="width: 40%;">
                                         <VSelect
@@ -146,7 +146,7 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Keyword" :value="'Keyword'"/>
+                                        <InputLabel for="Keyword" :value="$t('input.keyword')"/>
                                     </div>
                                     <div style="width: 70%;">
                                         <VTextField
@@ -164,7 +164,7 @@ const onSearch = () => {
                             </VCol>
                             <VCol cols="12">
                                 <div class="text-right">
-                                    <VBtn color="primary" @click="onSearch">Search</VBtn>
+                                    <VBtn color="primary" @click="onSearch">{{ $t('buttons.search') }}</VBtn>
                                 </div>
                             </VCol>
                         </VRow>
