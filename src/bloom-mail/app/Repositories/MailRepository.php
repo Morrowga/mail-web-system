@@ -64,13 +64,19 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
 
         $inbox = 0;
+        $trash = 0;
 
         switch ($pageType) {
             case 'sent':
                 $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->with('template')->paginate(10);
+                $inbox = MailLog::where('status', '!=', 'deleted')->count();
+                $trash = MailLog::where('status', 'deleted')->count();
                 break;
             case 'trash':
-                $data = MailLog::orderBy('datetime', 'desc')->where('status','deleted')->paginate(10);
+                $query = MailLog::orderBy('datetime', 'desc')->where('status','deleted');
+                $trash = $query->count();
+                $data = $query->paginate(10);
+                $inbox = MailLog::where('status', '!=', 'deleted')->count();
                 break;
             case 'inbox':
             default:
@@ -98,6 +104,7 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 $inbox = $query->count();
+                $trash = MailLog::where('status','deleted')->count();
 
                 $data = $query->orderBy('datetime', 'desc')->paginate(10);
                 break;
@@ -107,7 +114,8 @@ class MailRepository implements MailRepositoryInterface
             "data" => $data,
             "inbox" => $inbox,
             "sent" => $sent,
-            "folders" => $folders
+            "folders" => $folders,
+            "trash" => $trash
         ];
     }
 
@@ -143,7 +151,6 @@ class MailRepository implements MailRepositoryInterface
             $messages = $inbox->messages()->all()->get();
             $newEmails = [];
 
-            // Step 1: Process incoming messages and add to the database
             foreach ($messages as $message) {
                 $uid = $message->getUid();
                 $messageId = $message->getMessageId();
@@ -201,14 +208,13 @@ class MailRepository implements MailRepositoryInterface
                 }
             }
 
-            // Step 2: Process folders and match emails to folders
             $folders = Folder::all();
 
             foreach ($folders as $folder) {
                 $searchCharacter = $folder->search_character;
-                $method = strtolower($folder->method); // Ensure case-insensitivity
+                $method = strtolower($folder->method);
 
-                $allMails = MailLog::all(); // Get all mails to process for folder matching
+                $allMails = MailLog::all();
 
                 foreach ($allMails as $mail) {
                     $subject = $mail->subject;
@@ -238,8 +244,6 @@ class MailRepository implements MailRepositoryInterface
                 }
             }
 
-            $deletedMails = MailLog::where('status', 'deleted')->delete();
-
             $checkNew = count($newEmails) > 0 ? 1 : 0;
 
             broadcast(new TakingMail(["new" => $checkNew]));
@@ -248,11 +252,6 @@ class MailRepository implements MailRepositoryInterface
             logger()->error("Error fetching emails: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to fetch mails.'], 500);
         }
-    }
-
-    public function updatefolderAttachs()
-    {
-
     }
 
     public function markAsRead($id)
@@ -282,6 +281,7 @@ class MailRepository implements MailRepositoryInterface
         $mailLog = MailLog::find($id);
 
         $inbox = $this->client->getFolder('INBOX');
+
         $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
         $histories = [];
@@ -479,7 +479,7 @@ class MailRepository implements MailRepositoryInterface
         }
     }
 
-    public function deleteForever(MailLog $mailLog)
+    public function delete(MailLog $mailLog)
     {
         try {
             if (!$mailLog) {
@@ -487,11 +487,8 @@ class MailRepository implements MailRepositoryInterface
             }
 
             $inbox = $this->client->getFolder('INBOX');
-            $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
-            if ($message) {
-                $message->delete(true);
-            }
+            $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
             $mailLog->status = 'deleted';
             $mailLog->update();

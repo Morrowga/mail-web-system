@@ -17,6 +17,8 @@ const props = defineProps({
 
 const confirmDialog = ref(false);
 
+console.log(props?.pageType)
+
 const { t, locale } = useI18n();
 
 const emit = defineEmits();
@@ -171,7 +173,7 @@ const handleStatusChange = () => {
             <div v-if="threadLoading" class="loading-overlay d-flex justify-center my-5">
                 <v-progress-circular indeterminate color="blue"></v-progress-circular>
             </div>
-            <div v-if="props?.pageType == 'inbox'">
+            <div v-if="props?.pageType == 'inbox' || props?.pageType == 'trash'">
                 <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
             </div>
             <ReplyForwardDialog

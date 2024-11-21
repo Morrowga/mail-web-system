@@ -184,24 +184,22 @@ const markAsRead = async (id) => {
 
 const getHistories = async (id) => {
 
-  if(pageType.value != 'inbox')
+  if(pageType.value == 'inbox' || pageType.value == 'trash')
   {
-    return;
-  }
+    selectedHistories.value = {}
+    threadLoading.value = true;
 
-  selectedHistories.value = {}
-  threadLoading.value = true;
-
-    try {
-        const response = await axios.get(`/mails/histories/${id}`);
-        if (response.data.status === 'success') {
-            selectedHistories.value = response.data.data;
+        try {
+            const response = await axios.get(`/mails/histories/${id}`);
+            if (response.data.status === 'success') {
+                selectedHistories.value = response.data.data;
+            }
+        } catch (error) {
+            console.error('Failed to get histories:', error);
+        } finally {
+            threadLoading.value = false;
         }
-    } catch (error) {
-        console.error('Failed to get histories:', error);
-    } finally {
-        threadLoading.value = false;
-    }
+  }
 };
 
 
@@ -358,9 +356,9 @@ onUnmounted(() => {
                                 </div>
 
                                 <!-- Trash Can -->
-                                <!-- <div class="my-10 cursor-pointer" @click="setPageType('trash', null)">
-                                    <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash')}}</p>
-                                </div> -->
+                                <div class="my-10 cursor-pointer" @click="setPageType('trash', null)">
+                                    <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash') }} ( {{ countData?.trash ?? 0 }} )</p>
+                                </div>
                             </VCol>
                             <VCol cols="12" :lg="selectedMail ? 5 : 10"
                             >

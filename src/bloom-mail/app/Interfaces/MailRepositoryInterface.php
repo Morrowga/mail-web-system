@@ -25,7 +25,7 @@ interface MailRepositoryInterface
 
     public function store(Request $request);
 
-    public function deleteForever(MailLog $mailLog);
+    public function delete(MailLog $mailLog);
 
     public function deleteSentMail(SentMail $sent_mail);
 }
