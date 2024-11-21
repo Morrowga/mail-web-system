@@ -33,7 +33,8 @@
         "send": "送信",
         "close": "近い",
         "cancel": "キャンセル",
-        "confirm": "確認する"
+        "confirm": "確認する",
+        "search": "検索"
     },
     "input": {
         "name": "氏名",
@@ -43,6 +44,8 @@
         "confirm_password": "パスワードの再入力",
         "search_character": "検索文字",
         "method": "方法",
+        "date": "日付",
+        "keyword": "キーワード",
         "details": "詳細",
         "title": "タイトル",
         "subject": "件名",

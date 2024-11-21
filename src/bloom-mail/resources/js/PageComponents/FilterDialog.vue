@@ -154,7 +154,6 @@ const onSearch = () => {
                                             variant="outlined"
                                             id="keyword"
                                             type="text"
-                                            placeholder="Enter the keyword"
                                             class="block w-full"
                                             v-model="form.keyword"
                                             required

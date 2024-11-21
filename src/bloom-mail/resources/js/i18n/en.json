@@ -33,7 +33,8 @@
         "send": "Send",
         "close": "Close",
         "cancel": "Cancel",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "search": "Search"
     },
     "input": {
         "name": "Name",
@@ -43,6 +44,8 @@
         "confirm_password": "Confirm Password",
         "search_character": "Search Character",
         "method": "Method",
+        "date": "Date",
+        "keyword": "Keyword",
         "details": "Details",
         "title": "Title",
         "subject": "Subject",
