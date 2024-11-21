@@ -15,7 +15,8 @@
         "spam": "迷惑メール",
         "draft": "下書きメール",
         "trash": "ゴミ箱",
-        "sent": "送信済みメール"
+        "sent": "送信済みメール",
+        "account_registration": "Account Registration"
     },
     "buttons": {
         "template_registration": "テンプレート登録",
@@ -107,6 +108,8 @@
         "failed_copy": "テキストのコピーに失敗しました。",
         "delete_text": "本当にこれを削除されますか?",
         "confirmation": "確認",
-        "new_message": "新しいメッセージ"
+        "new_message": "新しいメッセージ",
+        "replace_text": "テンプレートに置き換えます。よろしいいですか？[はい]  [いいえ]",
+        "account_registration_text": "アカウントのプロフィール情報とメールアドレスを更新してください。"
     }
 }

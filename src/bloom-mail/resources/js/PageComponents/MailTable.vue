@@ -23,6 +23,20 @@ const emit = defineEmits();
 const handleRowClick = (row) => {
   emit('rowSelected', row);
 };
+
+const statusCheck = (status) => {
+    if(status == 'new')
+    {
+        return false;
+    }
+
+    if(status == 'read')
+    {
+        return false;
+    }
+
+    return true;
+}
 </script>
 
 <template>
@@ -49,7 +63,7 @@ const handleRowClick = (row) => {
                 <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
                 {{ getTranslatedStatus(t, email[header.value]) }}
                 </VChip>
-                <p class="px-2 py-1" v-if="email.status != 'read' || email.status != 'new'">{{ email.person_in_charge }}</p>
+                <p class="px-2 py-1" v-if="statusCheck(email.status)">{{ email.person_in_charge }}</p>
             </div>
           </template>
           <template v-else>

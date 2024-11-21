@@ -56,13 +56,14 @@ class MailRepository implements MailRepositoryInterface
      *
      * @return array
      */
-    public function inbox()
+    public function inbox($filter = [])
     {
         $pageType = request()->query('page_type');
         $folders = Folder::withCount('mails')->get();
 
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
-        $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
+
+        $inbox = 0;
 
         switch ($pageType) {
             case 'sent':
@@ -73,7 +74,32 @@ class MailRepository implements MailRepositoryInterface
                 break;
             case 'inbox':
             default:
-                $data = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->paginate(10);
+                $query = MailLog::where('status', '!=', 'deleted');
+
+                if (!empty($filter['status'])) {
+                    $query->where('status', $filter['status']);
+                }
+
+                if (!empty($filter['keyword'])) {
+                    $query->where(function ($q) use ($filter) {
+                        $q->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+                    });
+                }
+
+                if (!empty($filter['person_in_charge'])) {
+                    $query->where('person_in_charge', $filter['person_in_charge']);
+                }
+                if (!empty($filter['from']) && !empty($filter['to'])) {
+                    $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
+                }
+
+                $inbox = $query->count();
+
+                $data = $query->orderBy('datetime', 'desc')->paginate(10);
                 break;
         }
 

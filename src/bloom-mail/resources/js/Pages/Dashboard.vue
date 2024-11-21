@@ -18,6 +18,8 @@ const { t, locale } = useI18n();
 
 const pageType = ref('inbox');
 
+const searchForm = ref({});
+
 const label = ref(t('other.new_message'));
 
 const loading = ref(false);  // Loading status
@@ -91,7 +93,7 @@ const isVisibleFloatButton = ref(false);
 
 const handlePageChange = (newPage) => {
   page.value = newPage;
-  fetchEmails(newPage);
+  fetchEmails(newPage, searchForm.value);
 };
 
 const handleRowSelected = (row) => {
@@ -122,7 +124,8 @@ const fetchEmails = async () => {
     const response = await axios.get(`/mails/fetch`, {
       params: {
         page: page.value ?? 1,
-        page_type: pageType.value
+        page_type: pageType.value,
+        ...searchForm.value
       },
     });
 
@@ -298,6 +301,12 @@ onMounted(() => {
     });
 });
 
+const handleSearch = (form) => {
+    console.log(form)
+    searchForm.value = form
+
+    fetchEmails()
+}
 
 onUnmounted(() => {
     Echo.leaveChannel('mails');
@@ -308,7 +317,7 @@ onUnmounted(() => {
 <template>
     <Head :title="$t('nav.home')" />
 
-    <AuthenticatedLayout>
+    <AuthenticatedLayout @onSearch="handleSearch">
         <div class="bg-[#f2f4f6]">
             <div class="mx-auto sm:px-6 lg:px-5">
                 <div

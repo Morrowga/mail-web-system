@@ -5,15 +5,44 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
+import FilterDialog from '@/PageComponents/FilterDialog.vue';
 
 const showingNavigationDropdown = ref(false);
+const filterDialogVisible = ref(false);
 
 const { props } = usePage();
 
+const form = ref({
+    status: "",
+    from: "",
+    to: "",
+    person_in_charge: "",
+    keyword: ""
+})
+
+const emit = defineEmits();
 
 const onPrependClick = () => {
-    console.log("Prepend icon clicked!");
+    filterDialogVisible.value = true
+
+    console.log(filterDialogVisible.value)
+}
+
+const onCancel = () => {
+    form.value = {
+        status: "",
+        from: "",
+        to: "",
+        person_in_charge: "",
+        keyword: ""
+    };
+
+    emit('onSearch', form.value);
+}
+
+const handleSubmit = () => {
+    emit('onSearch', form.value)
 }
 
 </script>
@@ -37,12 +66,15 @@ const onPrependClick = () => {
                                 <VTextField
                                     :loading="loading"
                                     prepend-inner-icon="mdi-magnify"
+                                    append-inner-icon="mdi-close-circle-outline"
                                     @click:prepend-inner="onPrependClick"
+                                    @click:append-inner="onCancel"
                                     density="compact"
+                                    v-model="form.keyword"
                                     variant="solo"
                                     hide-details
                                     single-line
-                                    @click:append-inner="onClick"
+                                    @keydown.enter="handleSubmit"
                                 ></VTextField>
                             </div>
 
@@ -102,6 +134,11 @@ const onPrependClick = () => {
                                             :href="route('profile.edit')"
                                         >
                                          {{ $t('nav.profile') }}
+                                        </DropdownLink>
+                                        <DropdownLink
+                                            :href="route('profile.account')"
+                                        >
+                                         {{ $t('nav.account_registration') }}
                                         </DropdownLink>
                                         <DropdownLink
                                             @click="router.post(route('logout'))"
@@ -237,6 +274,7 @@ const onPrependClick = () => {
             >
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header" />
+
                 </div>
             </header>
 
@@ -244,6 +282,13 @@ const onPrependClick = () => {
             <main style="padding-top: 8vh; padding-left: 2vh; padding-right: 2vh;">
                 <slot />
             </main>
+
+            <FilterDialog
+                :filterDialog="filterDialogVisible"
+                :form="form"
+                @handleSubmit="handleSubmit"
+                @update:filterDialog="filterDialogVisible = $event"
+            />
         </div>
     </div>
 </template>

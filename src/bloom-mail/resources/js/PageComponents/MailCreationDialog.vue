@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import { useForm } from '@inertiajs/vue3';
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ReplaceConfirmDialog from './ReplaceConfirmDialog.vue';
 
 const props = defineProps({
 createDialog: Boolean,
@@ -16,7 +17,8 @@ label: String
 const { t, locale } = useI18n();
 
 const dialog = ref(props.createDialog);
-const isMenuOpen = ref(false);
+const currentActiveTemplateId = ref(null)
+const replaceDialog = ref(false);
 const formattedDateTime = ref(null);
 
 const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue']);
@@ -25,20 +27,22 @@ watch(() => props.createDialog, (newVal) => {
     dialog.value = newVal;
 });
 
-
-const minimizeDialog = () => {
+const minimizeDialog = () =>
+{
     dialog.value = false;
     emit('update:visibleFloat', true);
     emit('update:dialog', false);
 };
 
-const onClose = () => {
+const onClose = () =>
+{
     dialog.value = false;
     emit('update:dialog', false);
     emit('update:visibleFloat', false);
 }
 
-const onOpen = () => {
+const onOpen = () =>
+{
     dialog.value = true;
     emit('update:visibleFloat', false);
     emit('update:dialog', true);
@@ -54,7 +58,8 @@ const form = useForm({
     message_content: ""
 })
 
-const handleSubjectChange = (event) => {
+const handleSubjectChange = (event) =>
+{
   emit('update:labelValue', event.target.value);
 };
 
@@ -115,14 +120,26 @@ const itemProps = (item) =>  {
     }
 }
 
-
-const onTemplateChange = (templateId) => {
+const handleReplace = () =>
+{
     let templateSelected = props?.templates.find(
-        (template) => template.id === templateId
+        (template) => template.id === currentActiveTemplateId.value
     );
 
     form.subject = templateSelected?.subject;
     form.message_content = templateSelected?.message_content;
+}
+
+
+const onTemplateChange = (templateId) => {
+    if(currentActiveTemplateId.value == null)
+    {
+        currentActiveTemplateId.value = templateId;
+        handleReplace()
+    } else {
+        currentActiveTemplateId.value = templateId;
+        replaceDialog.value = true
+    }
 }
 
 </script>
@@ -384,6 +401,7 @@ const onTemplateChange = (templateId) => {
                 <!-- Card Actions -->
                 </VCard>
         </VForm>
+        <ReplaceConfirmDialog @handleReplace="handleReplace" :confirmDialog="replaceDialog" @update:dialog="replaceDialog = $event" />
     </VDialog>
   </template>
 

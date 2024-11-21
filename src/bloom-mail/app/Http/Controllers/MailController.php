@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Inertia\Inertia;
 use App\Models\MailLog;
 use App\Models\SentMail;
@@ -27,11 +28,14 @@ class MailController extends Controller
     {
         $templates = $this->templateRepository->getOnlyTemplates();
 
+        $person_in_charges = User::get();
+
         $from = env('IMAP_USERNAME');
 
         return Inertia::render('Dashboard', [
             "templates" => $templates['data'],
-            "from" => $from
+            "from" => $from,
+            "person_in_charges" => $person_in_charges
         ]);
     }
 

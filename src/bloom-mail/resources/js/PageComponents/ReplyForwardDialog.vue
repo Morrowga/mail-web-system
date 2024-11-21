@@ -6,6 +6,7 @@ import { useForm, usePage } from '@inertiajs/vue3';
 import MailThread from './MailThread.vue';
 import { useI18n } from 'vue-i18n';
 import { getTranslatedStatus } from '@/Helper/status';
+import ReplaceConfirmDialog from './ReplaceConfirmDialog.vue';
 
 const page = usePage();
 
@@ -18,6 +19,9 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+
+const currentActiveTemplateId = ref(null)
+const  replaceDialog = ref(false);
 
 const form = useForm({
     subject: props?.mailData?.subject,
@@ -92,13 +96,26 @@ const formatTemplates = (responses) => {
 
 const modifiedTemplates = formatTemplates(page?.props?.templates);
 
-const onTemplateChange = (templateId) => {
+const handleReplace = () =>
+{
     let templateSelected = page?.props?.templates.find(
-        (template) => template.id === templateId
+        (template) => template.id === currentActiveTemplateId.value
     );
 
     form.subject = templateSelected?.subject;
     form.message_content = templateSelected?.message_content;
+}
+
+
+const onTemplateChange = (templateId) => {
+    if(currentActiveTemplateId.value == null)
+    {
+        currentActiveTemplateId.value = templateId;
+        handleReplace()
+    } else {
+        currentActiveTemplateId.value = templateId;
+        replaceDialog.value = true
+    }
 }
 
 
@@ -281,6 +298,7 @@ watch(() => props.type, (newType) => {
                 </VCardText>
             </VCard>
         </VForm>
+        <ReplaceConfirmDialog @handleReplace="handleReplace" :confirmDialog="replaceDialog" @update:dialog="replaceDialog = $event" />
     </VDialog>
 </template>
 

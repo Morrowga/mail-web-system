@@ -3,6 +3,7 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\SpamController;
 use App\Http\Controllers\FolderController;
@@ -43,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('template-categories', TemplateCategoryController::class);
     Route::resource('spams', SpamController::class);
 
+    Route::get('/account-registration', [AuthController::class, 'indexAccountRegistration'])->name('profile.account');
+    Route::post('/account-registration', [AuthController::class, 'accountRegistration'])->name('profile.store.account');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

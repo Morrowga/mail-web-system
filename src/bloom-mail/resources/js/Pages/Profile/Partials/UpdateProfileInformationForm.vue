@@ -43,6 +43,7 @@ const form = useForm({
 
                 <TextInput
                     id="name"
+                    density="compact"
                     type="text"
                     class="mt-1 block w-full"
                     v-model="form.name"
@@ -59,6 +60,7 @@ const form = useForm({
 
                 <TextInput
                     id="email"
+                    density="compact"
                     type="email"
                     class="mt-1 block w-full"
                     v-model="form.email"

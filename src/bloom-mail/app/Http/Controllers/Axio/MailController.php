@@ -19,9 +19,17 @@ class MailController extends Controller
         $this->mailRepository = $mailRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $mails = $this->mailRepository->inbox();
+        $filter = [
+            "status" => $request->query('status'),
+            "from" => $request->query('from'),
+            "to" => $request->query('to'),
+            "keyword" => $request->query('keyword'),
+            "person_in_charge" => $request->query('person_in_charge')
+        ];
+
+        $mails = $this->mailRepository->inbox($filter);
 
         return response()->json($mails);
     }

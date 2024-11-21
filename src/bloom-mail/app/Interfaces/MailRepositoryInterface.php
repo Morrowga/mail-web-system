@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 interface MailRepositoryInterface
 {
-    public function inbox();
+    public function inbox($filter);
 
     public function inboxWithFolderId(Folder $folder);
 
