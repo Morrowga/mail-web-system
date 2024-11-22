@@ -114,7 +114,7 @@
         "delete_text": "本当にこれを削除されますか?",
         "confirmation": "確認",
         "new_message": "新しいメッセージ",
-        "replace_text": "テンプレートに置き換えます。よろしいいですか？[はい]  [いいえ]",
+        "replace_text": "テンプレートに置き換えます。よろしいいですか？",
         "account_registration_text": "アカウントのプロフィール情報とメールアドレスを更新してください。"
     }
 }

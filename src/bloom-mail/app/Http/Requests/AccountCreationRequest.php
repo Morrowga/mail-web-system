@@ -32,21 +32,21 @@ class AccountCreationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'ユーザ名は必須です.',
+            'name.required' => 'ユーザ名は必須です',
             'name.string' => 'ユーザ名は文字列でなければなりません',
-            'name.max' => 'ユーザ名の制限は255文字です.',
+            'name.max' => 'ユーザ名の制限は255文字です',
 
-            'email.required' => 'メールアドレスは必須です.',
-            'email.string' => 'メールは有効な文字列でなければなりません.',
-            'email.email' => 'メールアドレスは有効なものでなければなりません.',
-            'email.lowercase' => 'メールアドレスは小文字でご入力ください.',
-            'email.max' => 'メールアドレスの制限は255文字です.',
-            'email.unique' => 'このメールアドレスは既に登録済みです.',
+            'email.required' => 'メールアドレスは必須です',
+            'email.string' => 'メールは有効な文字列でなければなりません',
+            'email.email' => 'メールアドレスは有効なものでなければなりません',
+            'email.lowercase' => 'メールアドレスは小文字でご入力ください',
+            'email.max' => 'メールアドレスの制限は255文字です',
+            'email.unique' => 'このメールアドレスは既に登録済みです',
 
-            'password.required' => 'パスワードが必須です.',
-            'password.string' => 'パスワードは文字列でなければなりません.',
-            'password.min' => 'パスワードは最低でも8文字でなければなりません.',
-            'password.confirmed' => 'パスワードの再入力が一致しません.',
+            'password.required' => 'パスワードが必須です',
+            'password.string' => 'パスワードは文字列でなければなりません',
+            'password.min' => 'パスワードは最低でも8文字でなければなりません',
+            'password.confirmed' => 'パスワードの再入力が一致しません',
         ];
     }
 }

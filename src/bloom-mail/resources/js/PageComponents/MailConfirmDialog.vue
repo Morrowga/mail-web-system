@@ -32,7 +32,7 @@ watch(() => props.confirmDialog, (newVal) => {
 
 
 <template>
-    <v-dialog v-model="dialog" max-width="500">
+    <v-dialog v-model="dialog" max-width="500" persistent>
       <template v-slot:default>
         <v-card>
           <v-card-title>{{ $t('other.confirmation') }}</v-card-title>

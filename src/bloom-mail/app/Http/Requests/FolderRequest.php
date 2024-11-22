@@ -31,9 +31,9 @@ class FolderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'フォルダ名は必須です.',
-            'search_character.required' => '検索文字フィールドは必須です.',
-            'method.required' => '方法は必須です.',
+            'name.required' => 'フォルダ名は必須です',
+            'search_character.required' => '検索文字フィールドは必須です',
+            'method.required' => '方法は必須です',
         ];
     }
 }

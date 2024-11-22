@@ -35,8 +35,8 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login_id.required' => 'ログインIDは必須です.',
-            'password.required' => 'パスワードは必須です.',
+            'login_id.required' => 'ログインIDは必須です',
+            'password.required' => 'パスワードは必須です',
         ];
     }
 

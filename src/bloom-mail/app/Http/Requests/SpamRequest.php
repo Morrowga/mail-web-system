@@ -29,7 +29,7 @@ class SpamRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'mail_address.required' => 'メールアドレスは必須です.',
+            'mail_address.required' => 'メールアドレスは必須です',
         ];
     }
 }
