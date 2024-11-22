@@ -34,7 +34,9 @@
         "close": "Close",
         "cancel": "Cancel",
         "confirm": "Confirm",
-        "search": "Search"
+        "search": "Search",
+        "yes": "はい",
+        "no": "いいえ"
     },
     "input": {
         "name": "Name",

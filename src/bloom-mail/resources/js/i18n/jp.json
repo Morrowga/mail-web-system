@@ -34,7 +34,9 @@
         "close": "近い",
         "cancel": "キャンセル",
         "confirm": "確認する",
-        "search": "検索"
+        "search": "検索",
+        "yes": "はい",
+        "no": "いいえ"
     },
     "input": {
         "name": "氏名",

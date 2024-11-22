@@ -41,11 +41,9 @@ watch(() => props.confirmDialog, (newVal) => {
             </div>
           </v-card-text>
 
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn :text="$t('buttons.cancel')" color="green" @click="onClose"></v-btn>
-            <v-btn :text="$t('buttons.confirm')" color="red" @click="submitReplace"></v-btn>
+          <v-card-actions class="d-flex justify-center">
+            <v-btn :text="$t('buttons.yes')" color="green" @click="submitReplace"></v-btn>
+            <v-btn :text="$t('buttons.no')" color="primary" @click="onClose"></v-btn>
           </v-card-actions>
         </v-card>
       </template>
