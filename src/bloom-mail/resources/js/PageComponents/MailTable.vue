@@ -63,7 +63,7 @@ const statusCheck = (status) => {
                 <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
                 {{ getTranslatedStatus(t, email[header.value]) }}
                 </VChip>
-                <p class="px-2 py-1" v-if="statusCheck(email.status)">{{ email.person_in_charge }}</p>
+                <p class="px-2 py-1 text-[13px]" v-if="statusCheck(email.status)">{{ email.person_in_charge }}</p>
             </div>
           </template>
           <template v-else>

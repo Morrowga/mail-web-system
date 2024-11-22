@@ -132,14 +132,14 @@ const handleReplace = () =>
 
 
 const onTemplateChange = (templateId) => {
-    if(currentActiveTemplateId.value == null)
-    {
-        currentActiveTemplateId.value = templateId;
-        handleReplace()
-    } else {
+    // if(form.message_content == '')
+    // {
+        // currentActiveTemplateId.value = templateId;
+        // handleReplace()
+    // } else {
         currentActiveTemplateId.value = templateId;
         replaceDialog.value = true
-    }
+    // }
 }
 
 </script>

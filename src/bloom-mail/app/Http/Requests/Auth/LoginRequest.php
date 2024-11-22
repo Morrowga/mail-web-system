@@ -32,6 +32,14 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'login_id.required' => 'ログインIDは必須です.',
+            'password.required' => 'パスワードは必須です.',
+        ];
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *

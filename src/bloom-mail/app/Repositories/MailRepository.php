@@ -127,6 +127,7 @@ class MailRepository implements MailRepositoryInterface
 
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
         $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
+        $trash = MailLog::orderBy('datetime', 'desc')->where('status','deleted')->count();
 
         $data = MailLog::where('status', '!=', 'deleted')
         ->when(isset($folderId), function ($query) use ($folderId) {
@@ -140,6 +141,7 @@ class MailRepository implements MailRepositoryInterface
             "data" => $data,
             "inbox" => $inbox,
             "sent" => $sent,
+            "trash" => $trash,
             "folders" => $folders
         ];
     }

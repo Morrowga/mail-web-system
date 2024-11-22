@@ -26,4 +26,12 @@ class TemplateCategoryRequest extends FormRequest
             'detail' => ['required']
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'テンプレートカテゴリ名は必須です.',
+            'detail.required' => '詳細は必須です.',
+        ];
+    }
 }

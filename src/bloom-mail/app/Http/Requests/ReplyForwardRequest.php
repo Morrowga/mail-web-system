@@ -31,4 +31,14 @@ class ReplyForwardRequest extends FormRequest
             "og_message_id" => ['required']
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'subject.required' => '件名は必須です.',
+            'from.required' => '送信者のメールアドレスは必須です.',
+            'to.required' => '宛先のメールアドレスは必須です.',
+            'message_content.required' => '本文はは必須です.',
+        ];
+    }
 }

@@ -28,4 +28,15 @@ class TemplateRequest extends FormRequest
             "message_content" => ['required'],
         ];
     }
+
+
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'テンプレート名は必須です.',
+            'subject' => '件名は必須です.',
+            'template_category_id' => 'テンプレートカテゴリは必須です.',
+            'message_content' => '本文はは必須です.',
+        ];
+    }
 }

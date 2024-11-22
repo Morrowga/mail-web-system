@@ -106,16 +106,15 @@ const handleReplace = () =>
     form.message_content = templateSelected?.message_content;
 }
 
-
 const onTemplateChange = (templateId) => {
-    if(currentActiveTemplateId.value == null)
-    {
-        currentActiveTemplateId.value = templateId;
-        handleReplace()
-    } else {
+    // if(form.message_content == '')
+    // {
+        // currentActiveTemplateId.value = templateId;
+        // handleReplace()
+    // } else {
         currentActiveTemplateId.value = templateId;
         replaceDialog.value = true
-    }
+    // }
 }
 
 

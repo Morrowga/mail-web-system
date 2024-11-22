@@ -131,6 +131,7 @@ const fetchEmails = async () => {
 
     mails.value = response.data.data.data;
     folders.value = response.data.folders
+    console.log(folders.value);
     totalPages.value = response.data.data.last_page;
     page.value = response.data.data.current_page;
     countData.value = response.data
