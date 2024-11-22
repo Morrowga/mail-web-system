@@ -165,7 +165,7 @@ class MailRepository implements MailRepositoryInterface
                     $dateSent = $message->getDate();
                     $body = $message->getHTMLBody() ?? $message->getTextBody();
                     $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-                    $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+                    $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
 
                     $spamCheck = Spam::where('mail_address', $senderEmail)->first();
 
@@ -299,7 +299,7 @@ class MailRepository implements MailRepositoryInterface
                 ? $this->decodeString($threadMessage->getSubject()[0])
                 : 'No Subject';
                 $senderArray = $threadMessage->getFrom();
-                $senderEmail = $senderArray[0]->mail ?? 'unknown@example.com';
+                $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
                 // Check if the message has an HTML body, otherwise use plain text

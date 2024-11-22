@@ -17,6 +17,11 @@ class MailLog extends Model
         return $this->hasMany(SentMail::class, 'parent_id')->with('template');
     }
 
+    public function getSenderAttribute($value)
+    {
+        return $this->safeDecode($value, 'sender');
+    }
+
     public function getSubjectAttribute($value)
     {
         return $this->safeDecode($value, 'subject');
