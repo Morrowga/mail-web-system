@@ -500,6 +500,19 @@ class MailRepository implements MailRepositoryInterface
             logger()->error("Error deleting email: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to delete email.'], 500);
         }
+
+        // $oFolder = $this->client->getFolder('INBOX');
+
+        // $oMessage = $oFolder->query()->getMessageByUid($mailLog->uid);
+
+        // $trash = 'INBOX/Trash';
+        // $oFolder = $this->client->getFolder($trash, '/');
+        // if (!$oFolder) {
+        //    $trash = 'INBOX.Trash';
+        //    $this->client->getFolder($trash, '.');
+        // }
+
+        // $oMessage->move($trash);
     }
 
     public function deleteSentMail(SentMail $sent_mail)

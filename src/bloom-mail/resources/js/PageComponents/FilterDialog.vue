@@ -164,7 +164,7 @@ const onSearch = () => {
                             </VCol>
                             <VCol cols="12">
                                 <div class="text-right">
-                                    <VBtn color="primary" @click="onSearch">{{ $t('buttons.search') }}</VBtn>
+                                    <VBtn color="primary" prepend-icon="mdi-magnify" @click="onSearch">{{ $t('buttons.search') }}</VBtn>
                                 </div>
                             </VCol>
                         </VRow>
