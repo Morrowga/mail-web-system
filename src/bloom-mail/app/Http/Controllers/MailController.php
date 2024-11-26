@@ -26,9 +26,11 @@ class MailController extends Controller
 
     public function index()
     {
+
         $templates = $this->templateRepository->getOnlyTemplates();
 
         $person_in_charges = User::get();
+
 
         $from = env('IMAP_USERNAME');
 

@@ -150,8 +150,10 @@ class MailRepository implements MailRepositoryInterface
     {
         try {
             $inbox = $this->client->getFolder('INBOX');
-            $messages = $inbox->messages()->all()->get();
+            $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
             $newEmails = [];
+
+            $status = 'new';
 
             foreach ($messages as $message) {
                 $uid = $message->getUid();
@@ -171,9 +173,11 @@ class MailRepository implements MailRepositoryInterface
 
                     if(!empty($spamCheck))
                     {
-                        $message->move('Junk');
+                        $message->delete(false);
 
-                        continue;
+                        $status = 'deleted';
+                    } else {
+                        $status = in_array('Seen', $flags) ? 'read' : 'new';
                     }
 
                     $inReplyTo = $message->getHeader()->get('in-reply-to');
@@ -184,7 +188,6 @@ class MailRepository implements MailRepositoryInterface
                     }
 
                     $flags = $message->getFlags()->toArray();
-                    $status = in_array('Seen', $flags) ? 'read' : 'new';
 
                     $newMail = MailLog::create([
                         'uid' => $uid,
@@ -246,7 +249,7 @@ class MailRepository implements MailRepositoryInterface
                 }
             }
 
-            $checkNew = count($newEmails) > 0 ? 1 : 0;
+            $checkNew = count($newEmails) > 0 && $status != 'deleted'  ? 1 : 0;
 
             broadcast(new TakingMail(["new" => $checkNew]));
 
@@ -487,6 +490,12 @@ class MailRepository implements MailRepositoryInterface
             if (!$mailLog) {
                 return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
             }
+
+            $inbox = $this->client->getFolder('INBOX');
+
+            $message = $inbox->query()->getMessageByUid($mailLog->uid);
+
+            $message->move('INBOX.Trash');
 
             $mailLog->status = 'deleted';
             $mailLog->update();
