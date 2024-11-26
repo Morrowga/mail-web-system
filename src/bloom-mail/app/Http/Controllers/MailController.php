@@ -55,7 +55,7 @@ class MailController extends Controller
 
     public function destroy(MailLog $mail_log)
     {
-        return $this->mailRepository->delete($mail_log);
+        $this->mailRepository->delete($mail_log);
 
         return redirect()->route('dashboard');
     }

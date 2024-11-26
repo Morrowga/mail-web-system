@@ -110,6 +110,8 @@ class MailRepository implements MailRepositoryInterface
                 break;
         }
 
+        // dd($data);
+
         return [
             "data" => $data,
             "inbox" => $inbox,

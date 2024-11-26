@@ -28,7 +28,7 @@ const submit = () => {
             <h2
                 class="text-xl font-semibold leading-tight text-gray-800"
             >
-                Account Registration
+                {{ $t('nav.account_registration') }}
             </h2>
         </template>
 
@@ -48,7 +48,7 @@ const submit = () => {
                     </header>
                     <form @submit.prevent="submit" class="my-3">
                         <div class="w-50">
-                            <InputLabel for="name" value="Name" />
+                            <InputLabel for="name" :value="$t('input.name')" />
 
                             <TextInput
                                 id="name"
@@ -65,7 +65,7 @@ const submit = () => {
                         </div>
 
                         <div class="mt-4 w-50">
-                            <InputLabel for="email" value="Email" />
+                            <InputLabel for="email" :value="$t('input.email')" />
 
                             <TextInput
                                 id="email"
@@ -81,7 +81,7 @@ const submit = () => {
                         </div>
 
                         <div class="mt-4 w-50">
-                            <InputLabel for="password" value="Password" />
+                            <InputLabel for="password" :value="$t('auth.password')" />
 
                             <TextInput
                                 id="password"
@@ -99,7 +99,7 @@ const submit = () => {
                         <div class="mt-4 w-50">
                             <InputLabel
                                 for="password_confirmation"
-                                value="Confirm Password"
+                                :value="$t('input.confirm_password')"
                             />
 
                             <TextInput
@@ -123,7 +123,7 @@ const submit = () => {
                                 :class="{ 'opacity-25': form.processing }"
                                 :disabled="form.processing"
                             >
-                                Register
+                                {{ $t('buttons.registration' )}}
                             </PrimaryButton>
                         </div>
                     </form>

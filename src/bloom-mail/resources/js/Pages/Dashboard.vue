@@ -233,6 +233,7 @@ const setPageType = (type, folder_id = null) => {
   pageType.value = type;
   mails.value = {}
   selectedFolder.value = folder_id
+  page.value = 1
 
   console.log(selectedFolder.value)
   if(folder_id != null)
