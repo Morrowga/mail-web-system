@@ -1,7 +1,7 @@
 <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MailLayout from '@/Layouts/MailLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps(['template_categories', 'folders', 'template'])
@@ -34,7 +34,7 @@ const formSubmit = () => {
 <template>
     <Head :title="$t('nav.template')" />
 
-    <AuthenticatedLayout>
+    <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
@@ -136,5 +136,5 @@ const formSubmit = () => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MailLayout>
 </template>

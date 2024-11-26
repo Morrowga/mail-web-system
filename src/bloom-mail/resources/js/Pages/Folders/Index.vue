@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MailLayout from '@/Layouts/MailLayout.vue';
 import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -31,7 +32,7 @@ const tableHeaders = ref([
 <template>
     <Head :title="$t('nav.folders')" />
 
-    <AuthenticatedLayout>
+    <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
@@ -52,5 +53,5 @@ const tableHeaders = ref([
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MailLayout>
 </template>

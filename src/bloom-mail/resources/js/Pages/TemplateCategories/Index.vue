@@ -1,9 +1,9 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import { onMounted, ref } from 'vue';
+import MailLayout from '@/Layouts/MailLayout.vue';
 
 const props = defineProps(['template_categories']);
 const form = useForm({
@@ -34,7 +34,7 @@ const formSubmit = () => {
 <template>
     <Head :title="$t('input.template_category')" />
 
-    <AuthenticatedLayout>
+    <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
@@ -135,7 +135,7 @@ const formSubmit = () => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MailLayout>
 </template>
 
 

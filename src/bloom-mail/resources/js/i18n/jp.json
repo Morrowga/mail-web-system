@@ -16,7 +16,8 @@
         "draft": "下書きメール",
         "trash": "ゴミ箱",
         "sent": "送信済みメール",
-        "account_registration": "アカウント登録"
+        "account_registration": "アカウント登録",
+        "account": "アカウント"
     },
     "buttons": {
         "template_registration": "テンプレート登録",

@@ -7,21 +7,44 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import FilterDialog from '@/PageComponents/FilterDialog.vue';
-import DropDownMenu from '@/Components/DropDownMenu.vue';
-import { useI18n } from 'vue-i18n';
+
+const showingNavigationDropdown = ref(false);
+const filterDialogVisible = ref(false);
 
 const { props } = usePage();
 
-const { t, locale } = useI18n();
+const form = ref({
+    status: "",
+    from: "",
+    to: "",
+    person_in_charge: "",
+    keyword: ""
+})
 
-const defaultAccDowns = [
-    { label: t('nav.profile'), href: 'profile.edit', post: false },
-    { label: t('nav.logout'), href: 'logout', post: true },
-];
+const emit = defineEmits();
 
-const AccDowns = [
-    { label: t('nav.account_registration'), href: 'profile.account', post: false },
-];
+const onPrependClick = () => {
+    filterDialogVisible.value = true
+
+    console.log(filterDialogVisible.value)
+}
+
+const onCancel = () => {
+    form.value = {
+        status: "",
+        from: "",
+        to: "",
+        person_in_charge: "",
+        keyword: ""
+    };
+
+    emit('onSearch', form.value);
+}
+
+const handleSubmit = () => {
+    emit('onSearch', form.value)
+}
+
 </script>
 
 <template>
@@ -34,22 +57,93 @@ const AccDowns = [
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
                         <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 8%;">
-                            <h5 style="color: #fff;">Bloom</h5>
+                            <h5 style="color: #fff;">メールボックス</h5>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 92%;">
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-center" style="width: 92%;">
                             <!-- Settings Dropdown -->
+                            <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 55%;">
+                                <VTextField
+                                    :loading="loading"
+                                    prepend-inner-icon="mdi-magnify"
+                                    append-inner-icon="mdi-close-circle-outline"
+                                    @click:prepend-inner="onPrependClick"
+                                    @click:append-inner="onCancel"
+                                    density="compact"
+                                    v-model="form.keyword"
+                                    variant="solo"
+                                    hide-details
+                                    single-line
+                                    @keydown.enter="handleSubmit"
+                                ></VTextField>
+                            </div>
 
                             <NavLink
-                                :active="route().current('inbox')"
+                                class="mx-5 layout-nav-text d-flex align-center"
+                                :active="route().current('dashboard')"
                                 :href="route('inbox')"
+                                as="button"
+                            >
+                                <span>{{ $t('nav.inbox') }}</span>
+                            </NavLink>
+                            <NavLink
+                                :active="route().current('templinates')"
+                                :href="route('templates.index')"
                                 as="button"
                                 class="mx-5 layout-nav-text"
                             >
-                                {{ $t('nav.inbox') }}
+                                {{ $t('nav.template') }}
                             </NavLink>
-                            <DropDownMenu :title="$t('nav.account')" :content="AccDowns" />
-                            <DropDownMenu :title="$page.props.auth.user.name" :content="defaultAccDowns" />
+                            <NavLink
+                                :active="route().current('folders')"
+                                as="button"
+                                :href="route('folders.index')"
+                                class="mx-5 layout-nav-text"
+                            >
+                                {{ $t('nav.folders') }}
+                            </NavLink>
+                            <div class="relative ms-3">
+                                <Dropdown align="right" width="48">
+                                    <template #trigger>
+                                        <span class="inline-flex rounded-md">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center rounded-md px-3 pt-2 text-sm font-medium leading-4 layout-nav-text transition duration-150 ease-in-out
+                                                text-capitalize"
+                                            >
+                                                {{ $page.props.auth.user.name }}
+
+                                                <svg
+                                                    class="-me-0.5 ms-2 h-4 w-4"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                        clip-rule="evenodd"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </template>
+
+                                    <template #content>
+                                        <DropdownLink
+                                            :href="route('dashboard')"
+                                        >
+                                         {{ $t('nav.home') }}
+                                        </DropdownLink>
+                                        <DropdownLink
+                                            @click="router.post(route('logout'))"
+                                            as="button"
+                                        >
+                                        {{ $t('nav.logout') }}
+                                    </DropdownLink>
+                                    </template>
+                                </Dropdown>
+                            </div>
                         </div>
 
                         <!-- Hamburger -->
@@ -116,15 +210,15 @@ const AccDowns = [
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 class="layout-nav-text"
-                                :href="route('profile.account')"
+                                :href="route('templates.index')"
                             >
-                                {{ $t('nav.account_registration') }}
+                                {{ $t('nav.template') }}
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 class="layout-nav-text"
-                                :href="route('profile.edit')"
+                                :href="route('folders.index')"
                             >
-                                {{ $t('nav.profile') }}
+                                {{ $t('nav.folders') }}
                             </ResponsiveNavLink>
                             <!-- <ResponsiveNavLink
                                 class="layout-nav-text"
@@ -146,6 +240,9 @@ const AccDowns = [
                         </div>
 
                         <div class="mt-3 space-y-1">
+                            <!-- <ResponsiveNavLink :href="route('profile.edit')">
+                                Profile
+                            </ResponsiveNavLink> -->
                             <ResponsiveNavLink
                                 class="layout-nav-text"
                                 :href="route('logout')"

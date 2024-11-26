@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MailLayout from '@/Layouts/MailLayout.vue';
 import ConfirmDialog from '@/PageComponents/ConfirmDialog.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -49,7 +49,7 @@ const copyToClipboard = (text) => {
 <template>
     <Head :title="$t('nav.template')" />
 
-    <AuthenticatedLayout>
+    <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
@@ -108,7 +108,7 @@ const copyToClipboard = (text) => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MailLayout>
 </template>
 
 <style>

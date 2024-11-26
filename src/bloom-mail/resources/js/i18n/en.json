@@ -16,7 +16,8 @@
         "draft": "Draft Email",
         "trash": "Trash Can",
         "sent": "Sent Email",
-        "account_registration": "Account Registration"
+        "account_registration": "Registration",
+        "account": "Account"
     },
     "buttons": {
         "template_registration": "Template Registration",

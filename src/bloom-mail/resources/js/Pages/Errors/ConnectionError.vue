@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import MailLayout from '@/Layouts/MailLayout.vue';
 import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -12,7 +12,7 @@ const { t, locale } = useI18n();
 <template>
     <Head :title="'Connection Failed'" />
 
-    <AuthenticatedLayout>
+    <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
@@ -24,5 +24,5 @@ const { t, locale } = useI18n();
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MailLayout>
 </template>

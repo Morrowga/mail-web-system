@@ -32,7 +32,7 @@ class MailController extends Controller
 
         $from = env('IMAP_USERNAME');
 
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Inbox', [
             "templates" => $templates['data'],
             "from" => $from,
             "person_in_charges" => $person_in_charges
@@ -43,27 +43,27 @@ class MailController extends Controller
     {
         $sendRequest = $request->type == 'reply' ?  $this->mailRepository->reply($request, $mail_log) :  $this->mailRepository->forward($request, $mail_log);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('inbox');
     }
 
     public function store(MailRequest $request)
     {
         $createMail = $this->mailRepository->store($request);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('inbox');
     }
 
     public function destroy(MailLog $mail_log)
     {
         $this->mailRepository->delete($mail_log);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('inbox');
     }
 
     public function sentDestroy(SentMail $sent_mail)
     {
         $createMail = $this->mailRepository->deleteSentMail($sent_mail);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('inbox');
     }
 }

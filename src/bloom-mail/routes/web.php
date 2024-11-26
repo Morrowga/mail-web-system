@@ -9,6 +9,7 @@ use App\Http\Controllers\SpamController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TemplateCategoryController;
 
 if (config('app.env') === 'production') {
@@ -28,7 +29,8 @@ Route::get('/connection-error', function(){
 })->name('connection-error');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/home',[MailController::class, 'index'])->name('dashboard');
+    Route::get('/inbox',[MailController::class, 'index'])->name('inbox');
+    Route::get('/home',[DashboardController::class, 'index'])->name('dashboard');
     Route::post('/mails',[MailController::class, 'store'])->name('mails.store');
     Route::post('/mails/reply-forward/{mail_log}',[MailController::class, 'replyForward'])->name('mails.reply-forward');
     Route::delete('/mails/delete/{mail_log}',[MailController::class, 'destroy'])->name('mails.delete');
