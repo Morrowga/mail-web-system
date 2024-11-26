@@ -220,7 +220,7 @@ const cancelMailStatus = (id) => {
 
 const changeMailStatus = (id) => {
   axios
-    .post(`/mails/change-status/${id}`)
+    .post(`/mails/change-reply/${id}`)
     .then((response) => {
       console.log('Status changed successfully', response.data);
     })

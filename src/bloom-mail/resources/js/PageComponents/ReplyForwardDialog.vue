@@ -22,6 +22,7 @@ const { t } = useI18n();
 
 const currentActiveTemplateId = ref(null)
 const  replaceDialog = ref(false);
+const isDisabled = ref(false);
 
 const form = useForm({
     subject: props?.mailData?.subject,
@@ -53,14 +54,21 @@ const formatDateTime = () => {
 };
 
 const formSubmit = () => {
+    isDisabled.value = true;
+
     form.post(route('mails.reply-forward', props?.mailData?.id), {
         onSuccess: () => {
             form.reset();
             emit('handleLoadThread', props?.mailData?.id);
             emit('update:dialog', false);
             emit('update:mailTypeEevent', null)
+            isDisabled.value = false;
+        },
+        onFinish: () => {
+            isDisabled.value = false;
         },
         onError: (error) => {
+            isDisabled.value = false;
             console.error("Form submission error:", error);
         },
     });
@@ -288,7 +296,7 @@ watch(() => props.type, (newType) => {
                                 </VCol>
                                 <VCol cols="3">
                                     <div class="mx-5 my-5 d-flex justify-center" style="align-items: center; height: 100%;">
-                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" :text="$t('buttons.send')" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
+                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" :disabled="isDisabled" color="primary" :text="$t('buttons.send')" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
                                     </div>
                                 </VCol>
                             </VRow>

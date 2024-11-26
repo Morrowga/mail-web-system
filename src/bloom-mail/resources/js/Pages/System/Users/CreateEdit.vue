@@ -7,46 +7,57 @@ import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
+const props = defineProps(['user', 'roles'])
+
+console.log(props?.user);
+
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
+    name: props?.user?.name,
+    email: props?.user?.email,
+    password: null,
+    password_confirmation: null,
+    role_id: props?.user?.role_id
 });
 
-const submit = () => {
-    form.post(route('profile.store.account'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-        onSuccess: () => form.reset(),
+const formSubmit = () => {
+    const isEdit = Boolean(props?.user);
+
+    const routeLink = isEdit ? route('users.update', props.user.id) : route('users.store');
+    const method = isEdit ? 'patch' : 'post';
+
+    form[method](routeLink, {
+        onSuccess: () => {
+            form.reset();  // Reset the form upon success
+        },
+        onError: (error) => {
+            console.error("Form submission error:", error); // Handle the error if needed
+        },
     });
 };
 </script>
 
 <template>
     <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                {{ $t('nav.account_registration') }}
-            </h2>
-        </template>
-
         <div class="py-12">
-            <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+            <div class="mx-auto sm:px-6 space-y-6 lg:px-8">
+                <h1
+                    class="font-semibold leading-tight text-gray-800"
+                >
+                    {{ $t('nav.users') }}
+                </h1>
                 <div
                     class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
                 >
                     <header>
                         <h2 class="text-lg font-medium text-gray-900">
-                            {{ $t('nav.account_registration') }}
+                            {{ $t('nav.users') }}
                         </h2>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            {{ $t('other.account_registration_text') }}
+                            {{ $t('other.user_create') }}
                         </p>
                     </header>
-                    <form @submit.prevent="submit" class="my-3">
+                    <form @submit.prevent="formSubmit" class="my-3">
                         <div class="w-50">
                             <InputLabel for="name" :value="$t('input.name')" />
 
@@ -80,7 +91,7 @@ const submit = () => {
                             <InputError class="mt-2" :message="form.errors.email" />
                         </div>
 
-                        <div class="mt-4 w-50">
+                        <div class="mt-4 w-50" v-if="props?.user == undefined">
                             <InputLabel for="password" :value="$t('auth.password')" />
 
                             <TextInput
@@ -96,7 +107,7 @@ const submit = () => {
                             <InputError class="mt-2" :message="form.errors.password" />
                         </div>
 
-                        <div class="mt-4 w-50">
+                        <div class="mt-4 w-50" v-if="props?.user == undefined">
                             <InputLabel
                                 for="password_confirmation"
                                 :value="$t('input.confirm_password')"
@@ -115,6 +126,23 @@ const submit = () => {
                             <InputError
                                 class="mt-2"
                                 :message="form.errors.password_confirmation"
+                            />
+                        </div>
+
+                        <div class="mt-4 w-50">
+                            <VSelect
+                                v-model="form.role_id"
+                                :placeholder="'Select Role'"
+                                variant="outlined" density="compact" required hide-details
+                                :items="roles"
+                                item-value="id"
+                                clearable
+                                item-title="name"
+                            ></VSelect>
+
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.role_id"
                             />
                         </div>
 

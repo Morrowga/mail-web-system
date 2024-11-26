@@ -110,8 +110,6 @@ class MailRepository implements MailRepositoryInterface
                 break;
         }
 
-        // dd($data);
-
         return [
             "data" => $data,
             "inbox" => $inbox,
@@ -489,10 +487,6 @@ class MailRepository implements MailRepositoryInterface
             if (!$mailLog) {
                 return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
             }
-
-            $inbox = $this->client->getFolder('INBOX');
-
-            $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
             $mailLog->status = 'deleted';
             $mailLog->update();

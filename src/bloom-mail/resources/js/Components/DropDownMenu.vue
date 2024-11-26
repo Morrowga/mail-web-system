@@ -15,6 +15,16 @@ defineProps({
         default: () => [], // Main dropdown items (array of objects with `label` and `href`)
     },
 });
+
+const getRouteName = (item) => {
+    if(item.post)
+    {
+        router.post(route(item.href))
+        return;
+    }
+
+    router.get(route(item.href))
+}
 </script>
 
 <template>
@@ -49,16 +59,13 @@ defineProps({
                 <div
                 v-for="(item, index) in content" :key="index"
                 >
+                    <div>
+
+                    </div>
                     <DropdownLink
-                    v-if="!item.post"
-                    :href="route(item.href)"
-                    >
-                        {{ item.label }}
-                    </DropdownLink>
-                    <DropdownLink
-                        v-else
-                        @click="router.post(item.href)"
-                        as="button"
+                        v-if="item.show"
+                        @click="getRouteName(item)"
+                        :as="'button'"
                         >
                             {{ item.label }}
                     </DropdownLink>

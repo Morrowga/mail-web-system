@@ -19,16 +19,21 @@ defineProps({
     <Head :title="$t('nav.profile')" />
 
     <AuthenticatedLayout>
-        <template #header>
+        <!-- <template #header>
             <h2
                 class="text-xl font-semibold leading-tight text-gray-800"
             >
                 Profile
             </h2>
-        </template>
+        </template> -->
 
         <div class="py-12">
-            <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+            <div class="mx-auto sm:px-6 space-y-6 lg:px-8">
+                <h1
+                    class="font-semibold leading-tight text-gray-800"
+                >
+                    {{$t('nav.profile')}}
+                </h1>
                 <div
                     class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
                 >

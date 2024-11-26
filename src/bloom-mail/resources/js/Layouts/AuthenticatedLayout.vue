@@ -9,18 +9,24 @@ import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import FilterDialog from '@/PageComponents/FilterDialog.vue';
 import DropDownMenu from '@/Components/DropDownMenu.vue';
 import { useI18n } from 'vue-i18n';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
 const { props } = usePage();
 
 const { t, locale } = useI18n();
 
+const permissions = props?.auth?.user?.permissions
+const role = props?.auth?.user?.role
+
 const defaultAccDowns = [
-    { label: t('nav.profile'), href: 'profile.edit', post: false },
-    { label: t('nav.logout'), href: 'logout', post: true },
+    { label: t('nav.profile'), href: 'profile.edit', post: false, show: true },
+    { label: t('nav.logout'), href: 'logout', post: true, show: true },
 ];
 
 const AccDowns = [
-    { label: t('nav.account_registration'), href: 'profile.account', post: false },
+    { label: t('nav.users'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
+    { label: t('nav.roles'), href: 'roles.index', post: false, show: role == 'SA' ? true : false },
+    { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == 'SA' ? true : false },
 ];
 </script>
 
@@ -33,14 +39,15 @@ const AccDowns = [
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 8%;">
-                            <h5 style="color: #fff;">Bloom</h5>
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 20%;">
+                            <h5 style="color: #fff;">{{ $t('nav.logo') }}</h5>
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 92%;">
                             <!-- Settings Dropdown -->
 
                             <NavLink
+                                v-if="permissionGrant(permissions, 'mail_read')"
                                 :active="route().current('inbox')"
                                 :href="route('inbox')"
                                 as="button"
@@ -48,7 +55,7 @@ const AccDowns = [
                             >
                                 {{ $t('nav.inbox') }}
                             </NavLink>
-                            <DropDownMenu :title="$t('nav.account')" :content="AccDowns" />
+                            <DropDownMenu :title="$t('nav.account')" v-if="permissionGrant(permissions, 'account_read')" :content="AccDowns" />
                             <DropDownMenu :title="$page.props.auth.user.name" :content="defaultAccDowns" />
                         </div>
 
@@ -116,9 +123,9 @@ const AccDowns = [
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 class="layout-nav-text"
-                                :href="route('profile.account')"
+                                :href="route('users.index')"
                             >
-                                {{ $t('nav.account_registration') }}
+                                {{ $t('nav.users') }}
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 class="layout-nav-text"

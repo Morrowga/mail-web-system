@@ -26,8 +26,26 @@ const emit = defineEmits();
 const mailType = ref(null);
 
 const statusOptions = ref([
-  t('table.confirmed'),
-  t('table.' + props?.mail?.status),
+  {
+    name: t('table.confirmed'),
+    value: "confirmed"
+  },
+  {
+    name: t('table.resolved'),
+    value: "resolved"
+  },
+  {
+    name: t('table.pending'),
+    value: "pending"
+  },
+  {
+    name: t('table.under_review'),
+    value: "under_review"
+  },
+  {
+    name: t('table.' + props?.mail?.status),
+    value: props?.mail?.status
+  },
 ]);
 
 const selectedStatus = ref(t('table.' + props?.mail?.status) || '');
@@ -83,9 +101,13 @@ const handleDelete = async () => {
     }
 }
 
-const changeConfirmed = () => {
+const changeStatus = () => {
   axios
-    .post(`/mails/change-confirmed/${props?.mail?.id}`)
+    .post(`/mails/change-status/${props?.mail?.id}`,
+        {
+            status: selectedStatus.value, 
+        }
+    )
     .then((response) => {
       console.log('Status confirmed successfully', response.data);
     })
@@ -95,7 +117,7 @@ const changeConfirmed = () => {
 };
 
 const handleStatusChange = () => {
-  changeConfirmed()
+    changeStatus()
 };
 
 </script>
@@ -151,6 +173,8 @@ const handleStatusChange = () => {
                         :items="statusOptions"
                         @update:modelValue="handleStatusChange"
                         variant="outlined"
+                        item-title="name"
+                        item-value="value"
                         density="compact"
                         required
                         hide-details

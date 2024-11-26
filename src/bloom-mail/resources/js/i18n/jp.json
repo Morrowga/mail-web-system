@@ -6,6 +6,7 @@
         "login": "ログイン"
     },
     "nav": {
+        "logo": "メール・アプリ管理システム",
         "inbox": "受信トレイ",
         "home": "ホーム",
         "template": "テンプレート",
@@ -16,8 +17,10 @@
         "draft": "下書きメール",
         "trash": "ゴミ箱",
         "sent": "送信済みメール",
-        "account_registration": "アカウント登録",
-        "account": "アカウント"
+        "users": "アカウント登録",
+        "account": "アカウント",
+        "roles": "Roles",
+        "permissions": "Permissions"
     },
     "buttons": {
         "template_registration": "テンプレート登録",
@@ -94,6 +97,8 @@
         "replying": "返信処理中",
         "resolved": "対応済み",
         "confirmed": "確定",
+        "under_review": "確認中",
+        "pending": "保留",
         "no_data": "データがありません"
     },
    "other": {
@@ -103,6 +108,10 @@
         "edit_folder": "フォルダ編集",
         "edit_spam": "迷惑メール編集",
         "create_spam": "迷惑メール編集",
+        "edit_role": "Edit Role",
+        "create_role": "Create Role",
+        "edit_permission": "Edit Permission",
+        "create_permission": "Create Permission",
         "template_create": "テンプレート登録",
         "template_update": "テンプレート登録",
         "create_category_text": "新規テンプレートカテゴリ登録",
@@ -116,6 +125,7 @@
         "confirmation": "確認",
         "new_message": "新しいメッセージ",
         "replace_text": "テンプレートに置き換えます。よろしいいですか？",
-        "account_registration_text": "アカウントのプロフィール情報とメールアドレスを更新してください。"
+        "user_create": "アカウント情報を登録してください。",
+        "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。"
     }
 }

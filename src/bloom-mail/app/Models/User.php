@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected $appends = ['role_id', 'role_name'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -47,4 +49,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getRoleIdAttribute()
+    {
+        return $this->roles->first() ? $this->roles->first()->id : null;
+    }
+
+    public function getRoleNameAttribute()
+    {
+        return $this->roles->first() ? $this->roles->first()->name : null;
+    }
+
+
 }

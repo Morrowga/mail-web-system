@@ -20,6 +20,7 @@ const dialog = ref(props.createDialog);
 const currentActiveTemplateId = ref(null)
 const replaceDialog = ref(false);
 const formattedDateTime = ref(null);
+const isDisabled = ref(false);
 
 const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue']);
 
@@ -74,13 +75,19 @@ const formatDateTime = () => {
 };
 
 const formSubmit = () => {
+    isDisabled.value = true
     form.post(route('mails.store'), {
         onSuccess: () => {
             form.reset();
             emit('fetchMail')
             onClose();
+            isDisabled.value = false
+        },
+        onFinish: () => {
+            isDisabled.value = false
         },
         onError: (error) => {
+            isDisabled.value = false
             console.error("Form submission error:", error); // Handle the error if needed
         },
     });
@@ -390,7 +397,7 @@ const onTemplateChange = (templateId) => {
                                 </VCol>
                                 <VCol cols="2">
                                     <div class="mx-5 my-5 d-flex justify-center" style="align-items: center; height: 100%;">
-                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" color="primary" :text="$t('buttons.send')" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
+                                        <VBtn prepend-icon="mdi-email-arrow-right" type="submit" :disabled="isDisabled" color="primary" :text="$t('buttons.send')" style="background-color: #f2c228; font-size: 15px; color: #fff !important; width: 100%; height: 30%;"></VBtn>
                                     </div>
                                 </VCol>
                             </VRow>

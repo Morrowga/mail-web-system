@@ -5,11 +5,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SpamController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TemplateCategoryController;
 
 if (config('app.env') === 'production') {
@@ -29,6 +32,9 @@ Route::get('/connection-error', function(){
 })->name('connection-error');
 
 Route::middleware(['auth'])->group(function () {
+
+    // <------------------ Mail System --------------------->
+
     Route::get('/inbox',[MailController::class, 'index'])->name('inbox');
     Route::get('/home',[DashboardController::class, 'index'])->name('dashboard');
     Route::post('/mails',[MailController::class, 'store'])->name('mails.store');
@@ -46,11 +52,19 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('template-categories', TemplateCategoryController::class);
     Route::resource('spams', SpamController::class);
 
-    Route::get('/account-registration', [AuthController::class, 'indexAccountRegistration'])->name('profile.account');
-    Route::post('/account-registration', [AuthController::class, 'accountRegistration'])->name('profile.store.account');
+    // <------------------ Mail System --------------------->
+
+    // <------------------ App System --------------------->
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+    Route::resource('users', UserController::class);
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // <------------------ App System --------------------->
+
 });
 
 require __DIR__.'/auth.php';

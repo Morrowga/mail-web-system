@@ -8,6 +8,7 @@ export function getStatusColor(status) {
         'confirmed': '#0004fb',
         'replying': '#a600fe',
         'pending': '#186dc1',
+        'under_review': '#b4d7a6'
     };
 
     // Return the color associated with the status or a default color if the status is unknown
@@ -36,6 +37,14 @@ export function getTranslatedStatus(t, statusName) {
         {
             name: 'confirmed',
             value: t('table.confirmed')
+        },
+        {
+            name: 'under_review',
+            value: t('table.under_review')
+        },
+        {
+            name: 'pending',
+            value: t('table.pending')
         }
     ];
 

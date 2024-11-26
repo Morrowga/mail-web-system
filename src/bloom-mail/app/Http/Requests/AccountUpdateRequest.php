@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Rules\Password;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AccountCreationRequest extends FormRequest
+class AccountUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,14 @@ class AccountCreationRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('user');
+
         return [
             'name' => ['required', 'string' , 'max:255'],
             'role_id' => ['required'],
-            'email' => ['required', 'string' , 'lowercase','email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'email' => ['required', 'string' , 'lowercase','email', 'max:255',
+                Rule::unique('users', 'email')->ignore($userId), // Ignore the current user's email
+            ],
         ];
     }
 
@@ -45,11 +48,6 @@ class AccountCreationRequest extends FormRequest
             'email.lowercase' => 'メールアドレスは小文字でご入力ください',
             'email.max' => 'メールアドレスの制限は255文字です',
             'email.unique' => 'このメールアドレスは既に登録済みです',
-
-            'password.required' => 'パスワードが必須です',
-            'password.string' => 'パスワードは文字列でなければなりません',
-            'password.min' => 'パスワードは最低でも8文字でなければなりません',
-            'password.confirmed' => 'パスワードの再入力が一致しません',
         ];
     }
 }

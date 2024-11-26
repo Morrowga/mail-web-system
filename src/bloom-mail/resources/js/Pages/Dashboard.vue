@@ -22,9 +22,10 @@ const { props } = usePage();
                     class="overflow-hidden sm:rounded-lg"
                 >
                     <div class="py-6 text-gray-900" style="height: 100%;">
-                        <h1>
-                            Welcome {{ props?.auth?.user?.name }}
-                        </h1>
+                        <h3>
+                            {{ $t('other.welcome') }}
+                            <!-- {{ props?.auth?.user?.name }} -->
+                        </h3>
                     </div>
                 </div>
             </div>

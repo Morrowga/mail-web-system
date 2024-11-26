@@ -55,7 +55,7 @@ class MailController extends Controller
         return $response;
     }
 
-    public function changeStatus(Request $request, MailLog $mail_Log)
+    public function changeReply(Request $request, MailLog $mail_Log)
     {
         $mail_Log->update([
             'previous_status' => $mail_Log->status,
@@ -70,14 +70,14 @@ class MailController extends Controller
         ]);
     }
 
-    public function changeConfirmed(Request $request, MailLog $mail_Log)
+    public function changeStatus(Request $request, MailLog $mail_Log)
     {
         $mail_Log->update([
-            'status' => 'confirmed',
+            'status' => $request->status,
             'person_in_charge' => Auth::user()->name
         ]);
 
-        broadcast(new EmailStatusUpdated($mail_Log, 'confirmed'));
+        broadcast(new EmailStatusUpdated($mail_Log, $request->status));
 
         return response()->json([
             "message" => "success"
