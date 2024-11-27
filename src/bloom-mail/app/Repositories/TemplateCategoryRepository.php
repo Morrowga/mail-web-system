@@ -47,43 +47,43 @@ class TemplateCategoryRepository implements TemplateCategoryRepositoryInterface
         }
     }
 
-    // public function update(Request $request, TemplateCategory $template_category)
-    // {
-    //     DB::beginTransaction();
+    public function update(Request $request, TemplateCategory $template_category)
+    {
+        DB::beginTransaction();
 
-    //     try {
-    //         if($template_category)
-    //         {
-    //             $template_category->update($request->all());
+        try {
+            if($template_category)
+            {
+                $template_category->update($request->all());
 
-    //             DB::commit();
+                DB::commit();
 
-    //             return $this->success('Template Category has been updated successfully.');
+                return $this->success('Template Category has been updated successfully.');
 
-    //         }
+            }
 
-    //         return $this->error('Data not found');
+            return $this->error('Data not found');
 
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
+        } catch (\Exception $e) {
+            DB::rollback();
 
-    //         return $this->error($e->getMessage());
-    //     }
-    // }
+            return $this->error($e->getMessage());
+        }
+    }
 
-    // public function delete(Category $category)
-    // {
-    //     try {
-    //         if($category)
-    //         {
-    //             $category->delete();
-    //         }
+    public function delete(TemplateCategory $template_category)
+    {
+        try {
+            if($template_category)
+            {
+                $template_category->delete();
+            }
 
-    //         return $this->success('Category has been deleted');
+            return $this->success('Template Category has been deleted');
 
-    //     } catch (\Exception $e) {
+        } catch (\Exception $e) {
 
-    //         return $this->error($e->getMessage());
-    //     }
-    // }
+            return $this->error($e->getMessage());
+        }
+    }
 }

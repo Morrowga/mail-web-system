@@ -133,6 +133,8 @@
         "user_edit": "アカウント情報を更新してください。",
         "user_create_title": "アカウント登録",
         "user_edit_title": "アカウント更新",
-        "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。"
+        "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。",
+        "edit_templatecategory": "テンプレートカテゴリ編集",
+        "create_templatecategory": "テンプレートカテゴリ登録"
     }
 }

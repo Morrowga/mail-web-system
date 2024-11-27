@@ -132,7 +132,9 @@
         "user_edit_title": "User Modification",
         "user_create": "Create Staffs Accounts",
         "user_edit": "Edit Staffs Accounts",
-        "welcome": "Welcome..."
+        "welcome": "Welcome...",
+         "edit_templatecategory": "Edit Template Category",
+        "create_templatecategory": "Create Template Category"
     }
 }
 

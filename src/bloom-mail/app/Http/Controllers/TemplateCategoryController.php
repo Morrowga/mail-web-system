@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\TemplateCategory;
 use App\Http\Requests\TemplateCategoryRequest;
 use App\Interfaces\TemplateCategoryRepositoryInterface;
 
@@ -33,6 +34,7 @@ class TemplateCategoryController extends Controller
      */
     public function create()
     {
+        return Inertia::render('TemplateCategories/CreateEdit');
     }
 
     /**
@@ -56,24 +58,30 @@ class TemplateCategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(TemplateCategory $template_category)
     {
-        //
+        return Inertia::render('TemplateCategories/CreateEdit', [
+            "template_category" => $template_category
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TemplateCategoryRequest $request, TemplateCategory $template_category)
     {
-        //
+        $updateCategory = $this->templateCategoryRepository->update($request, $template_category);
+
+        return redirect()->route('template-categories.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(TemplateCategory $template_category)
     {
-        //
+        $deleteCategory = $this->templateCategoryRepository->delete($template_category);
+
+        return redirect()->back();
     }
 }

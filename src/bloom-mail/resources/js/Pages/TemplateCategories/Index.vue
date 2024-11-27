@@ -5,34 +5,32 @@ import InputLabel from '@/Components/InputLabel.vue';
 import { onMounted, ref } from 'vue';
 import MailLayout from '@/Layouts/MailLayout.vue';
 import { permissionGrant } from '@/Helper/permissionUtils';
-
+import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
+import { router } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 const props = defineProps(['template_categories','auth']);
 
 const permissions = props?.auth?.user?.permissions
+const { t, locale } = useI18n();
+
+const tableHeaders = ref([
+    {
+     header: t('table.folder_name'),
+     val: "name"
+   },
+   {
+    header: t('input.details'),
+    val: "detail"
+   }
+]);
+
+
+const routeUrl = ref('/template-categories')
 
 const form = useForm({
     name: '',
     detail: '',
 });
-
-const categories = ref([
-    {name: 'Reservation', description: '-'},
-    {name: 'Cancel', description: '-'},
-    {name: 'New', description: '-'},
-    {name: 'Contract', description: '-'},
-    {name: 'Cancellation', description: '-'},
-])
-
-const formSubmit = () => {
-    form.post(route('template-categories.store'),{
-        onSuccess: () => {
-            form.reset();
-        },
-        onError: (error) => {
-        },
-    })
-}
-
 </script>
 
 <template>
@@ -47,93 +45,15 @@ const formSubmit = () => {
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
                             <h1>{{ $t('input.template_category') }}</h1>
-                            <VForm @submit.prevent="formSubmit">
-                                <VRow>
-                                    <VCol cols="12" lg="5">
-                                        <h3 class="mt-2">{{ $t('other.create_category_text')  }}</h3>
-                                        <div class="mt-4">
-                                            <InputLabel for="name" :value="$t('input.title')"/>
-                                            <VTextField
-                                                density="compact"
-                                                variant="outlined"
-                                                id="name"
-                                                type="text"
-                                                class="mt-1 block w-full"
-                                                v-model="form.name"
-                                                required
-                                            ></VTextField>
-
-                                            <InputError class="mb-2" :message="form.errors.name" />
-                                        </div>
-                                        <div>
-                                            <InputLabel for="description" :value="$t('input.details')" />
-                                            <VTextarea
-                                                variant="outlined"
-                                                id="name"
-                                                type="text"
-                                                class="mt-1 block w-full"
-                                                v-model="form.detail"
-                                                required
-                                            ></VTextarea>
-
-                                            <InputError class="mb-2" :message="form.errors.detail" />
-                                        </div>
-                                        <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.create_category') }}</VBtn>
-                                        </div>
-                                    </VCol>
-                                    <VCol cols="12" lg="7" v-if="permissionGrant(permissions, 'templatecategory_read')">
-                                        <div class="d-flex justify-center">
-                                            <div class="table-container">
-                                                <table class="custom-table">
-                                                <!-- Fixed header -->
-                                                <thead>
-                                                    <tr>
-                                                    <th class="checkbox-column px-5">
-                                                        <div class="center-content">
-                                                        <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
-                                                        </div>
-                                                    </th>
-                                                    <th>{{ $t('table.title') }}</th>
-                                                    <th>{{ $t('table.description') }}</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <!-- Scrollable tbody within a fixed-height container -->
-                                                <tbody class="scrollable-tbody">
-                                                    <tr v-for="(item, index) in template_categories" :key="index">
-                                                    <td class="checkbox-column px-5">
-                                                        <div class="center-content">
-                                                        <v-checkbox :label="''" density="compact" class="d-inline-flex pt-2 text-[#000]"></v-checkbox>
-                                                        </div>
-                                                    </td>
-                                                    <td class="name-column">
-                                                        {{ item.name }}
-                                                    </td>
-                                                    <td class="description-column">
-                                                        {{ item.detail }}
-                                                    </td>
-                                                    </tr>
-                                                </tbody>
-
-                                                <!-- Fixed footer -->
-                                                <tfoot>
-                                                    <tr>
-                                                    <th class="checkbox-column px-5">
-                                                        <div class="center-content">
-                                                        <v-checkbox label="" class="d-inline-flex pt-2 text-[#000]" density="compact"></v-checkbox>
-                                                        </div>
-                                                    </th>
-                                                    <th>{{ $t('table.title') }}</th>
-                                                    <th>{{ $t('table.description') }}</th>
-                                                    </tr>
-                                                </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </VCol>
-                                </VRow>
-                            </VForm>
+                            <VBtn color="primary" v-if="permissionGrant(permissions, 'templatecategory_createdit')" @click="router.get(route('template-categories.create'))">{{ $t('buttons.registration') }}</VBtn>
+                            <div class="my-5">
+                                <CustomizeTable
+                                    :link="routeUrl"
+                                    :headers="tableHeaders"
+                                    :data="props?.template_categories"
+                                    :permission_name="'templatecategory'"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
