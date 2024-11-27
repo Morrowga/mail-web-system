@@ -14,6 +14,10 @@ const tableHeaders = ref([
      name: "Name",
      value: "name"
    },
+   {
+     name: "Display",
+     value: "display"
+   }
 ]);
 
 console.log(props?.permissions?.data);

@@ -168,9 +168,8 @@ class MailRepository implements MailRepositoryInterface
                     $body = $message->getHTMLBody() ?? $message->getTextBody();
                     $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
                     $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
-
                     $spamCheck = Spam::where('mail_address', $senderEmail)->first();
-                    
+
                     $flags = $message->getFlags()->toArray();
 
                     if(!empty($spamCheck))
@@ -179,7 +178,20 @@ class MailRepository implements MailRepositoryInterface
 
                         $status = 'deleted';
                     } else {
-                        $status = in_array('Seen', $flags) ? 'read' : 'new';
+
+                        $emailParts = explode('@', $senderEmail);
+                        $domain = isset($emailParts[1]) ? $emailParts[1] : null;
+
+                        $spamDomainCheck = Spam::where('mail_address', $domain)->first();
+
+                        if(!empty($spamDomainCheck))
+                        {
+                            $message->delete(false);
+
+                            $status = 'deleted';
+                        } else {
+                            $status = in_array('Seen', $flags) ? 'read' : 'new';
+                        }
                     }
 
                     $inReplyTo = $message->getHeader()->get('in-reply-to');
@@ -250,7 +262,7 @@ class MailRepository implements MailRepositoryInterface
                 }
             }
 
-            $checkNew = count($newEmails) > 0 && $status != 'deleted'  ? 1 : 0;
+            $checkNew = count($newEmails) > 0 ? 1 : 0;
 
             broadcast(new TakingMail(["new" => $checkNew]));
 
@@ -621,5 +633,12 @@ class MailRepository implements MailRepositoryInterface
             logger()->error("Error sending email: " . $e->getMessage());
             return $this->error('Connection Failed.', []);
         }
+    }
+
+    private function getDomainFromEmail($email)
+    {
+        $parts = explode('@', $email);
+
+        return isset($parts[1]) ? $parts[1] : null;
     }
 }

@@ -2,10 +2,11 @@
 import { getStatusColor, getTranslatedStatus } from '@/Helper/status';
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import AppConfirmDialog from './AppConfirmDialog.vue';
 import PaginationServerSide from './PaginationServerSide.vue';
 import usePagination from '@/Helper/usePagination';
+import { permissionGrant } from '@/Helper/permissionUtils';
 const props = defineProps({
   data: {
     type: Array,
@@ -17,6 +18,9 @@ const props = defineProps({
   },
   url: {
     type: String
+  },
+  permission_name: {
+    type: String
   }
 });
 
@@ -26,15 +30,15 @@ const pagination = ref({
     total: props?.data.total
 });
 
+const page = usePage();
+
+const permissions = page?.props?.auth?.user?.permissions
+
 const { t, locale } = useI18n();
 
 const emit = defineEmits();
 
 const getEdit = (id) => {
-    if(props?.url == 'permissions')
-    {
-        return;
-    }
     router.get(props?.url + '/' + id + '/edit')
 }
 
@@ -80,7 +84,7 @@ const paginate = usePagination(props.data);
         <td v-for="(header,i) in headers" :key="i">
             {{ item[header.value] }}
         </td>
-        <td v-if="url != 'permissions'">
+        <td v-if="url != 'permissions' && permissionGrant(permissions, permission_name + '_delete')">
             <AppConfirmDialog :routeUrl="url" :item="item" />
         </td>
       </tr>

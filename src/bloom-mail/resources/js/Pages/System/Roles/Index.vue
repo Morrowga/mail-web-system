@@ -46,6 +46,7 @@ console.log(props?.roles?.data);
                                     :headers="tableHeaders"
                                     :data="props?.roles"
                                     :url="'roles'"
+                                    :permission_name="'role'"
                                 />
                             </div>
                         </div>

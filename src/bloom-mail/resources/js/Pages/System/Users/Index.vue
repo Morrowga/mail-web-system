@@ -1,13 +1,16 @@
 <script setup>
+import { permissionGrant } from '@/Helper/permissionUtils';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import AppTable from '@/PageComponents/AppTable.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const props = defineProps(['users'])
+const props = defineProps(['users', 'auth'])
 
 const { t, locale } = useI18n();
+
+const permissions = props?.auth?.user?.permissions
 
 const tableHeaders = ref([
    {
@@ -44,7 +47,7 @@ console.log(props?.users)
                     >
                         {{$t('nav.users')}}
                     </h1>
-                    <VBtn color="primary" @click="router.get(route('users.create'))">
+                    <VBtn color="primary" v-if="permissionGrant(permissions, 'account_createdit')" @click="router.get(route('users.create'))">
                         {{ $t('buttons.registration') }}
                     </VBtn>
                 </div>
@@ -58,6 +61,7 @@ console.log(props?.users)
                                     :headers="tableHeaders"
                                     :data="props?.users"
                                     :url="'users'"
+                                    :permission_name="'account'"
                                 />
                             </div>
                         </div>

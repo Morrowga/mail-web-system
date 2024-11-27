@@ -4,8 +4,12 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import { onMounted, ref } from 'vue';
 import MailLayout from '@/Layouts/MailLayout.vue';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
-const props = defineProps(['template_categories']);
+const props = defineProps(['template_categories','auth']);
+
+const permissions = props?.auth?.user?.permissions
+
 const form = useForm({
     name: '',
     detail: '',
@@ -78,7 +82,7 @@ const formSubmit = () => {
                                             <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.create_category') }}</VBtn>
                                         </div>
                                     </VCol>
-                                    <VCol cols="12" lg="7">
+                                    <VCol cols="12" lg="7" v-if="permissionGrant(permissions, 'templatecategory_read')">
                                         <div class="d-flex justify-center">
                                             <div class="table-container">
                                                 <table class="custom-table">

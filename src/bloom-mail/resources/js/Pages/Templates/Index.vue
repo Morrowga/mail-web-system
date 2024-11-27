@@ -1,11 +1,14 @@
 <script setup>
+import { permissionGrant } from '@/Helper/permissionUtils';
 import MailLayout from '@/Layouts/MailLayout.vue';
 import ConfirmDialog from '@/PageComponents/ConfirmDialog.vue';
 import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const props = defineProps(['template_categories']);
+const props = defineProps(['template_categories', 'auth']);
+
+const permissions = props?.auth?.user?.permissions
 
 const { t, locale } = useI18n();
 
@@ -57,8 +60,8 @@ const copyToClipboard = (text) => {
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <VBtn class="text-capitalize" color="primary" @click="router.get(route('templates.create'))">{{$t('buttons.template_registration')}}</VBtn>
-                            <VBtn color="primary" class="mx-2 text-capitalize" @click="router.get('/template-categories')">{{$t('buttons.category_list')}}</VBtn>
+                            <VBtn class="text-capitalize" color="primary" v-if="permissionGrant(permissions, 'template_createdit')" @click="router.get(route('templates.create'))">{{$t('buttons.template_registration')}}</VBtn>
+                            <VBtn color="primary" class="mx-2 text-capitalize" v-if="permissionGrant(permissions, 'templatecategory_createdit')" @click="router.get('/template-categories')">{{$t('buttons.category_list')}}</VBtn>
                             <div class="my-5" v-for="(category, index) in props?.template_categories" :key="category?.id">
                                 <VCard>
                                     <!-- Card Title -->
@@ -90,7 +93,7 @@ const copyToClipboard = (text) => {
                                             <div>
                                                 <span class="text-[#1b5d9b] font-[500] cursor-pointer" @click="copyToClipboard(template.title)">{{ $t('table.copy')}}</span>
                                                 <span class="text-[#1b5d9b] font-[500] cursor-pointer "> | </span>
-                                                <ConfirmDialog :item="template" :routeUrl="'/templates'" />
+                                                <ConfirmDialog v-if="permissionGrant(permissions, 'template_delete')" :item="template" :routeUrl="'/templates'" />
                                             </div>
                                             </div>
                                         </VCardText>

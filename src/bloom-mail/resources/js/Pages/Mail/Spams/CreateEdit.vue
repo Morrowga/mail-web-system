@@ -4,11 +4,13 @@ import InputLabel from '@/Components/InputLabel.vue';
 import MailLayout from '@/Layouts/MailLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
-const props = defineProps(['spam'])
+const props = defineProps(['spam', 'auth'])
 
 const form = useForm({
     mail_address: props?.spam?.mail_address,
 })
+
+const permissions = props?.auth?.user?.permissions
 
 const formSubmit = () => {
     const isEdit = Boolean(props?.spam);
@@ -64,7 +66,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
+                                            <VBtn prepend-icon="mdi-content-save-all-outline" color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>

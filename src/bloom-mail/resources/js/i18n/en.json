@@ -39,8 +39,9 @@
         "cancel": "Cancel",
         "confirm": "Confirm",
         "search": "Search",
-        "yes": "はい",
-        "no": "いいえ"
+        "yes": "Yes",
+        "no": "No",
+        "update": "Update"
     },
     "input": {
         "name": "Name",
@@ -75,7 +76,8 @@
         "partial_match": "Partial Match",
         "front_match": "Front Match",
         "backward_match": "Backward Match",
-        "person_in_charge_text": "Person Incharge Name"
+        "person_in_charge_text": "Person Incharge Name",
+        "role": "Role"
     },
     "table": {
         "folder_name": "Folder Name",
@@ -125,7 +127,11 @@
         "confirmation": "Confirmation",
         "new_message": "New Message",
         "replace_text": "Do you want to replace it with the template?",
+        "user_create_title": "User Creation",
+        "user_edit_title": "User Modification",
         "user_create": "Create Staffs Accounts",
+        "user_edit": "Edit Staffs Accounts",
         "welcome": "Welcome..."
     }
 }
+

@@ -7,6 +7,7 @@ import MailConfirmDialog from './MailConfirmDialog.vue';
 import { useI18n } from 'vue-i18n';
 import { getTranslatedStatus } from '@/Helper/status';
 import axios from 'axios';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
 const props = defineProps({
     mail: Object,
@@ -21,31 +22,35 @@ console.log(props?.pageType)
 
 const { t, locale } = useI18n();
 
+const page = usePage();
+
+const permissions = page?.props?.auth?.user?.permissions
+
 const emit = defineEmits();
 
 const mailType = ref(null);
 
 const statusOptions = ref([
-  {
-    name: t('table.confirmed'),
-    value: "confirmed"
-  },
-  {
-    name: t('table.resolved'),
-    value: "resolved"
-  },
-  {
-    name: t('table.pending'),
-    value: "pending"
+    {
+    name: t('table.' + props?.mail?.status),
+    value: props?.mail?.status
   },
   {
     name: t('table.under_review'),
     value: "under_review"
   },
   {
-    name: t('table.' + props?.mail?.status),
-    value: props?.mail?.status
+    name: t('table.pending'),
+    value: "pending"
   },
+  {
+    name: t('table.resolved'),
+    value: "resolved"
+  },
+  {
+    name: t('table.confirmed'),
+    value: "confirmed"
+  }
 ]);
 
 const selectedStatus = ref(t('table.' + props?.mail?.status) || '');
@@ -158,12 +163,12 @@ const handleStatusChange = () => {
         </div>
         <VRow>
             <VCol cols="12" lg="2">
-                <VIcon icon="mdi-trash-can-outline" @click="openConfirmDialog('delete')" />
+                <VIcon icon="mdi-trash-can-outline" v-if="permissionGrant(permissions, 'mail_delete')" @click="openConfirmDialog('delete')" />
                 <VIcon icon="mdi-redo" class="ml-2" v-if="props?.pageType == 'trash'"@click="openConfirmDialog('redo')" />
             </VCol>
             <VCol cols="12" lg="6" v-if="props?.pageType == 'inbox'">
                 <div class="icon-container">
-                <div class="icon-wrapper">
+                <div class="icon-wrapper" v-if="permissionGrant(permissions, 'mail_reply')">
                     <VIcon icon="mdi-arrow-left-top" @click="openDialog('reply')" class="icon-size cursor-pointer" />
                     <div class="underline"></div>
                 </div>
@@ -171,7 +176,7 @@ const handleStatusChange = () => {
                     <VIcon icon="mdi-sync" class="icon-size" @click="loadThread(props?.mail?.id)" />
                     <div class="underline"></div>
                 </div>
-                <div class="icon-wrapper">
+                <div class="icon-wrapper" v-if="permissionGrant(permissions, 'mail_forward')">
                     <VIcon icon="mdi-arrow-right-top" @click="openDialog('forward')" class="icon-size cursor-pointer" />
                     <div class="underline"></div>
                 </div>

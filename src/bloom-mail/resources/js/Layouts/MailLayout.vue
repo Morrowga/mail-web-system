@@ -7,11 +7,14 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import FilterDialog from '@/PageComponents/FilterDialog.vue';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
 const showingNavigationDropdown = ref(false);
 const filterDialogVisible = ref(false);
 
 const { props } = usePage();
+
+const permissions = props?.auth?.user?.permissions
 
 const form = ref({
     status: "",
@@ -80,16 +83,17 @@ const handleSubmit = () => {
 
                             <NavLink
                                 class="mx-5 layout-nav-text d-flex align-center"
-                                :active="route().current('dashboard')"
+                                :active="route().current('inbox')"
                                 :href="route('inbox')"
                                 as="button"
                             >
                                 <span>{{ $t('nav.inbox') }}</span>
                             </NavLink>
                             <NavLink
-                                :active="route().current('templinates')"
+                                :active="route().current('templates')"
                                 :href="route('templates.index')"
                                 as="button"
+                                v-if="permissionGrant(permissions, 'template_read')"
                                 class="mx-5 layout-nav-text"
                             >
                                 {{ $t('nav.template') }}
@@ -98,6 +102,7 @@ const handleSubmit = () => {
                                 :active="route().current('folders')"
                                 as="button"
                                 :href="route('folders.index')"
+                                v-if="permissionGrant(permissions, 'folder_read')"
                                 class="mx-5 layout-nav-text"
                             >
                                 {{ $t('nav.folders') }}

@@ -1,8 +1,6 @@
 <script setup>
 import MailLayout from '@/Layouts/MailLayout.vue';
-import CustomizeTable from '@/PageComponents/CustomizeTable.vue';
 import { Head,router } from '@inertiajs/vue3';
-import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();

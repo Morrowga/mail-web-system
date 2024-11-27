@@ -26,24 +26,12 @@ watch(() => filterProps.filterDialog, (newVal) => {
 
 const statusList = ref([
     {
-        "name": t('table.replying'),
-        "value": "replying",
-    },
-    {
-        "name": t('table.read'),
-        "value": "read"
-    },
-    {
         "name": t('table.new'),
         "value": "new"
     },
     {
-        "name": t('table.confirmed'),
-        "value": "confirmed"
-    },
-    {
-        "name": t('table.resolved'),
-        "value": "resolved"
+        "name": t('table.read'),
+        "value": "read"
     },
     {
         "name": t('table.under_review'),
@@ -53,6 +41,18 @@ const statusList = ref([
         "name": t('table.pending'),
         "value": "pending"
     },
+    {
+        "name": t('table.replying'),
+        "value": "replying",
+    },
+    {
+        "name": t('table.resolved'),
+        "value": "resolved"
+    },
+    {
+        "name": t('table.confirmed'),
+        "value": "confirmed"
+    }
 ])
 
 const onClose = () => {

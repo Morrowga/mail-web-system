@@ -9,10 +9,11 @@ import { computed, initCustomFormatter, onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import MailLayout from '@/Layouts/MailLayout.vue';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
 const createDialogVisible = ref(false);
 
-const props = defineProps(['templates', 'from'])
+const props = defineProps(['templates', 'from', 'auth'])
 
 const { t, locale } = useI18n();
 
@@ -27,6 +28,8 @@ const loading = ref(false);  // Loading status
 const mails = ref({});
 
 const folders = ref({});
+
+const permissions = props?.auth?.user?.permissions
 
 const headers = ref({
     inbox: [
@@ -353,7 +356,7 @@ onUnmounted(() => {
                                 </div> -->
 
                                 <!-- Spam: Navigates to Spam route -->
-                                <div class="my-10 cursor-pointer" @click="goToSpam">
+                                <div class="my-10 cursor-pointer" @click="goToSpam" v-if="permissionGrant(permissions, 'spam_read')">
                                     <p :class="{ 'active-route': pageType === 'spam' }">{{$t('nav.spam')}}</p>
                                 </div>
 
@@ -364,7 +367,7 @@ onUnmounted(() => {
                             </VCol>
                             <VCol cols="12" :lg="selectedMail ? 5 : 10"
                             >
-                                <div class="mb-3">
+                                <div class="mb-3" v-if="permissionGrant(permissions, 'mail_create')">
                                 <MailCreationDialog
                                     :label="label"
                                     @update:labelValue="label = $event"

@@ -43,18 +43,14 @@ const formSubmit = () => {
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                    {{ $t('nav.users') }}
+                    {{ Boolean(props?.user) ? $t('other.user_edit_title') :  $t('other.user_create_title') }}
                 </h1>
                 <div
                     class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
                 >
                     <header>
-                        <h2 class="text-lg font-medium text-gray-900">
-                            {{ $t('nav.users') }}
-                        </h2>
-
-                        <p class="mt-1 text-sm text-gray-600">
-                            {{ $t('other.user_create') }}
+                        <p class="text-sm text-gray-600">
+                            {{ Boolean(props?.user) ? $t('other.user_edit') : $t('other.user_create') }}
                         </p>
                     </header>
                     <form @submit.prevent="formSubmit" class="my-3">
@@ -130,6 +126,10 @@ const formSubmit = () => {
                         </div>
 
                         <div class="mt-4 w-50">
+                            <InputLabel
+                                for="role"
+                                :value="$t('input.role')"
+                            />
                             <VSelect
                                 v-model="form.role_id"
                                 :placeholder="'Select Role'"
@@ -137,6 +137,7 @@ const formSubmit = () => {
                                 :items="roles"
                                 item-value="id"
                                 clearable
+                                class="mt-1"
                                 item-title="name"
                             ></VSelect>
 
@@ -146,13 +147,15 @@ const formSubmit = () => {
                             />
                         </div>
 
-                        <div class="mt-4 flex items-center justify-start">
-                            <PrimaryButton
+                        <div class="mt-10 flex items-center justify-end w-50">
+                            <VBtn
+                                prepend-icon="mdi-content-save-all-outline"
+                                color="primary"
                                 :class="{ 'opacity-25': form.processing }"
                                 :disabled="form.processing"
                             >
-                                {{ $t('buttons.registration' )}}
-                            </PrimaryButton>
+                                {{ Boolean(props?.user) ? $t('buttons.update') : $t('buttons.registration')}}
+                            </VBtn>
                         </div>
                     </form>
                 </div>

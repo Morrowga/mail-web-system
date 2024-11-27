@@ -25,8 +25,8 @@ const defaultAccDowns = [
 
 const AccDowns = [
     { label: t('nav.users'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
-    { label: t('nav.roles'), href: 'roles.index', post: false, show: role == 'SA' ? true : false },
-    { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == 'SA' ? true : false },
+    { label: t('nav.roles'), href: 'roles.index', post: false, show: role == 'Super Administrator' ? true : false },
+    { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == 'Super Administrator' ? true : false },
 ];
 </script>
 
@@ -39,13 +39,11 @@ const AccDowns = [
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 20%;">
-                            <h5 style="color: #fff;">{{ $t('nav.logo') }}</h5>
+                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 50%;">
+                            <h2 style="color: #fff;">{{ $t('nav.logo') }}</h2>
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 92%;">
-                            <!-- Settings Dropdown -->
-
                             <NavLink
                                 v-if="permissionGrant(permissions, 'mail_read')"
                                 :active="route().current('inbox')"

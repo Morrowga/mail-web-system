@@ -2,15 +2,19 @@
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import PermissionSelector from '@/PageComponents/PermissionSelector.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
-const props = defineProps(['role'])
+const props = defineProps(['role', 'permissions', 'role_permissions'])
 
 const form = useForm({
-    name: props?.role?.name,
+    name: props?.role?.name ?? '',
+    permissions: props?.role_permissions ?? [],
 })
 
 const formSubmit = () => {
+    console.log(form);
+
     const isEdit = Boolean(props?.role);
 
     const routeLink = isEdit ? route('roles.update', props.role.id) : route('roles.store');
@@ -42,7 +46,7 @@ const formSubmit = () => {
                             <VForm @submit.prevent="formSubmit">
                                 <VCard class="my-4">
                                     <VCardText>
-                                        <VRow class="my-3">
+                                        <VRow class="mt-3">
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
@@ -65,9 +69,12 @@ const formSubmit = () => {
                                         </VRow>
                                     </VCardText>
                                     <VCardText>
-                                        <div>
-                                            <VBtn color="primary" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
-                                        </div>
+                                        <h2 class="mx-2 mb-2">Select Permissions</h2>
+                                        <PermissionSelector  :permissions="props?.permissions" v-model="form.permissions" />
+                                        <InputError class="mb-2" :message="form.errors.permissions" />
+                                    </VCardText>
+                                    <VCardText class="text-right">
+                                        <VBtn color="primary" prepend-icon="mdi-content-save-all-outline" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                     </VCardText>
                                 </VCard>
                             </VForm>

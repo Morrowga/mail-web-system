@@ -7,7 +7,9 @@ import { Head, useForm } from '@inertiajs/vue3';
 const props = defineProps(['permission'])
 
 const form = useForm({
-    name: props?.permission?.name,
+    name: props?.permission?.name ?? '',
+    display: props?.permission?.display ?? '',
+    description: props?.permission?.description ?? '',
 })
 
 const formSubmit = () => {
@@ -53,18 +55,58 @@ const formSubmit = () => {
                                                             density="compact"
                                                             variant="outlined"
                                                             id="name"
-                                                            type="email"
+                                                            readonly
+                                                            type="text"
                                                             class="mt-1 block w-full"
                                                             v-model="form.name"
+                                                            disabled
                                                             required
                                                         ></VTextField>
                                                         <InputError class="mb-2" :message="form.errors.name" />
                                                     </div>
                                                 </div>
                                             </VCol>
+                                            <VCol cols="12" class="py-0">
+                                                <div class="d-flex justify-start">
+                                                    <div style="width: 17%; padding: 10px;">
+                                                        <InputLabel for="display" :value="'Display Name'"/>
+                                                    </div>
+                                                    <div style="width: 30%;">
+                                                        <VTextField
+                                                            density="compact"
+                                                            variant="outlined"
+                                                            id="display"
+                                                            type="text"
+                                                            class="mt-1 block w-full"
+                                                            v-model="form.display"
+                                                            required
+                                                        ></VTextField>
+                                                        <InputError class="mb-2" :message="form.errors.display" />
+                                                    </div>
+                                                </div>
+                                            </VCol>
+                                            <VCol cols="12" class="py-0">
+                                                <div class="d-flex justify-start">
+                                                    <div style="width: 17%; padding: 10px;">
+                                                        <InputLabel for="description" :value="'Description'"/>
+                                                    </div>
+                                                    <div style="width: 50%;">
+                                                        <VTextarea
+                                                            density="compact"
+                                                            variant="outlined"
+                                                            id="description"
+                                                            type="text"
+                                                            class="mt-1 block w-full"
+                                                            v-model="form.description"
+                                                            required
+                                                        ></VTextarea>
+                                                        <InputError class="mb-2" :message="form.errors.description" />
+                                                    </div>
+                                                </div>
+                                            </VCol>
                                         </VRow>
-                                        <div>
-                                            <VBtn color="primary" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
+                                        <div class="text-right">
+                                            <VBtn prepend-icon="mdi-content-save-all-outline" color="primary" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>

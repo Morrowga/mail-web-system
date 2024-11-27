@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Requests\RoleRequest;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use App\Interfaces\RoleRepositoryInterface;
 
 class RoleController extends Controller
@@ -33,7 +34,11 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return Inertia::render('System/Roles/CreateEdit');
+        $permissions = Permission::select('name', 'id', 'display')->get();
+
+        return Inertia::render('System/Roles/CreateEdit', [
+            "permissions" => $permissions
+        ]);
     }
 
     /**
@@ -59,8 +64,12 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        $permissions = Permission::select('name', 'display', 'id')->get();
+
         return Inertia::render('System/Roles/CreateEdit', [
-            "role" => $role
+            "role" => $role,
+            "role_permissions" => $role->permissions()->pluck('id'),
+            "permissions" => $permissions
         ]);
     }
 

@@ -1,8 +1,9 @@
 <script setup>
 import { defineProps, ref } from 'vue';
-import { Head,router } from '@inertiajs/vue3';
+import { Head,router, usePage } from '@inertiajs/vue3';
 import ConfirmDialog from './ConfirmDialog.vue';
 import { useI18n } from 'vue-i18n';
+import { permissionGrant } from '@/Helper/permissionUtils';
 
 // Define the props that this component accepts
 const props = defineProps({
@@ -17,12 +18,19 @@ const props = defineProps({
   link: {
     type: String,
     required: true,
+  },
+  permission_name: {
+    type: String,
+    required: true,
   }
 });
 
 const { t, locale } = useI18n();
 const snackbarVisible = ref(false);
 const snackbarMessage = ref("");
+const page = usePage();
+
+const permissions = page?.props?.auth?.user?.permissions
 
 // Copy function
 const copyToClipboard = (text) => {
@@ -55,8 +63,7 @@ const copyToClipboard = (text) => {
                 <td>
                     <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">{{ $t('table.copy') }}</span>
                     <span class="text-[#1b5d9b] font-[500]"> | </span>
-                    <ConfirmDialog :item="item" :routeUrl="link" />
-                    <!-- <span class="text-red font-bold cursor-pointer" @click="confirmDelete">Delete</span> -->
+                    <ConfirmDialog v-if="permissionGrant(permissions, props?.permission_name + '_delete')" :item="item" :routeUrl="link" />
                 </td>
             </tr>
         </tbody>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Interfaces\UserRepositoryInterface;
 
@@ -19,7 +20,11 @@ class UserRepository implements UserRepositoryInterface
     {
         try {
 
-            $users = User::paginate(10);
+            $currentUserRole = Auth::user()->role_id;
+
+            $query = User::query();
+
+            $users = $currentUserRole == 1 ? $query->paginate(10) : $query->where('id', '!=',  1)->paginate(10);
 
             return $this->success('Fetched Users', $users);
 

@@ -28,13 +28,14 @@ class RoleRepository implements RoleRepositoryInterface
 
     }
 
-
     public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
             $role = Role::create($request->all());
+
+            $role->syncPermissions($request->permissions);
 
             DB::commit();
 
@@ -55,6 +56,8 @@ class RoleRepository implements RoleRepositoryInterface
             if($role)
             {
                 $role->update($request->all());
+
+                $role->syncPermissions($request->permissions);
 
                 DB::commit();
 

@@ -133,7 +133,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
+                                            <VBtn prepend-icon="mdi-content-save-all-outline"  color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>
