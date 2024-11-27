@@ -8,6 +8,7 @@
     "nav": {
         "logo": "Email & App Management System",
         "inbox": "Inbox",
+        "template_categories": "テンプレート カテゴリ一覧",
         "home": "Home",
         "template": "Template",
         "folders": "Folders",
@@ -27,6 +28,7 @@
         "category_list": "Category List",
         "registration": "Registration",
         "create_category": "Create New Category",
+        "update_category": "Update Category",
         "create_folder": "Create Folder",
         "mailbox": "Mail Box",
         "save": "Save",
@@ -133,7 +135,7 @@
         "user_create": "Create Staffs Accounts",
         "user_edit": "Edit Staffs Accounts",
         "welcome": "Welcome...",
-         "edit_templatecategory": "Edit Template Category",
+        "edit_templatecategory": "Edit Template Category",
         "create_templatecategory": "Create Template Category"
     }
 }

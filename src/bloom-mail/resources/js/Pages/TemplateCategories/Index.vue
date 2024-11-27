@@ -34,7 +34,7 @@ const form = useForm({
 </script>
 
 <template>
-    <Head :title="$t('input.template_category')" />
+    <Head :title="$t('nav.template_categories')" />
 
     <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -44,7 +44,7 @@ const form = useForm({
                 >
                     <div class="p-6 text-gray-900">
                         <div style="padding: 20px;">
-                            <h1>{{ $t('input.template_category') }}</h1>
+                            <h1 class="my-2">{{ $t('nav.template_categories') }}</h1>
                             <VBtn color="primary" v-if="permissionGrant(permissions, 'templatecategory_createdit')" @click="router.get(route('template-categories.create'))">{{ $t('buttons.registration') }}</VBtn>
                             <div class="my-5">
                                 <CustomizeTable

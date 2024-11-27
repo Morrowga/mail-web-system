@@ -7,6 +7,7 @@
     },
     "nav": {
         "logo": "メール・アプリ管理システム",
+        "template_categories": "テンプレート カテゴリ一覧",
         "inbox": "受信トレイ",
         "home": "ホーム",
         "template": "テンプレート",
@@ -27,6 +28,7 @@
         "category_list": "カテゴリ一覧",
         "registration": "登録",
         "create_category": "新規カテゴリ追加",
+        "update_category": "カテゴリ更新",
         "create_folder": "フォルダー登録",
         "mailbox": "新規メール",
         "save": "更新",
@@ -134,7 +136,7 @@
         "user_create_title": "アカウント登録",
         "user_edit_title": "アカウント更新",
         "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。",
-        "edit_templatecategory": "テンプレートカテゴリ編集",
+        "edit_templatecategory": "テンプレート カテゴリ編集",
         "create_templatecategory": "テンプレートカテゴリ登録"
     }
 }

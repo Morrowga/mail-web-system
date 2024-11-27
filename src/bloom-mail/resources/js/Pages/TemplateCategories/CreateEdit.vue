@@ -22,10 +22,10 @@ const formSubmit = () => {
 
     form[method](routeLink, {
         onSuccess: () => {
-            form.reset();  // Reset the form upon success
+            form.reset();
         },
         onError: (error) => {
-            console.error("Form submission error:", error); // Handle the error if needed
+            console.error("Form submission error:", error);
         },
     });
 };
@@ -33,7 +33,7 @@ const formSubmit = () => {
 </script>
 
 <template>
-    <Head :title="$t('nav.template_categories')" />
+    <Head :title="$t('input.template_category')" />
 
     <MailLayout>
         <div class="bg-[#f2f4f6] h-screen">
@@ -46,12 +46,11 @@ const formSubmit = () => {
                             <VForm @submit.prevent="formSubmit">
                                 <VCard>
                                     <VCardTitle>
-                                        {{ props?.folder ? $t('other.edit_templatecategory') : $t('other.create_templatecategory')}}
+                                        {{ props?.template_category ? $t('other.edit_templatecategory') : $t('other.create_templatecategory')}}
                                     </VCardTitle>
                                     <VCardText>
                                         <VRow class="my-3">
                                             <VCol cols="12" lg="5">
-                                                <h3 class="mt-2">{{ $t('other.create_category_text')  }}</h3>
                                                 <div class="mt-4">
                                                     <InputLabel for="name" :value="$t('input.title')"/>
                                                     <VTextField
@@ -82,7 +81,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div>
-                                            <VBtn prepend-icon="mdi-content-save-all-outline"  color="customBtnColor" type="submit" class="text-white text-capitalize">{{ $t('buttons.create_category') }}</VBtn>
+                                            <VBtn prepend-icon="mdi-content-save-all-outline"  color="customBtnColor" type="submit" class="text-white text-capitalize">{{ props?.template_category ?   $t('buttons.update_category') : $t('buttons.create_category') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>
