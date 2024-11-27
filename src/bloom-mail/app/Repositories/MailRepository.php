@@ -495,9 +495,12 @@ class MailRepository implements MailRepositoryInterface
 
             $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
-            $message->move('INBOX.Trash');
+            $message->delete(false);
+
+            $prev = $mailLog->status;
 
             $mailLog->status = 'deleted';
+            $mailLog->previous_status = $prev;
             $mailLog->update();
 
             return response()->json(['status' => 'success', 'message' => 'Email deleted permanently.']);
@@ -505,19 +508,52 @@ class MailRepository implements MailRepositoryInterface
             logger()->error("Error deleting email: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to delete email.'], 500);
         }
+    }
 
-        // $oFolder = $this->client->getFolder('INBOX');
+    public function redo(MailLog $mailLog)
+    {
+        try {
+            if (!$mailLog) {
+                return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
+            }
 
-        // $oMessage = $oFolder->query()->getMessageByUid($mailLog->uid);
+            $inbox = $this->client->getFolder('INBOX');
 
-        // $trash = 'INBOX/Trash';
-        // $oFolder = $this->client->getFolder($trash, '/');
-        // if (!$oFolder) {
-        //    $trash = 'INBOX.Trash';
-        //    $this->client->getFolder($trash, '.');
-        // }
+            $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
-        // $oMessage->move($trash);
+            $message->restore(false);
+
+            $mailLog->status = $mailLog->previous_status ?? 'read';
+            $mailLog->previous_status = '';
+            $mailLog->update();
+
+            return response()->json(['status' => 'success', 'message' => 'Email deleted permanently.']);
+        } catch (Exception $e) {
+            logger()->error("Error deleting email: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete email.'], 500);
+        }
+    }
+
+    public function deleteForever(MailLog $mailLog)
+    {
+        try {
+            if (!$mailLog) {
+                return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
+            }
+
+            $inbox = $this->client->getFolder('INBOX');
+
+            $message = $inbox->query()->getMessageByUid($mailLog->uid);
+
+            $message->delete(true);
+
+            $mailLog->delete();
+
+            return response()->json(['status' => 'success', 'message' => 'Email deleted permanently.']);
+        } catch (Exception $e) {
+            logger()->error("Error deleting email: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to delete email.'], 500);
+        }
     }
 
     public function deleteSentMail(SentMail $sent_mail)

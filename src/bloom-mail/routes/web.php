@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mails',[MailController::class, 'store'])->name('mails.store');
     Route::post('/mails/reply-forward/{mail_log}',[MailController::class, 'replyForward'])->name('mails.reply-forward');
     Route::delete('/mails/delete/{mail_log}',[MailController::class, 'destroy'])->name('mails.delete');
+    Route::post('/mails/redo/{mail_log}',[MailController::class, 'redo'])->name('mails.redo');
+    Route::delete('/mails/delete-forever/{mail_log}',[MailController::class, 'destroyForever'])->name('mails.deleteforever');
     Route::delete('/mails/sent/delete/{sent_mail}',[MailController::class, 'sentDestroy'])->name('mails.sent.delete');
 
 

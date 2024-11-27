@@ -49,6 +49,7 @@ const statusOptions = ref([
 ]);
 
 const selectedStatus = ref(t('table.' + props?.mail?.status) || '');
+const selectedConfirmType = ref('delete');
 
 const form = useForm({});
 
@@ -75,7 +76,8 @@ const loadThread = (id) => {
     emit('getThreads', id)
 }
 
-const openConfirmDialog = () => {
+const openConfirmDialog = (type) => {
+    selectedConfirmType.value = type;
     confirmDialog.value = true
 }
 
@@ -85,7 +87,15 @@ watch(() => props?.mail?.status, (newStatus) => {
 
 const handleDelete = async () => {
     try {
-        let url = props?.pageType == 'inbox' ? `/mails/delete/${props?.mail?.id}` : `/mails/sent/delete/${props?.mail?.id}`;
+        let url;
+
+        if(props?.pageType == 'inbox') {
+           url = `/mails/delete/${props?.mail?.id}`
+        } else if(props?.pageType == 'trash') {
+            url = `/mails/delete-forever/${props?.mail?.id}`
+        } else {
+            url = `/mails/sent/delete/${props?.mail?.id}`
+        }
 
         form.delete(url, {
             onSuccess: () => {
@@ -101,11 +111,30 @@ const handleDelete = async () => {
     }
 }
 
+const handleRedo = async () => {
+    try {
+        let url = `/mails/redo/${props?.mail?.id}`
+
+        form.post(url, {
+            onSuccess: () => {
+                emit('handleRemoveRow');
+                emit('fetchagain');
+            },
+            onError: (error) => {
+                console.error("Form submission error:", error);
+            },
+        });
+    } catch (error) {
+        console.error('Failed to mark as read:', error);
+    }
+}
+
+
 const changeStatus = () => {
   axios
     .post(`/mails/change-status/${props?.mail?.id}`,
         {
-            status: selectedStatus.value, 
+            status: selectedStatus.value,
         }
     )
     .then((response) => {
@@ -129,7 +158,8 @@ const handleStatusChange = () => {
         </div>
         <VRow>
             <VCol cols="12" lg="2">
-                <VIcon icon="mdi-trash-can-outline" @click="openConfirmDialog()" />
+                <VIcon icon="mdi-trash-can-outline" @click="openConfirmDialog('delete')" />
+                <VIcon icon="mdi-redo" class="ml-2" v-if="props?.pageType == 'trash'"@click="openConfirmDialog('redo')" />
             </VCol>
             <VCol cols="12" lg="6" v-if="props?.pageType == 'inbox'">
                 <div class="icon-container">
@@ -211,7 +241,7 @@ const handleStatusChange = () => {
                 :threads="props?.threads"
                 :from="props?.from"
             />
-            <MailConfirmDialog @handleDelete="handleDelete" :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
+            <MailConfirmDialog @handleDelete="handleDelete" @handleRedo="handleRedo" :selectedConfirmType="selectedConfirmType"  :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
         </div>
     </VCardText>
 </template>

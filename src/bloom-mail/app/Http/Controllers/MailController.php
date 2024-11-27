@@ -62,6 +62,22 @@ class MailController extends Controller
         return redirect()->route('inbox');
     }
 
+    public function redo(MailLog $mail_log)
+    {
+        $this->mailRepository->redo($mail_log);
+
+        return redirect()->route('inbox');
+    }
+
+
+    public function destroyForever(MailLog $mail_log)
+    {
+        $this->mailRepository->deleteForever($mail_log);
+
+        return redirect()->route('inbox');
+    }
+
+
     public function sentDestroy(SentMail $sent_mail)
     {
         $createMail = $this->mailRepository->deleteSentMail($sent_mail);
