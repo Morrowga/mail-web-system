@@ -246,7 +246,7 @@ const handleStatusChange = () => {
                 :threads="props?.threads"
                 :from="props?.from"
             />
-            <MailConfirmDialog @handleDelete="handleDelete" @handleRedo="handleRedo" :selectedConfirmType="selectedConfirmType"  :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
+            <MailConfirmDialog @handleDelete="handleDelete" :pageType="props?.pageType" @handleRedo="handleRedo" :selectedConfirmType="selectedConfirmType"  :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
         </div>
     </VCardText>
 </template>

@@ -25,8 +25,8 @@ const defaultAccDowns = [
 
 const AccDowns = [
     { label: t('nav.users'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
-    { label: t('nav.roles'), href: 'roles.index', post: false, show: role == 'Super Administrator' ? true : false },
-    { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == 'Super Administrator' ? true : false },
+    { label: t('nav.roles'), href: 'roles.index', post: false, show: role == '管理者' ? true : false },
+    { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == '管理者' ? true : false },
 ];
 </script>
 

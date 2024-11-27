@@ -132,7 +132,6 @@ const formSubmit = () => {
                             />
                             <VSelect
                                 v-model="form.role_id"
-                                :placeholder="'Select Role'"
                                 variant="outlined" density="compact" required hide-details
                                 :items="roles"
                                 item-value="id"

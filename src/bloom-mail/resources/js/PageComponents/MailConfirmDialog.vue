@@ -5,7 +5,8 @@ import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
     confirmDialog: Boolean,
-    selectedConfirmType: String
+    selectedConfirmType: String,
+    pageType: String
 });
 
 const dialog = ref(props.confirmDialog);
@@ -44,8 +45,11 @@ watch(() => props.confirmDialog, (newVal) => {
           <v-card-title>{{ $t('other.confirmation') }}</v-card-title>
           <v-card-text>
             <div>
-              <p>
+              <p v-if="pageType != 'trash'">
                 {{ $t('other.delete_text') }}
+              </p>
+              <p v-else>
+                {{ $t('other.delete_permanent_text') }}
               </p>
             </div>
           </v-card-text>

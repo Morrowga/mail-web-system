@@ -19,7 +19,7 @@ class RolePermissionSeeder extends Seeder
         // Assigned as SA ( Super Admin )
 
         $saRole = Role::create([
-            "name" => "Super Administrator"
+            "name" => "管理者"
         ]);
 
         $permissionArrays = [
@@ -135,12 +135,12 @@ class RolePermissionSeeder extends Seeder
 
         $user = User::where('id', 1)->first();
 
-        $user->assignRole('Super Administrator');
+        $user->assignRole('管理者');
 
         // Assigned as SA ( Super Admin )
 
         $staffRole = Role::create([
-            "name" => "Staff"
+            "name" => "店員"
         ]);
 
         $createStaff = User::create([
@@ -150,7 +150,7 @@ class RolePermissionSeeder extends Seeder
             "password" => Hash::make('password'),
         ]);
 
-        $createStaff->assignRole('Staff');
+        $createStaff->assignRole('店員');
 
     }
 }

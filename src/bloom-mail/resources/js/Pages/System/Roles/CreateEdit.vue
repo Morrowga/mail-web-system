@@ -54,7 +54,7 @@ const formSubmit = () => {
                                                     </div>
                                                     <div style="width: 30%;">
                                                         <VTextField
-                                                            :disabled="form.name == 'Super Administrator'"
+                                                            :disabled="form.name == '管理者'"
                                                             density="compact"
                                                             variant="outlined"
                                                             id="name"
