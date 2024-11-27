@@ -25,10 +25,6 @@ const tableHeaders = ref([
      name: "Role",
      value: "role_name"
    },
-   {
-     name: "Created",
-     value: "created_at"
-   },
 ]);
 
 console.log(props?.users)
