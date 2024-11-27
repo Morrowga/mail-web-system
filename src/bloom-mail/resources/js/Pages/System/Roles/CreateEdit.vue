@@ -18,10 +18,10 @@ const formSubmit = () => {
 
     form[method](routeLink, {
         onSuccess: () => {
-            form.reset();  // Reset the form upon success
+            form.reset();
         },
         onError: (error) => {
-            console.error("Form submission error:", error); // Handle the error if needed
+            console.error("Form submission error:", error);
         },
     });
 };
@@ -63,6 +63,8 @@ const formSubmit = () => {
                                                 </div>
                                             </VCol>
                                         </VRow>
+                                    </VCardText>
+                                    <VCardText>
                                         <div>
                                             <VBtn color="primary" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
                                         </div>

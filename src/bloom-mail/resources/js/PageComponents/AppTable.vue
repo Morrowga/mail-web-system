@@ -60,7 +60,7 @@ const paginate = usePagination(props.data);
         <th class="header-cell" v-for="header in headers" :key="header.value">
           {{ header.name }}
         </th>
-        <th class="header-cell">
+        <th class="header-cell" v-if="url != 'permissions'">
 
         </th>
       </tr>
@@ -80,7 +80,7 @@ const paginate = usePagination(props.data);
         <td v-for="(header,i) in headers" :key="i">
             {{ item[header.value] }}
         </td>
-        <td>
+        <td v-if="url != 'permissions'">
             <AppConfirmDialog :routeUrl="url" :item="item" />
         </td>
       </tr>

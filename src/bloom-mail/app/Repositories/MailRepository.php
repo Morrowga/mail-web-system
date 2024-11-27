@@ -170,6 +170,8 @@ class MailRepository implements MailRepositoryInterface
                     $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
 
                     $spamCheck = Spam::where('mail_address', $senderEmail)->first();
+                    
+                    $flags = $message->getFlags()->toArray();
 
                     if(!empty($spamCheck))
                     {
@@ -187,7 +189,6 @@ class MailRepository implements MailRepositoryInterface
                         continue;
                     }
 
-                    $flags = $message->getFlags()->toArray();
 
                     $newMail = MailLog::create([
                         'uid' => $uid,
