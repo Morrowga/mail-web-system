@@ -25,103 +25,103 @@ class RolePermissionSeeder extends Seeder
         $permissionArrays = [
             [
                 "name" => "account_createdit",
-                "display" => "Account Creation & Modification",
-                "description" =>  "User can create the account and update the account info."
+                "display" => "アカウント登録・編集",
+                "description" =>  "アカウントの登録・編集を許可します。"
             ],
             [
                 "name" => "account_delete",
-                "display" => "Account Deletion",
-                "description" => "User can delete the user accounts."
+                "display" => "アカウント削除",
+                "description" => "アカウントの削除を許可します。"
             ],
             [
                 "name" => "account_read",
-                "display" => "Account Readable",
-                "description" => "User can read the list of user accounts."
+                "display" => "アカウント閲覧",
+                "description" => "アカウント一覧の閲覧を許可します。"
             ],
             [
                 "name" => "mail_reply",
-                "display" => "Reply Mail",
-                "description" => "User can reply the selected mail."
+                "display" => "メール返信",
+                "description" => "メールの返信を許可します。"
             ],
             [
                 "name" => "mail_forward",
-                "display" => "Forward Mail",
-                "description" => "User can forward the selected mail."
+                "display" => "メール転送",
+                "description" => "メールの転送を許可します。"
             ],
             [
                 "name" => "mail_delete",
-                "display" => "Mail Deletion",
-                "description" => "User can delete the selected mail."
+                "display" => "メール削除",
+                "description" => "メールの削除を許可します。"
             ],
             [
                 "name" => "mail_read",
-                "display" => "Mail Readable",
-                "description" => "User can read the mail lists."
+                "display" => "メール閲覧",
+                "description" => "メールの閲覧を許可します。"
             ],
             [
                 "name" => "mail_create",
-                "display" => "Mail Creation",
-                "description" => "User can send the mail."
+                "display" => "メール作成・送信",
+                "description" => "メールの作成・送信を許可します。"
             ],
             [
                 "name" => "spam_createdit",
-                "display" => "Spam Mail Registration & Modification",
-                "description" => "User can register the spam mail."
+                "display" => "迷惑メール登録・編集",
+                "description" => "迷惑メールの登録・編集を許可します。"
             ],
             [
                 "name" => "spam_read",
-                "display" => "Spam Readable",
-                "description" => "User can read the spam mail lists."
+                "display" => "迷惑メール閲覧",
+                "description" => "迷惑メール一覧の閲覧を許可します。"
             ],
             [
                 "name" => "spam_delete",
-                "display" => "Spam Deletion",
-                "description" => "User can delete the spam mail lists."
+                "display" => "迷惑メール削除",
+                "description" => "迷惑メール一覧からの削除を許可します。"
             ],
             [
                 "name" => "folder_createdit",
-                "display" => "Folder Creation & Modification",
-                "description" => "User can create and edit the folder."
+                "display" => "フォルダ登録・編集",
+                "description" => "フォルダの登録・編集を許可します。"
             ],
             [
                 "name" => "folder_read",
-                "display" => "Folder Readable",
-                "description" => "User can read the folder lists."
+                "display" => "フォルダ閲覧",
+                "description" => "フォルダ一覧の閲覧を許可します。"
             ],
             [
                 "name" => "folder_delete",
-                "display" => "Folder Deletion",
-                "description" => "User can delete the folder lists."
+                "display" => "フォルダ削除",
+                "description" => "フォルダの削除を許可します。"
             ],
             [
                 "name" => "template_createdit",
-                "display" => "Template Creation & Modification",
-                "description" => "User can create and edit the template."
+                "display" => "テンプレート登録・編集",
+                "description" => "テンプレートの登録・編集を許可します。"
             ],
             [
                 "name" => "template_read",
-                "display" => "Template Readable",
-                "description" => "User can read the template lists."
+                "display" => "テンプレート閲覧",
+                "description" => "テンプレート一覧の閲覧を許可します。"
             ],
             [
                 "name" => "template_delete",
-                "display" => "Template Deletion",
-                "description" => "User can delete the template lists."
+                "display" => "テンプレート削除",
+                "description" => "テンプレートの削除を許可します。"
             ],
             [
                 "name" => "templatecategory_createdit",
-                "display" => "Template Category Creation & Modification",
-                "description" => "User can create and edit the template category."
+                "display" => "テンプレートカテゴリ登録・編集",
+                "description" => "テンプレートカテゴリの登録・編集を許可します。"
             ],
             [
                 "name" => "templatecategory_read",
-                "display" => "Template Category Readable",
-                "description" => "User can read the template category lists."
+                "display" => "テンプレートカテゴリ閲覧",
+                "description" => "テンプレートカテゴリ一覧の閲覧を許可します。"
             ],
             [
                 "name" => "templatecategory_delete",
-                "display" => "Template Category Deletion",
-                "description" => "User can delete the template category lists."
+                "display" => "テンプレートカテゴリ削除",
+                "description" => "テンプレートカテゴリの削除を許可します。"
             ],
         ];
 

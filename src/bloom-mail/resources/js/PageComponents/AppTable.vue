@@ -85,7 +85,12 @@ const paginate = usePagination(props.data);
             {{ index + 1 }}
         </td>
         <td v-for="(header,i) in headers" :key="i">
-            {{ item[header.value] }}
+            <div v-if="header.value != 'description'">
+                {{ item[header.value] }}
+            </div>
+            <div v-else>
+                {{item[header.value]?.length > 40 ? item[header.value].substring(0, 40) + '...' : item[header.value]}}
+            </div>
         </td>
         <td v-if="url != 'permissions' && permissionGrant(permissions, permission_name + '_delete')">
             <AppConfirmDialog :routeUrl="url" :item="item" />
