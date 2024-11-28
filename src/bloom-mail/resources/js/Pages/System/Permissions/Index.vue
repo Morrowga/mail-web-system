@@ -15,7 +15,7 @@ const tableHeaders = ref([
      value: "name"
    },
    {
-     name: t('table.display'),
+     name: t('table.permission_display_name'),
      value: "display"
    },
    {
