@@ -106,7 +106,7 @@ const formSubmit = () => {
                                             </VCol>
                                         </VRow>
                                         <div class="text-right">
-                                            <VBtn prepend-icon="mdi-content-save-all-outline" color="primary" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
+                                            <VBtn color="primary" prepend-icon="mdi-content-save-all-outline"  type="submit" class="text-white text-capitalize">{{ props?.permission ? $t('buttons.update') : $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
                                 </VCard>

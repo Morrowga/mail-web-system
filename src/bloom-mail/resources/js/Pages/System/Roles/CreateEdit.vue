@@ -75,7 +75,7 @@ const formSubmit = () => {
                                         <InputError class="mb-2" :message="form.errors.permissions" />
                                     </VCardText>
                                     <VCardText class="text-right">
-                                        <VBtn color="primary" prepend-icon="mdi-content-save-all-outline" type="submit" class="text-white text-capitalize">{{ $t('buttons.registration') }}</VBtn>
+                                        <VBtn color="primary" prepend-icon="mdi-content-save-all-outline"  type="submit" class="text-white text-capitalize">{{ props?.role ? $t('buttons.update') : $t('buttons.registration') }}</VBtn>
                                     </VCardText>
                                 </VCard>
                             </VForm>

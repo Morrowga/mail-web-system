@@ -74,6 +74,22 @@ const formSubmit = () => {
     });
 };
 
+watch(() => props.mailData, (newMailData) => {
+    if (newMailData) {
+        // Update the form fields with the new mailData
+        form.subject = newMailData.subject || "";
+        form.template_id = newMailData.template_id || null;
+        form.to = newMailData.sender || "";
+        form.message_content = "";
+        form.og_message_id = newMailData.message_id || null;
+        form.type = props.type || null;
+
+        // Reset template selection and dialog state
+        currentActiveTemplateId.value = null;
+        replaceDialog.value = false;
+    }
+});
+
 const itemProps = (item) =>  {
     console.log(item);
     return {
