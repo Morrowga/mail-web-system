@@ -106,6 +106,7 @@
         "role_name": "Role Name",
         "permission_display_name":"Permission Display Name",
         "permission_name": "Permission Name",
+        "permission_description": "Description",
         "display": "Display"
     },
     "other": {

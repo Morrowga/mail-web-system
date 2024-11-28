@@ -17,6 +17,10 @@ const tableHeaders = ref([
    {
      name: t('table.display'),
      value: "display"
+   },
+   {
+     name: t('table.permission_description'),
+     value: "description"
    }
 ]);
 

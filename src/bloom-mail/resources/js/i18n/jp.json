@@ -107,6 +107,7 @@
         "role_name": "名称",
         "permission_display_name":"名称",
         "permission_name": "識別名",
+        "permission_description": "内容",
         "display": "内容"
     },
    "other": {

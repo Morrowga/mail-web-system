@@ -88,7 +88,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="description" :value="$t('table.description')"/>
+                                                        <InputLabel for="description" :value="$t('table.permission_description')"/>
                                                     </div>
                                                     <div style="width: 50%;">
                                                         <VTextarea
