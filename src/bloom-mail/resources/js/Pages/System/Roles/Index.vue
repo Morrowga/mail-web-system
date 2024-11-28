@@ -11,7 +11,7 @@ const { t, locale } = useI18n();
 
 const tableHeaders = ref([
    {
-     name: "Name",
+     name: t('table.role_name'),
      value: "name"
    },
 ]);

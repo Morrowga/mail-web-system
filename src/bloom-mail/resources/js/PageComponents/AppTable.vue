@@ -55,11 +55,6 @@ watch(() => pagination.value.current_page, (newPage) => {
 });
 
 const paginate = usePagination(props.data);
-
-const formatDate = (date) => {
-  return moment(date).format('YYYY年MM月DD日');
-};
-
 </script>
 
 <template>
@@ -71,9 +66,6 @@ const formatDate = (date) => {
         </th>
         <th class="header-cell" v-for="header in headers" :key="header.value">
           {{ header.name }}
-        </th>
-        <th class="header-cell">
-            Created
         </th>
         <th class="header-cell" v-if="url != 'permissions'">
 
@@ -94,9 +86,6 @@ const formatDate = (date) => {
         </td>
         <td v-for="(header,i) in headers" :key="i">
             {{ item[header.value] }}
-        </td>
-        <td >
-            {{  formatDate(item.created_at)  }}
         </td>
         <td v-if="url != 'permissions' && permissionGrant(permissions, permission_name + '_delete')">
             <AppConfirmDialog :routeUrl="url" :item="item" />

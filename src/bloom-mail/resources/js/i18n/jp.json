@@ -20,8 +20,8 @@
         "sent": "送信済みメール",
         "users": "アカウント登録",
         "account": "アカウント",
-        "roles": "Roles",
-        "permissions": "Permissions"
+        "roles": "役割",
+        "permissions": "権限"
     },
     "buttons": {
         "template_registration": "テンプレート登録",
@@ -103,7 +103,10 @@
         "confirmed": "確定",
         "under_review": "確認中",
         "pending": "保留",
-        "no_data": "データがありません"
+        "no_data": "データがありません",
+        "role_name": "名称",
+        "permission_name":"名称",
+        "display": "内容"
     },
    "other": {
         "forward_form": "転送フォーム",

@@ -48,7 +48,7 @@ const onNavigatePage = (to) => {
 </script>
 
 <template>
-    <div class="flex justify-start mt-4">
+    <div class="flex justify-center mt-4">
         <v-pagination :total-visible="3" :model-value="currentPage" :length="total">
             <template v-slot:next="pages">
                 <v-btn

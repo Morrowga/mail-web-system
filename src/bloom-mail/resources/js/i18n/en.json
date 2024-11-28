@@ -102,7 +102,10 @@
         "under_review": "Under Review",
         "pending": "Pending",
         "no_data": "No Data Available",
-        "person_in_charge_text": "Person In Charge"
+        "person_in_charge_text": "Person In Charge",
+        "role_name": "Role Name",
+        "permission_name":"Permission Name",
+        "display": "Display"
     },
     "other": {
         "forward_form": "Forward Form",

@@ -11,11 +11,11 @@ const { t, locale } = useI18n();
 
 const tableHeaders = ref([
    {
-     name: "Name",
+     name: t('table.permission_name'),
      value: "name"
    },
    {
-     name: "Display",
+     name: t('table.display'),
      value: "display"
    }
 ]);
