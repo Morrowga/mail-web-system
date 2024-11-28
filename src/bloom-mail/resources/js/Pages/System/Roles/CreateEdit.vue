@@ -50,7 +50,7 @@ const formSubmit = () => {
                                             <VCol cols="12" class="py-0">
                                                 <div class="d-flex justify-start">
                                                     <div style="width: 17%; padding: 10px;">
-                                                        <InputLabel for="address" :value="'Name'"/>
+                                                        <InputLabel for="address" :value="$t('table.role_name')"/>
                                                     </div>
                                                     <div style="width: 30%;">
                                                         <VTextField
@@ -70,7 +70,7 @@ const formSubmit = () => {
                                         </VRow>
                                     </VCardText>
                                     <VCardText>
-                                        <h2 class="mx-2 mb-2">Select Permissions</h2>
+                                        <h2 class="mx-2 mb-2">{{ $t('other.select_permissions') }}</h2>
                                         <PermissionSelector  :permissions="props?.permissions" v-model="form.permissions" />
                                         <InputError class="mb-2" :message="form.errors.permissions" />
                                     </VCardText>

@@ -104,7 +104,8 @@
         "no_data": "No Data Available",
         "person_in_charge_text": "Person In Charge",
         "role_name": "Role Name",
-        "permission_name":"Permission Name",
+        "permission_display_name":"Permission Display Name",
+        "permission_name": "Permission Name",
         "display": "Display"
     },
     "other": {
@@ -116,6 +117,7 @@
         "create_spam": "Create Spam",
         "edit_role": "Edit Role",
         "create_role": "Create Role",
+        "select_permissions": "Select Permissions",
         "edit_permission": "Edit Permission",
         "create_permission": "Create Permission",
         "template_create": "Create Template",
