@@ -67,7 +67,7 @@ const paginate = usePagination(props.data);
         <th class="header-cell" v-for="header in headers" :key="header.value">
           {{ header.name }}
         </th>
-        <th class="header-cell" v-if="url != 'permissions'">
+        <th class="header-cell" v-if="url != 'permissions' && permissionGrant(permissions, permission_name + '_delete')">
 
         </th>
       </tr>
