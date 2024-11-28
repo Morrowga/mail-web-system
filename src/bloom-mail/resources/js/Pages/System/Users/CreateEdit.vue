@@ -13,7 +13,7 @@ console.log(props?.user);
 
 const form = useForm({
     name: props?.user?.name,
-    email: props?.user?.email,
+    login_id: props?.user?.login_id,
     password: null,
     password_confirmation: null,
     role_id: props?.user?.role_id
@@ -72,19 +72,19 @@ const formSubmit = () => {
                         </div>
 
                         <div class="mt-4 w-50">
-                            <InputLabel for="email" :value="$t('input.email')" />
+                            <InputLabel for="email" :value="$t('auth.login_id')" />
 
                             <TextInput
-                                id="email"
-                                type="email"
+                                id="loginid"
+                                type="text"
                                 density="compact"
                                 class="mt-1 block w-full"
-                                v-model="form.email"
+                                v-model="form.login_id"
                                 required
-                                autocomplete="username"
+                                autocomplete="login_id"
                             />
 
-                            <InputError class="mt-2" :message="form.errors.email" />
+                            <InputError class="mt-2" :message="form.errors.login_id" />
                         </div>
 
                         <div class="mt-4 w-50" v-if="props?.user == undefined">
@@ -150,8 +150,7 @@ const formSubmit = () => {
                             <VBtn
                                 prepend-icon="mdi-content-save-all-outline"
                                 color="primary"
-                                :class="{ 'opacity-25': form.processing }"
-                                :disabled="form.processing"
+                                type="submit"
                             >
                                 {{ Boolean(props?.user) ? $t('buttons.update') : $t('buttons.registration')}}
                             </VBtn>

@@ -14,15 +14,15 @@ const permissions = props?.auth?.user?.permissions
 
 const tableHeaders = ref([
    {
-     name: "Name",
+     name: t('table.name'),
      value: "name"
    },
    {
-     name: "Email",
-     value: "email"
+     name: t('auth.login_id'),
+     value: "login_id"
    },
    {
-     name: "Role",
+     name: t('table.role_name'),
      value: "role_name"
    },
 ]);

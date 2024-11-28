@@ -25,7 +25,7 @@ class AccountCreationRequest extends FormRequest
         return [
             'name' => ['required', 'string' , 'max:255'],
             'role_id' => ['required'],
-            'email' => ['required', 'string' , 'lowercase','email', 'max:255', 'unique:users,email'],
+            'login_id' => ['required', 'string' , 'lowercase', 'max:255', 'unique:users,login_id'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
@@ -39,12 +39,11 @@ class AccountCreationRequest extends FormRequest
 
             'role_id.required' => 'Role is required',
 
-            'email.required' => 'メールアドレスは必須です',
-            'email.string' => 'メールは有効な文字列でなければなりません',
-            'email.email' => 'メールアドレスは有効なものでなければなりません',
-            'email.lowercase' => 'メールアドレスは小文字でご入力ください',
-            'email.max' => 'メールアドレスの制限は255文字です',
-            'email.unique' => 'このメールアドレスは既に登録済みです',
+            'login_id.required' => 'メールアドレスは必須です',
+            'login_id.string' => 'メールは有効な文字列でなければなりません',
+            'login_id.lowercase' => 'メールアドレスは小文字でご入力ください',
+            'login_id.max' => 'メールアドレスの制限は255文字です',
+            'login_id.unique' => 'このメールアドレスは既に登録済みです',
 
             'password.required' => 'パスワードが必須です',
             'password.string' => 'パスワードは文字列でなければなりません',

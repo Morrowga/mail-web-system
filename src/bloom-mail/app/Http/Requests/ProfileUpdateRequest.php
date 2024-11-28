@@ -17,13 +17,12 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
+            'login_id' => [
                 'required',
                 'string',
                 'lowercase',
-                'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                Rule::unique('users', 'login_id')->ignore($this->user()->id),
             ],
         ];
     }
@@ -35,12 +34,11 @@ class ProfileUpdateRequest extends FormRequest
             'name.string' => 'ユーザ名は文字列でなければなりません',
             'name.max' => 'ユーザ名の制限は255文字です',
 
-            'email.required' => 'メールアドレスは必須です',
-            'email.string' => 'メールは有効な文字列でなければなりません',
-            'email.email' => 'メールアドレスは有効なものでなければなりません',
-            'email.lowercase' => 'メールアドレスは小文字でご入力ください',
-            'email.max' => 'メールアドレスの制限は255文字です',
-            'email.unique' => 'このメールアドレスは既に登録済みです',
+            'login_id.required' => 'メールアドレスは必須です',
+            'login_id.string' => 'メールは有効な文字列でなければなりません',
+            'login_id.lowercase' => 'メールアドレスは小文字でご入力ください',
+            'login_id.max' => 'メールアドレスの制限は255文字です',
+            'login_id.unique' => 'このメールアドレスは既に登録済みです',
         ];
     }
 }
