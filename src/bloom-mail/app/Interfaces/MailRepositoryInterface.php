@@ -31,5 +31,7 @@ interface MailRepositoryInterface
 
     public function deleteForever(MailLog $mailLog);
 
+    public function deleteForeverProcess(MailLog $mailLog);
+
     public function deleteSentMail(SentMail $sent_mail);
 }

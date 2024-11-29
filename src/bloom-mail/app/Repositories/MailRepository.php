@@ -554,19 +554,26 @@ class MailRepository implements MailRepositoryInterface
                 return response()->json(['status' => 'error', 'message' => 'Email not found.'], 404);
             }
 
-            $inbox = $this->client->getFolder('INBOX');
-
-            $message = $inbox->query()->getMessageByUid($mailLog->uid);
-
-            $message->delete(true);
-
-            $mailLog->delete();
+            $this->deleteForeverProcess($mailLog);
 
             return response()->json(['status' => 'success', 'message' => 'Email deleted permanently.']);
         } catch (Exception $e) {
             logger()->error("Error deleting email: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to delete email.'], 500);
         }
+    }
+
+    public function deleteForeverProcess(MailLog $mailLog)
+    {
+
+        $inbox = $this->client->getFolder('INBOX');
+
+        $message = $inbox->query()->getMessageByUid($mailLog->uid);
+
+        $message->delete(true);
+
+        $mailLog->delete();
+
     }
 
     public function deleteSentMail(SentMail $sent_mail)
