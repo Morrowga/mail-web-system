@@ -53,7 +53,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => "認証に失敗しました。ログインIDとパスワードをご確認ください。",
             ]);
         }
 

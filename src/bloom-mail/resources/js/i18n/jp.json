@@ -116,7 +116,7 @@
         "create_folder": "フォルダ登録",
         "edit_folder": "フォルダ編集",
         "edit_spam": "迷惑メール編集",
-        "create_spam": "迷惑メール編集",
+        "create_spam": "迷惑メール登録",
         "edit_role": "役割の編集",
         "create_role": "役割の登録",
         "select_permissions": "権限の選択",
