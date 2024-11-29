@@ -27,5 +27,5 @@ Artisan::command('trash-deletion', function () {
         $emails = $mailRepository->deleteForeverProcess($mail);
     }
 })->purpose('Running Trash Deletion')->twiceMonthly(1, 16, '13:00');
-
+// ->purpose('Running Trash Deletion')->everyTwentySeconds();
 
