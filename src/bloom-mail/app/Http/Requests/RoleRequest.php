@@ -26,4 +26,12 @@ class RoleRequest extends FormRequest
             "permissions" => ['required']
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => '名称は必須です',
+            'permissions.required' => '権限の選択は必須です',
+        ];
+    }
 }
