@@ -3,9 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\Spam;
+use App\Models\MailLog;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\MailRepository;
 use App\Interfaces\SpamRepositoryInterface;
 
 class SpamRepository implements SpamRepositoryInterface
@@ -28,13 +30,21 @@ class SpamRepository implements SpamRepositoryInterface
 
     }
 
-
     public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
-            $category = Spam::create($request->all());
+            $spam = Spam::create($request->all());
+
+            $mailLogs = MailLog::where('sender', $spam->mail_address)->get();
+
+            $mailRepository = app(MailRepository::class);
+
+            foreach($mailLogs as $mailLog)
+            {
+                $mailRepository->softDelete($mailLog);
+            }
 
             DB::commit();
 
@@ -56,6 +66,15 @@ class SpamRepository implements SpamRepositoryInterface
             {
                 $spam->update($request->all());
 
+                $mailLogs = MailLog::where('sender', $spam->mail_address)->get();
+
+                $mailRepository = app(MailRepository::class);
+
+                foreach($mailLogs as $mailLog)
+                {
+                    $mailRepository->softDelete($mailLog);
+                }
+
                 DB::commit();
 
                 return $this->success('Spam has been updated successfully.');
@@ -76,6 +95,15 @@ class SpamRepository implements SpamRepositoryInterface
         try {
             if($spam)
             {
+                $mailLogs = MailLog::where('sender', $spam->mail_address)->get();
+
+                $mailRepository = app(MailRepository::class);
+
+                foreach($mailLogs as $mailLog)
+                {
+                    $mailRepository->redoProcess($mailLog);
+                }
+
                 $spam->delete();
             }
 

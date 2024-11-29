@@ -29,9 +29,13 @@ interface MailRepositoryInterface
 
     public function redo(MailLog $mailLog);
 
+    public function softDelete(MailLog $mailLog);
+
     public function deleteForever(MailLog $mailLog);
 
     public function deleteForeverProcess(MailLog $mailLog);
+
+    public function redoProcess(MailLog $mailLog);
 
     public function deleteSentMail(SentMail $sent_mail);
 }

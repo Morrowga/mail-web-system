@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\MailLog;
 use App\Jobs\ProcessMails;
 use App\Repositories\MailRepository;
@@ -20,12 +21,14 @@ Artisan::command('mail-fetching', function () {
 Artisan::command('trash-deletion', function () {
     $mailRepository = app(MailRepository::class);
 
-    $mails = MailLog::where('status', 'deleted')->get();
+    $twoWeeksAgo = Carbon::now()->subWeeks(2);
 
-    foreach($mails  as $mail)
-    {
-        $emails = $mailRepository->deleteForeverProcess($mail);
+    $mails = MailLog::where('status', 'deleted')
+        ->where('datetime', '<=', $twoWeeksAgo)
+        ->get();
+
+    foreach ($mails as $mail) {
+        $mailRepository->deleteForeverProcess($mail);
     }
-})->purpose('Running Trash Deletion')->twiceMonthly(1, 16, '13:00');
-// ->purpose('Running Trash Deletion')->everyTwentySeconds();
+})->purpose('Running Trash Deletion')->everyTwentySeconds();
 
