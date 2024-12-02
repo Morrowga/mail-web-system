@@ -21,6 +21,10 @@ class PermissionController extends Controller
      */
     public function index()
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $permissions = $this->permissionRepository->index();
 
         return Inertia::render('System/Permissions/Index', [
@@ -33,6 +37,10 @@ class PermissionController extends Controller
      */
     public function create()
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         return Inertia::render('System/Permissions/CreateEdit');
     }
 
@@ -41,6 +49,10 @@ class PermissionController extends Controller
      */
     public function store(PermissionRequest $request)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $createPermission = $this->permissionRepository->store($request);
 
         return redirect()->route('permissions.index')->with('success', 'Form submitted successfully');
@@ -59,6 +71,10 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         return Inertia::render('System/Permissions/CreateEdit', [
             "permission" => $permission
         ]);
@@ -69,6 +85,10 @@ class PermissionController extends Controller
      */
     public function update(PermissionRequest $request, Permission $permission)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $updatePermission = $this->permissionRepository->update($request, $permission);
 
         return redirect()->route('permissions.index')->with('success', 'Form submitted successfully');
@@ -79,6 +99,10 @@ class PermissionController extends Controller
      */
     public function destroy(Permission $permission)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $deletePermission = $this->permissionRepository->delete($permission);
 
         return redirect()->back();

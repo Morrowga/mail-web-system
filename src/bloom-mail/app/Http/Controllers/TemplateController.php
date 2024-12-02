@@ -29,6 +29,10 @@ class TemplateController extends Controller
      */
     public function index()
     {
+        if (!check_user_permission('template_read')) {
+            return abort(401);
+        }
+
         $templates = $this->templateRepository->index();
 
         return Inertia::render('Templates/Index', [
@@ -41,6 +45,10 @@ class TemplateController extends Controller
      */
     public function create()
     {
+        if (!check_user_permission('template_createdit')) {
+            return abort(401);
+        }
+
         $template_categories = $this->templateCategoryRepository->index();
         $folders = $this->folderRepository->index();
 
@@ -55,6 +63,10 @@ class TemplateController extends Controller
      */
     public function store(TemplateRequest $request)
     {
+        if (!check_user_permission('template_createdit')) {
+            return abort(401);
+        }
+
         $createTemplate = $this->templateRepository->store($request);
 
         return redirect()->route('templates.index');
@@ -73,6 +85,10 @@ class TemplateController extends Controller
      */
     public function edit(Template $template)
     {
+        if (!check_user_permission('template_createdit')) {
+            return abort(401);
+        }
+
         $template_categories = $this->templateCategoryRepository->index();
         $folders = $this->folderRepository->index();
 
@@ -88,6 +104,10 @@ class TemplateController extends Controller
      */
     public function update(Request $request, Template $template)
     {
+        if (!check_user_permission('template_createdit')) {
+            return abort(401);
+        }
+
         $updateTemplate = $this->templateRepository->update($request, $template);
 
         return redirect()->route('templates.index')->with('success', 'Form submitted successfully');
@@ -98,6 +118,10 @@ class TemplateController extends Controller
      */
     public function destroy(Template $template)
     {
+        if (!check_user_permission('template_delete')) {
+            return abort(401);
+        }
+
         $deleteTemplate = $this->templateRepository->delete($template);
 
         return redirect()->back();

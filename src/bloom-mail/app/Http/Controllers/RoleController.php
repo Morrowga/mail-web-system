@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Requests\RoleRequest;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use App\Interfaces\RoleRepositoryInterface;
 
@@ -22,6 +23,10 @@ class RoleController extends Controller
      */
     public function index()
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $roles = $this->roleRepository->index();
 
         return Inertia::render('System/Roles/Index', [
@@ -34,6 +39,10 @@ class RoleController extends Controller
      */
     public function create()
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $permissions = Permission::select('name', 'id', 'display')->get();
 
         return Inertia::render('System/Roles/CreateEdit', [
@@ -46,6 +55,10 @@ class RoleController extends Controller
      */
     public function store(RoleRequest $request)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $createRole = $this->roleRepository->store($request);
 
         return redirect()->route('roles.index')->with('success', 'Form submitted successfully');
@@ -64,6 +77,10 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $permissions = Permission::select('name', 'display', 'id')->get();
 
         return Inertia::render('System/Roles/CreateEdit', [
@@ -78,6 +95,10 @@ class RoleController extends Controller
      */
     public function update(RoleRequest $request, Role $role)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $updateRole = $this->roleRepository->update($request, $role);
 
         return redirect()->route('roles.index')->with('success', 'Form submitted successfully');
@@ -88,6 +109,10 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        if (!check_superadmin()) {
+            return abort(401);
+        }
+
         $deleteRole = $this->roleRepository->delete($role);
 
         return redirect()->back();

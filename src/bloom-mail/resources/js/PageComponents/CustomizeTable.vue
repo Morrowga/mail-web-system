@@ -45,6 +45,13 @@ const copyToClipboard = (text) => {
       console.error('Error copying text: ', error);
     });
 }
+
+const goToEdit = (id) => {
+    if(permissionGrant(permissions, props?.permission_name + '_createdit'))
+    {
+        router.get(props?.link + '/' + id + '/edit')
+    }
+}
 </script>
 
 <template>
@@ -57,7 +64,7 @@ const copyToClipboard = (text) => {
         </thead>
         <tbody>
             <tr v-for="(item, rowIndex) in data" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'back-gray' : 'back-white'">
-                <td  @click="router.get(link + '/' + item.id + '/edit')" v-for="(header, colIndex) in headers" :key="colIndex">
+                <td  @click="goToEdit(item?.id)" v-for="(header, colIndex) in headers" :key="colIndex">
                     {{ item[header.val] }} <!-- Assuming keys are in lower case -->
                 </td>
                 <td>

@@ -21,6 +21,10 @@ class FolderController extends Controller
      */
     public function index()
     {
+        if (!check_user_permission('folder_read')) {
+            return abort(401);
+        }
+
         $folders = $this->folderRepository->index();
 
         return Inertia::render('Folders/Index', [
@@ -33,6 +37,10 @@ class FolderController extends Controller
      */
     public function create()
     {
+        if (!check_user_permission('folder_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('Folders/CreateEdit');
     }
 
@@ -41,6 +49,10 @@ class FolderController extends Controller
      */
     public function store(FolderRequest $request)
     {
+        if (!check_user_permission('folder_createdit')) {
+            return abort(401);
+        }
+
         $createFolder = $this->folderRepository->store($request);
 
         return redirect()->route('folders.index')->with('success', 'Form submitted successfully');
@@ -59,6 +71,10 @@ class FolderController extends Controller
      */
     public function edit(Folder $folder)
     {
+        if (!check_user_permission('folder_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('Folders/CreateEdit', [
             "folder" => $folder
         ]);
@@ -69,6 +85,10 @@ class FolderController extends Controller
      */
     public function update(FolderRequest $request, Folder $folder)
     {
+        if (!check_user_permission('folder_createdit')) {
+            return abort(401);
+        }
+
         $updateFolder = $this->folderRepository->update($request, $folder);
 
         return redirect()->route('folders.index');
@@ -79,6 +99,10 @@ class FolderController extends Controller
      */
     public function destroy(Folder $folder)
     {
+        if (!check_user_permission('folder_delete')) {
+            return abort(401);
+        }
+
         $deleteFolder = $this->folderRepository->delete($folder);
 
         return redirect()->back();

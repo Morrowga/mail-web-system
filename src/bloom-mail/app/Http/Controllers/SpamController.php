@@ -22,6 +22,10 @@ class SpamController extends Controller
      */
     public function index()
     {
+        if (!check_user_permission('spam_read')) {
+            return abort(401);
+        }
+
         $spams = $this->spamRepository->index();
 
         return Inertia::render('Mail/Spams/Index', [
@@ -34,6 +38,10 @@ class SpamController extends Controller
      */
     public function create()
     {
+        if (!check_user_permission('spam_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('Mail/Spams/CreateEdit');
     }
 
@@ -42,6 +50,10 @@ class SpamController extends Controller
      */
     public function store(SpamRequest $request)
     {
+        if (!check_user_permission('spam_createdit')) {
+            return abort(401);
+        }
+
         $createSpam = $this->spamRepository->store($request);
 
         return redirect()->route('spams.index')->with('success', 'Form submitted successfully');
@@ -60,6 +72,10 @@ class SpamController extends Controller
      */
     public function edit(Spam $spam)
     {
+        if (!check_user_permission('spam_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('Mail/Spams/CreateEdit', [
             "spam" => $spam
         ]);
@@ -70,6 +86,10 @@ class SpamController extends Controller
      */
     public function update(SpamRequest $request, Spam $spam)
     {
+        if (!check_user_permission('spam_createdit')) {
+            return abort(401);
+        }
+
         $updateSpam = $this->spamRepository->update($request, $spam);
 
         return redirect()->route('spams.index')->with('success', 'Form submitted successfully');
@@ -80,6 +100,10 @@ class SpamController extends Controller
      */
     public function destroy(Spam $spam)
     {
+        if (!check_user_permission('spam_delete')) {
+            return abort(401);
+        }
+
         $deleteSpam = $this->spamRepository->delete($spam);
 
         return redirect()->back();

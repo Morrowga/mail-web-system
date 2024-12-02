@@ -22,6 +22,10 @@ class TemplateCategoryController extends Controller
      */
     public function index()
     {
+        if (!check_user_permission('templatecategory_read')) {
+            return abort(401);
+        }
+
         $templateCategories = $this->templateCategoryRepository->index();
 
         return Inertia::render('TemplateCategories/Index', [
@@ -34,6 +38,10 @@ class TemplateCategoryController extends Controller
      */
     public function create()
     {
+        if (!check_user_permission('templatecategory_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('TemplateCategories/CreateEdit');
     }
 
@@ -60,6 +68,10 @@ class TemplateCategoryController extends Controller
      */
     public function edit(TemplateCategory $template_category)
     {
+        if (!check_user_permission('templatecategory_createdit')) {
+            return abort(401);
+        }
+
         return Inertia::render('TemplateCategories/CreateEdit', [
             "template_category" => $template_category
         ]);
@@ -70,6 +82,10 @@ class TemplateCategoryController extends Controller
      */
     public function update(TemplateCategoryRequest $request, TemplateCategory $template_category)
     {
+        if (!check_user_permission('templatecategory_createdit')) {
+            return abort(401);
+        }
+
         $updateCategory = $this->templateCategoryRepository->update($request, $template_category);
 
         return redirect()->route('template-categories.index');
@@ -80,6 +96,10 @@ class TemplateCategoryController extends Controller
      */
     public function destroy(TemplateCategory $template_category)
     {
+        if (!check_user_permission('templatecategory_delete')) {
+            return abort(401);
+        }
+
         $deleteCategory = $this->templateCategoryRepository->delete($template_category);
 
         return redirect()->back();

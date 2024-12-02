@@ -47,6 +47,13 @@ const copyToClipboard = (text) => {
     });
 }
 
+const goToEdit = (id) => {
+   if(permissionGrant(permissions, 'template_createdit'))
+    {
+        router.get(route('templates.edit', id))
+    }
+}
+
 </script>
 
 <template>
@@ -85,7 +92,7 @@ const copyToClipboard = (text) => {
                                             :key="index"
                                             :class="['d-flex', 'justify-between', 'cursor-pointer', index % 2 === 0 ? 'self-card-text' : 'self-card-text-white']"
                                             >
-                                            <div @click="router.get(route('templates.edit', template?.id))">
+                                            <div @click="goToEdit(template?.id)">
                                                 <a class="a-underline-none font-bold">
                                                 {{ template?.title }}
                                                 </a>
