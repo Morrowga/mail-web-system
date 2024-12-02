@@ -17,11 +17,17 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::create([
-            "name" => "admin",
-            "email" => "admin@mail.com",
-            "login_id" => 'admin',
-            "password" => Hash::make('password'),
-        ]);
+        $find = User::where('email', 'admin@mail.com')->first();
+
+        if(empty($find))
+        {
+            $user = User::create([
+                "name" => "admin",
+                "email" => "admin@mail.com",
+                "login_id" => 'admin',
+                "password" => Hash::make('password'),
+            ]);
+        }
+
     }
 }
