@@ -53,6 +53,7 @@ const adjustBaseUrl = (base) => {
 };
 
 const onNavigatePage = (to) => {
+    console.log(window.location.protocol);
     const separator = hasQueryParams(props?.base) ? '&' : '?'; // Determine the correct separator
     const adjustedBaseUrl = adjustBaseUrl(props.base); // Adjust the base URL with HTTPS
     const url = `${adjustedBaseUrl}${separator}page=${to}`; // Construct the full URL
