@@ -155,6 +155,8 @@ class MailRepository implements MailRepositoryInterface
 
             $status = 'new';
 
+            $deleted_date = null;
+
             foreach ($messages as $message) {
                 $uid = $message->getUid();
                 $messageId = $message->getMessageId();
@@ -189,6 +191,7 @@ class MailRepository implements MailRepositoryInterface
                             $message->delete(false);
 
                             $status = 'deleted';
+                            $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
                         } else {
                             $status = in_array('Seen', $flags) ? 'read' : 'new';
                         }
@@ -211,7 +214,7 @@ class MailRepository implements MailRepositoryInterface
                         'body' => $body,
                         'datetime' => $dateSent[0]->toDateTimeString(),
                         'status' => $status,
-                        'deleted_at' => Carbon::now('Asia/Tokyo')->toDateTimeString()
+                        'deleted_at' => $deleted_date
                     ]);
 
                     $newEmails[] = [
@@ -308,7 +311,6 @@ class MailRepository implements MailRepositoryInterface
         if ($message) {
             $threadMessages = $message->thread($inbox);
 
-            // Collect thread message data
             foreach ($threadMessages as $threadMessage) {
                 $uid = $threadMessage->getUid();
                 $messageId = $threadMessage->getMessageId()[0];
@@ -319,14 +321,12 @@ class MailRepository implements MailRepositoryInterface
                 $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
-                // Check if the message has an HTML body, otherwise use plain text
                 if ($threadMessage->hasHTMLBody()) {
                     $body = $threadMessage->getHTMLBody();
                 } else {
                     $body = $threadMessage->getTextBody();
                 }
 
-                // Get the date the message was sent, fallback to current time if not available
                 $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
 
