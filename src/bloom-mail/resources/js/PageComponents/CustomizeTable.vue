@@ -52,6 +52,10 @@ const goToEdit = (id) => {
         router.get(props?.link + '/' + id + '/edit')
     }
 }
+
+const changeJapanese = () => {
+
+}
 </script>
 
 <template>
@@ -65,7 +69,12 @@ const goToEdit = (id) => {
         <tbody>
             <tr v-for="(item, rowIndex) in data" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'back-gray' : 'back-white'">
                 <td  @click="goToEdit(item?.id)" v-for="(header, colIndex) in headers" :key="colIndex">
-                    {{ item[header.val] }} <!-- Assuming keys are in lower case -->
+                    <div v-if="header.val == 'method'">
+                        {{ t('input.' + item[header.val]) }}
+                    </div>
+                    <div v-else>
+                        {{ item[header.val] }}
+                    </div>
                 </td>
                 <td>
                     <span @click="copyToClipboard(item.search_character)" class="text-[#1b5d9b] font-[500] cursor-pointer">{{ $t('table.copy') }}</span>
