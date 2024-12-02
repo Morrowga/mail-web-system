@@ -38,29 +38,25 @@ const props = defineProps({
     },
 });
 
+// Function to dynamically return 'https' protocol
 const getProtocol = () => {
-    if (window.location.protocol === "https:") {
-        return "https://";
-    } else {
-        return "http://";
-    }
+    return window.location.protocol === "https:" ? "https://" : "https://"; // Force HTTPS
 };
 
+// Ensure the base URL uses the correct protocol (https)
 const adjustBaseUrl = (base) => {
-    const protocol = getProtocol();
-
+    const protocol = getProtocol(); // Use HTTPS for all environments
     if (!base.startsWith("http://") && !base.startsWith("https://")) {
-        return protocol + base;
+        return protocol + base; // Add HTTPS if base doesn't have a protocol
     }
-
-    return base;
+    return base; // If base already has a protocol, return as is
 };
 
 const onNavigatePage = (to) => {
-    const separator = hasQueryParams(props?.base) ? '&' : '?';
-    const adjustedBaseUrl = adjustBaseUrl(props.base);
-    const url = `${adjustedBaseUrl}${separator}page=${to}`;
-    router.get(url);
+    const separator = hasQueryParams(props?.base) ? '&' : '?'; // Determine the correct separator
+    const adjustedBaseUrl = adjustBaseUrl(props.base); // Adjust the base URL with HTTPS
+    const url = `${adjustedBaseUrl}${separator}page=${to}`; // Construct the full URL
+    router.get(url); // Navigate to the constructed URL
 };
 </script>
 
