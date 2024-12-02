@@ -44,5 +44,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        $url = env('APP_URL');
+
+        $parsedUrl = parse_url($url);
+
+        if (isset($parsedUrl['scheme'])) {
+            if ($parsedUrl['scheme'] === 'https') {
+                $this->app['request']->server->set('HTTPS', true);
+            }
+        }
     }
 }
