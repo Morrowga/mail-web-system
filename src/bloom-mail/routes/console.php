@@ -24,7 +24,7 @@ Artisan::command('trash-deletion', function () {
     $twoWeeksAgo = Carbon::now()->subWeeks(2);
 
     $mails = MailLog::where('status', 'deleted')
-        ->where('datetime', '<=', $twoWeeksAgo)
+        ->where('deleted_at', '<=', $twoWeeksAgo)
         ->get();
 
     foreach ($mails as $mail) {

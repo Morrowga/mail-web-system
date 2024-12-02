@@ -211,6 +211,7 @@ class MailRepository implements MailRepositoryInterface
                         'body' => $body,
                         'datetime' => $dateSent[0]->toDateTimeString(),
                         'status' => $status,
+                        'deleted_at' => Carbon::now('Asia/Tokyo')->toDateTimeString()
                     ]);
 
                     $newEmails[] = [
@@ -539,6 +540,7 @@ class MailRepository implements MailRepositoryInterface
 
         $mailLog->status = $mailLog->previous_status ?? 'read';
         $mailLog->previous_status = '';
+        $mailLog->deleted_at = null;
         $mailLog->update();
     }
 
@@ -555,6 +557,7 @@ class MailRepository implements MailRepositoryInterface
 
         $mailLog->status = 'deleted';
         $mailLog->previous_status = $prev;
+        $mailLog->deleted_at = Carbon::now('Asia/Tokyo')->toDateTimeString();
         $mailLog->update();
 
     }
