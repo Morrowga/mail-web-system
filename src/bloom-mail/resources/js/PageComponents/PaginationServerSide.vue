@@ -38,12 +38,29 @@ const props = defineProps({
     },
 });
 
-const onNavigatePage = (to) => {
-    // router.get(`${props.base}?page=${to}`);
-    const separator = hasQueryParams(props?.base) ? '&' : '?'; // Determine the correct separator
-    const url = `${props.base}${separator}page=${to}`; // Construct the full URL
-    router.get(url); // Navigate to the constructed URL
+const getProtocol = () => {
+    if (window.location.protocol === "https:") {
+        return "https://";
+    } else {
+        return "http://";
+    }
+};
 
+const adjustBaseUrl = (base) => {
+    const protocol = getProtocol();
+
+    if (!base.startsWith("http://") && !base.startsWith("https://")) {
+        return protocol + base;
+    }
+
+    return base;
+};
+
+const onNavigatePage = (to) => {
+    const separator = hasQueryParams(props?.base) ? '&' : '?';
+    const adjustedBaseUrl = adjustBaseUrl(props.base);
+    const url = `${adjustedBaseUrl}${separator}page=${to}`;
+    router.get(url);
 };
 </script>
 
