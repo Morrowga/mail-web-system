@@ -46,10 +46,10 @@ const getProtocol = () => {
 // Ensure the base URL uses the correct protocol (https)
 const adjustBaseUrl = (base) => {
     const protocol = getProtocol(); // Use HTTPS for all environments
-    if (!base.startsWith("http://") && !base.startsWith("https://")) {
-        return protocol + base; // Add HTTPS if base doesn't have a protocol
+    if (!base.startsWith("http://")) {
+        return protocol + base;
     }
-    return base; // If base already has a protocol, return as is
+    return base; 
 };
 
 const onNavigatePage = (to) => {
