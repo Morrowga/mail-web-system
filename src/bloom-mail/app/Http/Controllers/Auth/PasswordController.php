@@ -17,7 +17,7 @@ class PasswordController extends Controller
     public function update(PasswordUpdateRequest $request)
     {
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($request->password),
         ]);
 
         return back();
