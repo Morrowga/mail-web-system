@@ -24,8 +24,6 @@ return new class extends Migration
             $table->enum('status', ['new', 'read', 'resolved','under_review', 'pending', 'replying', 'confirmed', 'deleted'])->default('new');
             $table->string('person_in_charge')->nullable();
             $table->dateTime('deleted_at')->nullable();
-            // $table->string('attachment');
-
             $table->timestamps();
         });
     }

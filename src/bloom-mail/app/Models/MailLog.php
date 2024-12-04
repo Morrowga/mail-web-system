@@ -50,4 +50,9 @@ class MailLog extends Model
     {
         return $this->belongsToMany(Folder::class, 'folder_mails', 'mail_log_id', 'folder_id');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class);
+    }
 }

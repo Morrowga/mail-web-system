@@ -12,6 +12,7 @@ use App\Models\MailLog;
 use App\Models\SentMail;
 use Webklex\PHPIMAP\IMAP;
 use App\Events\TakingMail;
+use App\Models\Attachment;
 use App\Models\FolderMail;
 use Illuminate\Http\Request;
 use Webklex\PHPIMAP\Message;
@@ -204,6 +205,7 @@ class MailRepository implements MailRepositoryInterface
                         continue;
                     }
 
+                    $attachments = $message->getAttachments();
 
                     $newMail = MailLog::create([
                         'uid' => $uid,
@@ -216,6 +218,28 @@ class MailRepository implements MailRepositoryInterface
                         'status' => $status,
                         'deleted_at' => $deleted_date
                     ]);
+
+                    foreach ($attachments as $attachment) {
+                        $fileName = $attachment->getName();
+
+                        $filePath = 'mails/attachments/';  // This is the path to save the file (e.g., mails/attachments/0560a9a9b86a804a41e32dc786475ccd.jpg)
+
+                        $storagePath = storage_path('app/public/' . $filePath);
+
+                        $mimeType = $attachment->getMimeType();
+                        $fileSize = $attachment->getSize();
+
+                        $attachment->save($storagePath);
+
+
+                        Attachment::create([
+                            'file_name' => $fileName,
+                            'mime_type' => $mimeType,
+                            'file_size' => $fileSize,
+                            'path' => 'storage/' . $filePath . $fileName,
+                            'mail_log_id' => $newMail->id
+                        ]);
+                    }
 
                     $newEmails[] = [
                         'uid' => $uid,
@@ -330,6 +354,8 @@ class MailRepository implements MailRepositoryInterface
                 $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
                 $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
 
+                $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
+
                 $histories[] = [
                     'uid' => $uid,
                     'message_id' => $messageId,
@@ -339,21 +365,22 @@ class MailRepository implements MailRepositoryInterface
                     'body' => $body,
                     'datetime' => $dateSent->toDateTimeString(),
                     'status' => $status,
+                    'attachments' => $findAttachement != null ? $findAttachement->attachments : []
                 ];
             }
 
-            $systemMailHistories = $mailLog->mail_histories->toArray();
+            // $systemMailHistories = $mailLog->mail_histories->toArray();
 
-            $mergedHistories = array_merge($histories, $systemMailHistories);
+            // $mergedHistories = array_merge($histories, $systemMailHistories);
 
-            usort($mergedHistories, function ($a, $b) {
-                return strtotime($b['datetime']) - strtotime($a['datetime']);
-            });
+            // usort($mergedHistories, function ($a, $b) {
+            //     return strtotime($b['datetime']) - strtotime($a['datetime']);
+            // });
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Email histories fetched successfully.',
-                'data' => $mergedHistories,
+                'data' => $histories,
             ]);
         } else {
             return response()->json([
