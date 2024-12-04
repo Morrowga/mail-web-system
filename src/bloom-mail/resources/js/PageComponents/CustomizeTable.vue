@@ -53,9 +53,6 @@ const goToEdit = (id) => {
     }
 }
 
-const changeJapanese = () => {
-
-}
 </script>
 
 <template>

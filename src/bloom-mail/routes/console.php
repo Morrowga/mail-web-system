@@ -30,5 +30,5 @@ Artisan::command('trash-deletion', function () {
     foreach ($mails as $mail) {
         $mailRepository->deleteForeverProcess($mail);
     }
-})->purpose('Running Trash Deletion')->everyTwentySeconds();
+})->purpose('Running Trash Deletion')->hourly();
 

@@ -40,7 +40,7 @@ class UserRepository implements UserRepositoryInterface
         try {
             $user = User::create([
                 "name" => $request->name,
-                "login_id" => $request->name,
+                "login_id" => $request->login_id,
                 "email" => $request->email,
                 "password" => Hash::make($request->password),
             ]);
