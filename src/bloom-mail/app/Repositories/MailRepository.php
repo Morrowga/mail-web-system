@@ -614,6 +614,22 @@ class MailRepository implements MailRepositoryInterface
 
         $message->delete(true);
 
+        $attachments = Attachment::where('mail_log_id', $mailLog->id)->get();
+
+        foreach ($attachments as $attachment) {
+            $relativeFilePath = $attachment->path;
+
+            $relativeFilePath = str_replace('storage/', '', $relativeFilePath);
+
+            $filePath = storage_path('app/public/' . $relativeFilePath); // E.g., '/var/www/html/storage/app/public/mails/attachments/filename.ext'
+
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            $attachment->delete();
+        }
+
         $mailLog->delete();
 
     }
