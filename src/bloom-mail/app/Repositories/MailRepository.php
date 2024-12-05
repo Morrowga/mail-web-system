@@ -222,15 +222,16 @@ class MailRepository implements MailRepositoryInterface
                     foreach ($attachments as $attachment) {
                         $fileName = $attachment->getName();
 
-                        $filePath = 'mails/attachments/';  // This is the path to save the file (e.g., mails/attachments/0560a9a9b86a804a41e32dc786475ccd.jpg)
+                        $filePath = 'mails/attachments/';
 
                         $storagePath = storage_path('app/public/' . $filePath);
+
+                        Log::info('storage/' . $filePath . $fileName);
 
                         $mimeType = $attachment->getMimeType();
                         $fileSize = $attachment->getSize();
 
                         $attachment->save($storagePath);
-
 
                         Attachment::create([
                             'file_name' => $fileName,
@@ -352,7 +353,7 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
-                $status = in_array('\\Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
+                $status = in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
 
                 $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
 
