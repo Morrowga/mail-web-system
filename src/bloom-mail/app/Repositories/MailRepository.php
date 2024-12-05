@@ -224,13 +224,10 @@ class MailRepository implements MailRepositoryInterface
                         $fileName = $attachment->getName();
                         $filePath = 'mails/attachments/' . $fileName;
 
-                        // Save the file using the public disk
-                        Storage::disk('public')->put($filePath, $attachment->content); // Automatically creates directories
-
+                        Storage::disk('public')->put($filePath, $attachment->content);
 
                         $mimeType = $attachment->getMimeType();
                         $fileSize = $attachment->getSize();
-
 
                         Attachment::create([
                             'file_name' => $fileName,

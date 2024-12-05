@@ -48,6 +48,7 @@
     "input": {
         "name": "氏名",
         "email": "メールアドレス",
+        "attachment": "添付ファイル:",
         "current_password": "現在のパスワード",
         "new_password": "新しいパスワード",
         "confirm_password": "パスワードの再入力",

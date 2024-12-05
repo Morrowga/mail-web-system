@@ -11,12 +11,12 @@
                             <div v-html="formattedReplyBody"></div>
 
                             <div class="mt-5" v-if="reply?.attachments && reply?.attachments.length > 0">
-                                <h4 class="my-2">Attachments: </h4>
+                                <h4 class="my-2">{{ $t('input.attachment') }}: </h4>
                                 <VRow>
                                     <VCol v-for="(attachment, index) in reply?.attachments" :key="index" cols="12" lg="6">
                                         <div class="cursor-pointer" @click="onDownload(attachment.path)">
                                             <template v-if="attachment.mime_type.includes('image')">
-                                            <img width="150" height="150":src="attachment.path" alt="Attachment" class="attachment-image" style="border-radius: 20px;"/>
+                                            <img width="150" height="150":src="attachment.path" alt="Attachment" class="attachment-image" style="border-radius: 20px; object-fit: cover;"/>
                                             </template>
                                             <template v-else>
                                                 <!-- Show div for other types of attachments -->
@@ -99,9 +99,10 @@ const onDownload = (path) => {
     background-color: gray;
     height: 150px;
     display: flex;
-    text-align: center;
+    text-align: center !important;
     border-radius: 20px;
     color: #fff;
+    justify-content: center;
     align-items: center;
   }
 
