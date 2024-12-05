@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Mime\Part\TextPart;
 use App\Interfaces\MailRepositoryInterface;
 use Webklex\IMAP\Exceptions\ConnectionFailedException;
@@ -221,21 +222,21 @@ class MailRepository implements MailRepositoryInterface
 
                     foreach ($attachments as $attachment) {
                         $fileName = $attachment->getName();
+                        $filePath = 'mails/attachments/' . $fileName;
 
-                        $filePath = 'mails/attachments/';
+                        // Save the file using the public disk
+                        Storage::disk('public')->put($filePath, $attachment->content); // Automatically creates directories
 
-                        $storagePath = storage_path('app/public/' . $filePath);
 
                         $mimeType = $attachment->getMimeType();
                         $fileSize = $attachment->getSize();
 
-                        $attachment->save($storagePath);
 
                         Attachment::create([
                             'file_name' => $fileName,
                             'mime_type' => $mimeType,
                             'file_size' => $fileSize,
-                            'path' => 'storage/' . $filePath . $fileName,
+                            'path' => 'storage/' . $filePath,
                             'mail_log_id' => $newMail->id
                         ]);
                     }
