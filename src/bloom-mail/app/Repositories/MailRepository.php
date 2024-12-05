@@ -222,11 +222,9 @@ class MailRepository implements MailRepositoryInterface
                     foreach ($attachments as $attachment) {
                         $fileName = $attachment->getName();
 
-                        $filePath = 'mails/attachments/';
+                        $filePath = 'mails/attachments';
 
                         $storagePath = storage_path('app/public/' . $filePath);
-
-                        Log::info('storage/' . $filePath . $fileName);
 
                         $mimeType = $attachment->getMimeType();
                         $fileSize = $attachment->getSize();
