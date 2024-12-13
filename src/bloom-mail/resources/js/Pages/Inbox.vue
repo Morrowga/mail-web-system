@@ -342,7 +342,7 @@ onUnmounted(() => {
 
                                 <div v-for="folder in folders" :key="folder.id" class="ml-4">
                                     <!-- Top-level folder -->
-                                    <div class="cursor-pointer" @click="setPageType('inbox', folder.id)" v-if="folder.mails_count > 0">
+                                    <div class="cursor-pointer" @click="setPageType('inbox', folder.id)">
                                         <p :class="{ 'active-route': pageType === 'inbox' && folder.id === selectedFolder }">├{{ folder.name }} ({{ folder.mails_count ?? 0 }})</p>
                                     </div>
                                 </div>
