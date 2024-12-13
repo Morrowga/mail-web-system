@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Folder;
 use App\Models\MailLog;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -43,7 +44,7 @@ class EmailStatusUpdated implements ShouldBroadcast
         return [
             'mail_id' => $this->mailId,
             'new_status' => $this->newStatus,
-            'person_in_charge' => $this->person_in_charge
+            'person_in_charge' => $this->person_in_charge,
         ];
     }
 }

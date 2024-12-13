@@ -179,6 +179,11 @@ const markAsRead = async (id) => {
             console.log(mailItem);
             if (mailItem) {
                 mailItem.status = 'read'; // Update status locally
+
+                if(countData.value.inbox > 0)
+                {
+                    countData.value.inbox -= 1
+                }
             }
         }
     } catch (error) {
@@ -275,7 +280,7 @@ onMounted(() => {
     Echo.channel('mail-status')
     .listen('.mail-status-changed', (event) => {
       console.log('Mail status changed:', event);
-      const { mail_id, new_status, person_in_charge } = event;
+      const { mail_id, new_status, person_in_charge} = event;
 
       const mail = mails.value.find(mail => mail.id === mail_id);
 
@@ -294,7 +299,6 @@ onMounted(() => {
                 selectedMail.value.person_in_charge = person_in_charge ?? ''
             }
         }
-
       }
 
       console.log(`Mail ${mail_id} status changed to ${new_status}`);
