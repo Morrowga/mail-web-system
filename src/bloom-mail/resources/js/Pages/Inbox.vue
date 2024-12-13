@@ -332,14 +332,14 @@ onUnmounted(() => {
                                <!-- Inbox -->
                                 <div class="mb-5 cursor-pointer" @click="setPageType('inbox', null)">
                                     <p :class="{ 'active-route': pageType === 'inbox' }">
-                                        {{ $t('nav.inbox') }} ( {{ countData?.inbox ?? 0 }} )
+                                        {{ $t('nav.inbox') }} ({{ countData?.inbox ?? 0 }})
                                     </p>
                                 </div>
 
                                 <div v-for="folder in folders" :key="folder.id" class="ml-4">
                                     <!-- Top-level folder -->
                                     <div class="cursor-pointer" @click="setPageType('inbox', folder.id)" v-if="folder.mails_count > 0">
-                                        <p :class="{ 'active-route': pageType === 'inbox' && folder.id === selectedFolder }">├{{ folder.name }} ( {{ folder.mails_count }} )</p>
+                                        <p :class="{ 'active-route': pageType === 'inbox' && folder.id === selectedFolder }">├{{ folder.name }} ({{ folder.mails_count ?? 0 }})</p>
                                     </div>
                                 </div>
 

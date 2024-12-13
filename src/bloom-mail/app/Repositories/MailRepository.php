@@ -61,8 +61,11 @@ class MailRepository implements MailRepositoryInterface
     public function inbox($filter = [])
     {
         $pageType = request()->query('page_type');
-        $folders = Folder::withCount('mails')->get();
 
+        $folders = Folder::withCount(['mails' => function ($query) {
+            $query->where('status', 'new');
+        }])->get();
+        
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
 
         $inbox = 0;
@@ -78,7 +81,7 @@ class MailRepository implements MailRepositoryInterface
                 $query = MailLog::orderBy('datetime', 'desc')->where('status','deleted');
                 $trash = $query->count();
                 $data = $query->paginate(10);
-                $inbox = MailLog::where('status', '!=', 'deleted')->count();
+                $inbox = MailLog::where('status', '=', 'new')->count();
                 break;
             case 'inbox':
             default:
@@ -105,7 +108,7 @@ class MailRepository implements MailRepositoryInterface
                     $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
                 }
 
-                $inbox = $query->count();
+                $inbox = MailLog::where('status', 'new')->count();
                 $trash = MailLog::where('status','deleted')->count();
 
                 $data = $query->orderBy('datetime', 'desc')->paginate(10);
