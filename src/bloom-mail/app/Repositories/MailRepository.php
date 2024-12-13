@@ -65,7 +65,7 @@ class MailRepository implements MailRepositoryInterface
         $folders = Folder::withCount(['mails' => function ($query) {
             $query->where('status', 'new');
         }])->get();
-        
+
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
 
         $inbox = 0;
@@ -126,12 +126,14 @@ class MailRepository implements MailRepositoryInterface
 
     public function inboxWithFolderId(Folder $folder)
     {
-        $folders = Folder::withCount('mails')->get();
+        $folders = Folder::withCount(['mails' => function ($query) {
+            $query->where('status', 'new');
+        }])->get();
 
         $folderId = $folder->id;
 
         $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
-        $inbox = MailLog::where('status', '!=', 'deleted')->orderBy('datetime', 'desc')->count();
+        $inbox = MailLog::where('status', 'new')->orderBy('datetime', 'desc')->count();
         $trash = MailLog::orderBy('datetime', 'desc')->where('status','deleted')->count();
 
         $data = MailLog::where('status', '!=', 'deleted')
@@ -317,6 +319,8 @@ class MailRepository implements MailRepositoryInterface
                 $mailLog->status = 'read';
                 $mailLog->save();
             }
+
+            broadcast(new EmailStatusUpdated($mailLog, 'read'));
 
             return response()->json(['status' => 'success', 'message' => 'Email marked as read and updated in database.']);
         }

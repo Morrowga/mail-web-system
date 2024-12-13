@@ -174,18 +174,13 @@ const fetchEmailsWithFolderId = async () => {
 const markAsRead = async (id) => {
     try {
         const response = await axios.post(`/mails/mark-as-read/${id}`);
-        if (response.data.status === 'success') {
-            const mailItem = mails.value.find(mail => mail.id === id);
-            console.log(mailItem);
-            if (mailItem) {
-                mailItem.status = 'read'; // Update status locally
-
-                if(countData.value.inbox > 0)
-                {
-                    countData.value.inbox -= 1
-                }
-            }
-        }
+        // if (response.data.status === 'success') {
+        //     const mailItem = mails.value.find(mail => mail.id === id);
+        //     console.log(mailItem);
+        //     if (mailItem) {
+        //         mailItem.status = 'read'; // Update status locally
+        //     }
+        // }
     } catch (error) {
         console.error('Failed to mark as read:', error);
     }
@@ -280,7 +275,7 @@ onMounted(() => {
     Echo.channel('mail-status')
     .listen('.mail-status-changed', (event) => {
       console.log('Mail status changed:', event);
-      const { mail_id, new_status, person_in_charge} = event;
+      const { mail_id, new_status, person_in_charge, count_data, folders_data} = event;
 
       const mail = mails.value.find(mail => mail.id === mail_id);
 
@@ -299,6 +294,11 @@ onMounted(() => {
                 selectedMail.value.person_in_charge = person_in_charge ?? ''
             }
         }
+
+        countData.value.inbox = count_data
+        folders.value = folders_data
+
+        console.log(folders.value);
       }
 
       console.log(`Mail ${mail_id} status changed to ${new_status}`);
