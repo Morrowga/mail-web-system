@@ -20,7 +20,7 @@ class EmailStatusUpdated implements ShouldBroadcast
     public $person_in_charge;
     public $newStatus;
 
-    public function __construct(MailLog $mailLog, string $newStatus)
+    public function __construct(MailLog $mailLog, string $newStatus = 'read')
     {
         $this->mailId = $mailLog->id;
         $this->person_in_charge = $mailLog->person_in_charge;
