@@ -336,6 +336,7 @@ class MailRepository implements MailRepositoryInterface
 
         $histories = [];
 
+
         if ($message) {
             $threadMessages = $message->thread($inbox);
 
@@ -373,18 +374,18 @@ class MailRepository implements MailRepositoryInterface
                 ];
             }
 
-            // $systemMailHistories = $mailLog->mail_histories->toArray();
+            $systemMailHistories = $mailLog->mail_histories->toArray();
 
-            // $mergedHistories = array_merge($histories, $systemMailHistories);
+            $mergedHistories = array_merge($histories, $systemMailHistories);
 
-            // usort($mergedHistories, function ($a, $b) {
-            //     return strtotime($b['datetime']) - strtotime($a['datetime']);
-            // });
+            usort($mergedHistories, function ($a, $b) {
+                return strtotime($b['datetime']) - strtotime($a['datetime']);
+            });
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Email histories fetched successfully.',
-                'data' => $histories,
+                'data' => $mergedHistories,
             ]);
         } else {
             return response()->json([

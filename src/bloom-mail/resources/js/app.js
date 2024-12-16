@@ -20,7 +20,6 @@ const i18n = createI18n({
     }
 });
 
-
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
@@ -33,7 +32,7 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(i18n)
-            .use(vuetify) // Use Vuetify
+            .use(vuetify) 
             .mount(el);
     },
     progress: {
