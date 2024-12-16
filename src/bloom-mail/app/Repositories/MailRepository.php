@@ -74,7 +74,7 @@ class MailRepository implements MailRepositoryInterface
         switch ($pageType) {
             case 'sent':
                 $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->with('template')->paginate(10);
-                $inbox = MailLog::where('status', '!=', 'deleted')->count();
+                $inbox = MailLog::where('status','new')->count();
                 $trash = MailLog::where('status', 'deleted')->count();
                 break;
             case 'trash':
