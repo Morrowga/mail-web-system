@@ -176,7 +176,13 @@ class MailRepository implements MailRepositoryInterface
                     $dateSent = $message->getDate();
                     $body = $message->getHTMLBody() ?? $message->getTextBody();
                     $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-                    $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
+
+                    if (!empty($senderArray) && isset($senderArray[0]->mail)) {
+                        $senderEmail = $this->decodeString($senderArray[0]->mail);
+                    } else {
+                        $senderEmail = 'unknown@example.com'; 
+                    }
+
                     $spamCheck = Spam::where('mail_address', $senderEmail)->first();
 
                     $flags = $message->getFlags()->toArray();
