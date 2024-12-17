@@ -41,6 +41,8 @@ sudo systemctl status laravel-queue.service
 
 sudo systemctl status laravel-schedule.service  
 
+sudo systemctl status laravel-schedule.timer  
+
 # Debugging
 
 // debugging the logs
