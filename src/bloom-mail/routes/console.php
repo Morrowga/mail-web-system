@@ -15,7 +15,7 @@ Artisan::command('inspire', function () {
 
 Artisan::command('mail-fetching', function () {
     ProcessMails::dispatch();
-})->purpose('Running Realtime')->everyTwentySeconds();
+})->purpose('Running Realtime')->everyTwoMinutes();
 
 
 Artisan::command('trash-deletion', function () {

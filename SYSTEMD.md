@@ -8,9 +8,18 @@ sudo systemctl enable laravel-queue.service
 
 sudo systemctl enable laravel-schedule.service  
 
+//disable service 
+
+sudo systemctl disable laravel-reverb.service 
+
+sudo systemctl disable laravel-queue.service  
+
+sudo systemctl disable laravel-schedule.service  
+
+
 // start service
 
-    sudo systemctl start laravel-reverb.service  
+sudo systemctl start laravel-reverb.service  
 
 sudo systemctl start laravel-queue.service  
 
