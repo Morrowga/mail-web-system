@@ -265,7 +265,7 @@ class MailRepository implements MailRepositoryInterface
                 $allMails = MailLog::all();
 
                 foreach ($allMails as $mail) {
-                    $subject = $mail->subject;
+                    $subject = $this->decodeString($mail->subject);
                     $isMatch = false;
 
                     if ($method === 'exact_match' && $subject === $searchCharacter) {
