@@ -19,11 +19,13 @@ class ProcessMails implements ShouldQueue
 
     public function handle()
     {
+        Log::info('ProcessMails job started');
+
         $mailRepository = app(MailRepository::class);
 
         $emails = $mailRepository->newMessage();
 
-        Log::info('worked');
+        Log::info('ProcessMails job ended');
     }
 
 }
