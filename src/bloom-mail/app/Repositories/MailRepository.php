@@ -158,111 +158,111 @@ class MailRepository implements MailRepositoryInterface
         // try {
             Log::info('Message fetching started');
 
-            $inbox = $this->client->getFolder('INBOX');
-            $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+            // $inbox = $this->client->getFolder('INBOX');
+            // $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
             $newEmails = [];
 
-            $status = 'new';
+            // $status = 'new';
 
-            $deleted_date = null;
+            // $deleted_date = null;
 
-            foreach ($messages as $message) {
-                $uid = $message->getUid();
-                $messageId = $message->getMessageId();
-                $subject = $this->decodeString($message->getSubject()[0]);
+            // foreach ($messages as $message) {
+            //     $uid = $message->getUid();
+            //     $messageId = $message->getMessageId();
+            //     $subject = $this->decodeString($message->getSubject()[0]);
 
-                $existingMail = MailLog::where('message_id', $messageId)->first();
+            //     $existingMail = MailLog::where('message_id', $messageId)->first();
 
-                if (!$existingMail) {
-                    $senderArray = $message->getFrom();
-                    $dateSent = $message->getDate();
-                    $body = $message->getHTMLBody() ?? $message->getTextBody();
-                    $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+            //     if (!$existingMail) {
+            //         $senderArray = $message->getFrom();
+            //         $dateSent = $message->getDate();
+            //         $body = $message->getHTMLBody() ?? $message->getTextBody();
+            //         $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
 
-                    if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-                        $senderEmail = $this->decodeString($senderArray[0]->mail);
-                    } else {
-                        $senderEmail = 'unknown@example.com';
-                    }
+            //         if (!empty($senderArray) && isset($senderArray[0]->mail)) {
+            //             $senderEmail = $this->decodeString($senderArray[0]->mail);
+            //         } else {
+            //             $senderEmail = 'unknown@example.com';
+            //         }
 
-                    $spamCheck = Spam::where('mail_address', $senderEmail)->first();
+            //         $spamCheck = Spam::where('mail_address', $senderEmail)->first();
 
-                    $flags = $message->getFlags()->toArray();
+            //         $flags = $message->getFlags()->toArray();
 
-                    if(!empty($spamCheck))
-                    {
-                        $message->delete(false);
+            //         if(!empty($spamCheck))
+            //         {
+            //             $message->delete(false);
 
-                        $status = 'deleted';
-                    } else {
+            //             $status = 'deleted';
+            //         } else {
 
-                        $emailParts = explode('@', $senderEmail);
-                        $domain = isset($emailParts[1]) ? $emailParts[1] : null;
+            //             $emailParts = explode('@', $senderEmail);
+            //             $domain = isset($emailParts[1]) ? $emailParts[1] : null;
 
-                        $spamDomainCheck = Spam::where('mail_address', $domain)->first();
+            //             $spamDomainCheck = Spam::where('mail_address', $domain)->first();
 
-                        if(!empty($spamDomainCheck))
-                        {
-                            $message->delete(false);
+            //             if(!empty($spamDomainCheck))
+            //             {
+            //                 $message->delete(false);
 
-                            $status = 'deleted';
-                            $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
-                        } else {
-                            $status = in_array('Seen', $flags) ? 'read' : 'new';
-                        }
-                    }
+            //                 $status = 'deleted';
+            //                 $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
+            //             } else {
+            //                 $status = in_array('Seen', $flags) ? 'read' : 'new';
+            //             }
+            //         }
 
-                    $inReplyTo = $message->getHeader()->get('in-reply-to');
-                    $references = $message->getHeader()->get('references');
+            //         $inReplyTo = $message->getHeader()->get('in-reply-to');
+            //         $references = $message->getHeader()->get('references');
 
-                    if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-                        continue;
-                    }
+            //         if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
+            //             continue;
+            //         }
 
-                    $attachments = $message->getAttachments();
+            //         $attachments = $message->getAttachments();
 
-                    $newMail = MailLog::create([
-                        'uid' => $uid,
-                        'message_id' => $messageId,
-                        'subject' => $subject,
-                        'sender' => $senderEmail,
-                        'name' => $senderName,
-                        'body' => $body,
-                        'datetime' => $dateSent[0]->toDateTimeString(),
-                        'status' => $status,
-                        'deleted_at' => $deleted_date
-                    ]);
+            //         $newMail = MailLog::create([
+            //             'uid' => $uid,
+            //             'message_id' => $messageId,
+            //             'subject' => $subject,
+            //             'sender' => $senderEmail,
+            //             'name' => $senderName,
+            //             'body' => $body,
+            //             'datetime' => $dateSent[0]->toDateTimeString(),
+            //             'status' => $status,
+            //             'deleted_at' => $deleted_date
+            //         ]);
 
-                    foreach ($attachments as $attachment) {
-                        $fileName = $attachment->getName();
-                        $filePath = 'mails/attachments/' . $fileName;
+            //         foreach ($attachments as $attachment) {
+            //             $fileName = $attachment->getName();
+            //             $filePath = 'mails/attachments/' . $fileName;
 
-                        Storage::disk('public')->put($filePath, $attachment->content);
+            //             Storage::disk('public')->put($filePath, $attachment->content);
 
-                        $mimeType = $attachment->getMimeType();
-                        $fileSize = $attachment->getSize();
+            //             $mimeType = $attachment->getMimeType();
+            //             $fileSize = $attachment->getSize();
 
-                        Attachment::create([
-                            'file_name' => $fileName,
-                            'mime_type' => $mimeType,
-                            'file_size' => $fileSize,
-                            'path' => 'storage/' . $filePath,
-                            'mail_log_id' => $newMail->id
-                        ]);
-                    }
+            //             Attachment::create([
+            //                 'file_name' => $fileName,
+            //                 'mime_type' => $mimeType,
+            //                 'file_size' => $fileSize,
+            //                 'path' => 'storage/' . $filePath,
+            //                 'mail_log_id' => $newMail->id
+            //             ]);
+            //         }
 
-                    $newEmails[] = [
-                        'uid' => $uid,
-                        'message_id' => $messageId,
-                        'subject' => $subject,
-                        'sender' => $senderEmail,
-                        'name' => $senderName,
-                        'body' => $body,
-                        'datetime' => $dateSent[0]->toDateTimeString(),
-                        'status' => $status,
-                    ];
-                }
-            }
+            //         $newEmails[] = [
+            //             'uid' => $uid,
+            //             'message_id' => $messageId,
+            //             'subject' => $subject,
+            //             'sender' => $senderEmail,
+            //             'name' => $senderName,
+            //             'body' => $body,
+            //             'datetime' => $dateSent[0]->toDateTimeString(),
+            //             'status' => $status,
+            //         ];
+            //     }
+            // }
 
             Log::info('Message fetching ended');
 
