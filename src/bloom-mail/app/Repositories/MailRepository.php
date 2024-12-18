@@ -62,31 +62,39 @@ class MailRepository implements MailRepositoryInterface
     {
         $pageType = request()->query('page_type');
 
+        // Pre-fetch the counts for inbox and trash to avoid redundant queries
+        $inboxCount = MailLog::where('status', 'new')->count();
+        $trashCount = MailLog::where('status', 'deleted')->count();
+
+        // Fetch folders with the count of mails with 'new' status for each folder
         $folders = Folder::withCount(['mails' => function ($query) {
             $query->where('status', 'new');
         }])->get();
 
-        $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
+        // Fetch sent mail count
+        $sentCount = SentMail::where('type', 'sent')->count();
 
-        $inbox = 0;
-        $trash = 0;
-
+        // Determine the query and data based on the page type
         switch ($pageType) {
             case 'sent':
-                $data = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->with('template')->paginate(10);
-                $inbox = MailLog::where('status','new')->count();
-                $trash = MailLog::where('status', 'deleted')->count();
+                $data = SentMail::with('template')
+                    ->orderBy('datetime', 'desc')
+                    ->where('type', 'sent')
+                    ->paginate(10);
                 break;
+
             case 'trash':
-                $query = MailLog::orderBy('datetime', 'desc')->where('status','deleted');
-                $trash = $query->count();
-                $data = $query->paginate(10);
-                $inbox = MailLog::where('status', '=', 'new')->count();
+                $data = MailLog::where('status', 'deleted')
+                    ->orderBy('datetime', 'desc')
+                    ->paginate(10);
                 break;
+
             case 'inbox':
             default:
+                // Base query for inbox, excluding deleted emails
                 $query = MailLog::where('status', '!=', 'deleted');
 
+                // Apply filters if available
                 if (!empty($filter['status'])) {
                     $query->where('status', $filter['status']);
                 }
@@ -104,45 +112,50 @@ class MailRepository implements MailRepositoryInterface
                 if (!empty($filter['person_in_charge'])) {
                     $query->where('person_in_charge', $filter['person_in_charge']);
                 }
+
                 if (!empty($filter['from']) && !empty($filter['to'])) {
                     $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
                 }
 
-                $inbox = MailLog::where('status', 'new')->count();
-                $trash = MailLog::where('status','deleted')->count();
-
+                // Apply pagination
                 $data = $query->orderBy('datetime', 'desc')->paginate(10);
                 break;
         }
 
+        // Return the data with counts and folders
         return [
             "data" => $data,
-            "inbox" => $inbox,
-            "sent" => $sent,
+            "inbox" => $inboxCount,
+            "sent" => $sentCount,
             "folders" => $folders,
-            "trash" => $trash
+            "trash" => $trashCount
         ];
     }
 
     public function inboxWithFolderId(Folder $folder)
     {
+        $folderId = $folder->id;
+
+        $counts = MailLog::selectRaw('
+                sum(status = "new") as inbox,
+                sum(status = "deleted") as trash
+            ')->first();
+
+        $inbox = $counts->inbox ?? 0;
+        $trash = $counts->trash ?? 0;
+
+        $sent = SentMail::where('type', 'sent')->count();
+
         $folders = Folder::withCount(['mails' => function ($query) {
             $query->where('status', 'new');
         }])->get();
 
-        $folderId = $folder->id;
-
-        $sent = SentMail::orderBy('datetime', 'desc')->where('type', 'sent')->count();
-        $inbox = MailLog::where('status', 'new')->orderBy('datetime', 'desc')->count();
-        $trash = MailLog::orderBy('datetime', 'desc')->where('status','deleted')->count();
-
         $data = MailLog::where('status', '!=', 'deleted')
-        ->when(isset($folderId), function ($query) use ($folderId) {
-            $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
-        })
-        ->orderBy('datetime', 'desc')
-        ->paginate(10);
-
+            ->when($folderId, function ($query) use ($folderId) {
+                $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
+            })
+            ->orderBy('datetime', 'desc')
+            ->paginate(10);
 
         return [
             "data" => $data,
@@ -152,6 +165,7 @@ class MailRepository implements MailRepositoryInterface
             "folders" => $folders
         ];
     }
+
 
     public function newMessage()
     {
