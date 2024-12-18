@@ -155,153 +155,164 @@ class MailRepository implements MailRepositoryInterface
 
     public function newMessage()
     {
-        Log::info('here');
         // try {
-            // $inbox = $this->client->getFolder('INBOX');
-            // $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
-            // $newEmails = [];
+            Log::info('Message fetching started');
 
-            // $status = 'new';
+            $inbox = $this->client->getFolder('INBOX');
+            $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+            $newEmails = [];
 
-            // $deleted_date = null;
+            $status = 'new';
 
-            // foreach ($messages as $message) {
-            //     $uid = $message->getUid();
-            //     $messageId = $message->getMessageId();
-            //     $subject = $this->decodeString($message->getSubject()[0]);
+            $deleted_date = null;
 
-            //     $existingMail = MailLog::where('message_id', $messageId)->first();
+            foreach ($messages as $message) {
+                $uid = $message->getUid();
+                $messageId = $message->getMessageId();
+                $subject = $this->decodeString($message->getSubject()[0]);
 
-            //     if (!$existingMail) {
-            //         $senderArray = $message->getFrom();
-            //         $dateSent = $message->getDate();
-            //         $body = $message->getHTMLBody() ?? $message->getTextBody();
-            //         $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+                $existingMail = MailLog::where('message_id', $messageId)->first();
 
-            //         if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-            //             $senderEmail = $this->decodeString($senderArray[0]->mail);
-            //         } else {
-            //             $senderEmail = 'unknown@example.com';
-            //         }
+                if (!$existingMail) {
+                    $senderArray = $message->getFrom();
+                    $dateSent = $message->getDate();
+                    $body = $message->getHTMLBody() ?? $message->getTextBody();
+                    $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
 
-            //         $spamCheck = Spam::where('mail_address', $senderEmail)->first();
+                    if (!empty($senderArray) && isset($senderArray[0]->mail)) {
+                        $senderEmail = $this->decodeString($senderArray[0]->mail);
+                    } else {
+                        $senderEmail = 'unknown@example.com';
+                    }
 
-            //         $flags = $message->getFlags()->toArray();
+                    $spamCheck = Spam::where('mail_address', $senderEmail)->first();
 
-            //         if(!empty($spamCheck))
-            //         {
-            //             $message->delete(false);
+                    $flags = $message->getFlags()->toArray();
 
-            //             $status = 'deleted';
-            //         } else {
+                    if(!empty($spamCheck))
+                    {
+                        $message->delete(false);
 
-            //             $emailParts = explode('@', $senderEmail);
-            //             $domain = isset($emailParts[1]) ? $emailParts[1] : null;
+                        $status = 'deleted';
+                    } else {
 
-            //             $spamDomainCheck = Spam::where('mail_address', $domain)->first();
+                        $emailParts = explode('@', $senderEmail);
+                        $domain = isset($emailParts[1]) ? $emailParts[1] : null;
 
-            //             if(!empty($spamDomainCheck))
-            //             {
-            //                 $message->delete(false);
+                        $spamDomainCheck = Spam::where('mail_address', $domain)->first();
 
-            //                 $status = 'deleted';
-            //                 $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
-            //             } else {
-            //                 $status = in_array('Seen', $flags) ? 'read' : 'new';
-            //             }
-            //         }
+                        if(!empty($spamDomainCheck))
+                        {
+                            $message->delete(false);
 
-            //         $inReplyTo = $message->getHeader()->get('in-reply-to');
-            //         $references = $message->getHeader()->get('references');
+                            $status = 'deleted';
+                            $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
+                        } else {
+                            $status = in_array('Seen', $flags) ? 'read' : 'new';
+                        }
+                    }
 
-            //         if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-            //             continue;
-            //         }
+                    $inReplyTo = $message->getHeader()->get('in-reply-to');
+                    $references = $message->getHeader()->get('references');
 
-            //         $attachments = $message->getAttachments();
+                    if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
+                        continue;
+                    }
 
-            //         $newMail = MailLog::create([
-            //             'uid' => $uid,
-            //             'message_id' => $messageId,
-            //             'subject' => $subject,
-            //             'sender' => $senderEmail,
-            //             'name' => $senderName,
-            //             'body' => $body,
-            //             'datetime' => $dateSent[0]->toDateTimeString(),
-            //             'status' => $status,
-            //             'deleted_at' => $deleted_date
-            //         ]);
+                    $attachments = $message->getAttachments();
 
-            //         foreach ($attachments as $attachment) {
-            //             $fileName = $attachment->getName();
-            //             $filePath = 'mails/attachments/' . $fileName;
+                    $newMail = MailLog::create([
+                        'uid' => $uid,
+                        'message_id' => $messageId,
+                        'subject' => $subject,
+                        'sender' => $senderEmail,
+                        'name' => $senderName,
+                        'body' => $body,
+                        'datetime' => $dateSent[0]->toDateTimeString(),
+                        'status' => $status,
+                        'deleted_at' => $deleted_date
+                    ]);
 
-            //             Storage::disk('public')->put($filePath, $attachment->content);
+                    foreach ($attachments as $attachment) {
+                        $fileName = $attachment->getName();
+                        $filePath = 'mails/attachments/' . $fileName;
 
-            //             $mimeType = $attachment->getMimeType();
-            //             $fileSize = $attachment->getSize();
+                        Storage::disk('public')->put($filePath, $attachment->content);
 
-            //             Attachment::create([
-            //                 'file_name' => $fileName,
-            //                 'mime_type' => $mimeType,
-            //                 'file_size' => $fileSize,
-            //                 'path' => 'storage/' . $filePath,
-            //                 'mail_log_id' => $newMail->id
-            //             ]);
-            //         }
+                        $mimeType = $attachment->getMimeType();
+                        $fileSize = $attachment->getSize();
 
-            //         $newEmails[] = [
-            //             'uid' => $uid,
-            //             'message_id' => $messageId,
-            //             'subject' => $subject,
-            //             'sender' => $senderEmail,
-            //             'name' => $senderName,
-            //             'body' => $body,
-            //             'datetime' => $dateSent[0]->toDateTimeString(),
-            //             'status' => $status,
-            //         ];
-            //     }
-            // }
+                        Attachment::create([
+                            'file_name' => $fileName,
+                            'mime_type' => $mimeType,
+                            'file_size' => $fileSize,
+                            'path' => 'storage/' . $filePath,
+                            'mail_log_id' => $newMail->id
+                        ]);
+                    }
 
-            // $folders = Folder::all();
+                    $newEmails[] = [
+                        'uid' => $uid,
+                        'message_id' => $messageId,
+                        'subject' => $subject,
+                        'sender' => $senderEmail,
+                        'name' => $senderName,
+                        'body' => $body,
+                        'datetime' => $dateSent[0]->toDateTimeString(),
+                        'status' => $status,
+                    ];
+                }
+            }
 
-            // foreach ($folders as $folder) {
-            //     $searchCharacter = $folder->search_character;
-            //     $method = strtolower($folder->method);
+            Log::info('Message fetching ended');
 
-            //     $allMails = MailLog::all();
+            Log::info('Folder matching started');
 
-            //     foreach ($allMails as $mail) {
-            //         $subject = $this->decodeString($mail->subject);
-            //         $isMatch = false;
+            $folders = Folder::all();
 
-            //         if ($method === 'exact_match' && $subject === $searchCharacter) {
-            //             $isMatch = true;
-            //         } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-            //             $isMatch = true;
-            //         } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-            //             $isMatch = true;
-            //         } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-            //             $isMatch = true;
-            //         }
+            foreach ($folders as $folder) {
+                $searchCharacter = $folder->search_character;
+                $method = strtolower($folder->method);
 
-            //         if ($isMatch) {
-            //             DB::table('folder_mails')->updateOrInsert(
-            //                 ['mail_log_id' => $mail->id],
-            //                 ['folder_id' => $folder->id]
-            //             );
-            //         } else {
-            //             DB::table('folder_mails')
-            //                 ->where('mail_log_id', $mail->id)
-            //                 ->where('folder_id', $folder->id)
-            //                 ->delete();
-            //         }
-            //     }
-            // }
+                $allMails = MailLog::all();
 
-            // $checkNew = count($newEmails) > 0 ? 1 : 0;
+                foreach ($allMails as $mail) {
+                    $subject = $this->decodeString($mail->subject);
+                    $isMatch = false;
 
-            // broadcast(new TakingMail(["new" => $checkNew]));
+                    if ($method === 'exact_match' && $subject === $searchCharacter) {
+                        $isMatch = true;
+                    } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                        $isMatch = true;
+                    } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                        $isMatch = true;
+                    } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                        $isMatch = true;
+                    }
+
+                    if ($isMatch) {
+                        DB::table('folder_mails')->updateOrInsert(
+                            ['mail_log_id' => $mail->id],
+                            ['folder_id' => $folder->id]
+                        );
+                    } else {
+                        DB::table('folder_mails')
+                            ->where('mail_log_id', $mail->id)
+                            ->where('folder_id', $folder->id)
+                            ->delete();
+                    }
+                }
+            }
+
+            Log::info('Folder matching end');
+
+            Log::info('Sending to queue started');
+
+            $checkNew = count($newEmails) > 0 ? 1 : 0;
+
+            broadcast(new TakingMail(["new" => $checkNew]));
+
+            Log::info('Sending to queue ended');
 
         // } catch (Exception $e) {
         //     logger()->error("Error fetching emails: " . $e->getMessage());
