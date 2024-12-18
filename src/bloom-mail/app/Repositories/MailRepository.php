@@ -266,46 +266,6 @@ class MailRepository implements MailRepositoryInterface
 
             Log::info('Message fetching ended');
 
-            Log::info('Folder matching started');
-
-            $folders = Folder::all();
-
-            foreach ($folders as $folder) {
-                $searchCharacter = $folder->search_character;
-                $method = strtolower($folder->method);
-
-                $allMails = MailLog::all();
-
-                foreach ($allMails as $mail) {
-                    $subject = $this->decodeString($mail->subject);
-                    $isMatch = false;
-
-                    if ($method === 'exact_match' && $subject === $searchCharacter) {
-                        $isMatch = true;
-                    } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-                        $isMatch = true;
-                    } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-                        $isMatch = true;
-                    } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-                        $isMatch = true;
-                    }
-
-                    if ($isMatch) {
-                        DB::table('folder_mails')->updateOrInsert(
-                            ['mail_log_id' => $mail->id],
-                            ['folder_id' => $folder->id]
-                        );
-                    } else {
-                        DB::table('folder_mails')
-                            ->where('mail_log_id', $mail->id)
-                            ->where('folder_id', $folder->id)
-                            ->delete();
-                    }
-                }
-            }
-
-            Log::info('Folder matching end');
-
             Log::info('Sending to queue started');
 
             $checkNew = count($newEmails) > 0 ? 1 : 0;
@@ -316,8 +276,46 @@ class MailRepository implements MailRepositoryInterface
 
         // } catch (Exception $e) {
         //     logger()->error("Error fetching emails: " . $e->getMessage());
-        //     return response()->json(['status' => 'error', 'message' => 'Failed to fetch mails.'], 500);
         // }
+    }
+
+    public function folderMatching()
+    {
+        $folders = Folder::all();
+
+        foreach ($folders as $folder) {
+            $searchCharacter = $folder->search_character;
+            $method = strtolower($folder->method);
+
+            $allMails = MailLog::all();
+
+            foreach ($allMails as $mail) {
+                $subject = $mail->subject;
+                $isMatch = false;
+
+                if ($method === 'exact_match' && $subject === $searchCharacter) {
+                    $isMatch = true;
+                } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                    $isMatch = true;
+                } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                    $isMatch = true;
+                } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                    $isMatch = true;
+                }
+
+                if ($isMatch) {
+                    DB::table('folder_mails')->updateOrInsert(
+                        ['mail_log_id' => $mail->id],
+                        ['folder_id' => $folder->id]
+                    );
+                } else {
+                    DB::table('folder_mails')
+                        ->where('mail_log_id', $mail->id)
+                        ->where('folder_id', $folder->id)
+                        ->delete();
+                }
+            }
+        }
     }
 
     public function markAsRead($id)

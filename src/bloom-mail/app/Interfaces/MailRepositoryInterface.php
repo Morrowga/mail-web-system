@@ -15,6 +15,8 @@ interface MailRepositoryInterface
 
     public function newMessage();
 
+    public function folderMatching();
+
     public function reply(Request $request, MailLog $mail_log);
 
     public function forward(Request $request, MailLog $mail_log);
