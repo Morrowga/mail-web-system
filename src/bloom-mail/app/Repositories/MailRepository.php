@@ -155,7 +155,7 @@ class MailRepository implements MailRepositoryInterface
 
     public function newMessage()
     {
-        try {
+        // try {
             $inbox = $this->client->getFolder('INBOX');
             $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
             $newEmails = [];
@@ -302,10 +302,10 @@ class MailRepository implements MailRepositoryInterface
 
             broadcast(new TakingMail(["new" => $checkNew]));
 
-        } catch (Exception $e) {
-            logger()->error("Error fetching emails: " . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Failed to fetch mails.'], 500);
-        }
+        // } catch (Exception $e) {
+        //     logger()->error("Error fetching emails: " . $e->getMessage());
+        //     return response()->json(['status' => 'error', 'message' => 'Failed to fetch mails.'], 500);
+        // }
     }
 
     public function markAsRead($id)
