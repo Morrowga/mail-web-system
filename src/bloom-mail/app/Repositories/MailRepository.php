@@ -155,128 +155,119 @@ class MailRepository implements MailRepositoryInterface
 
     public function newMessage()
     {
-        // try {
-            Log::info('Message fetching started');
+        Log::info('Message fetching started');
 
-            // $inbox = $this->client->getFolder('INBOX');
-            // $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
-            $newEmails = [];
+        $inbox = $this->client->getFolder('INBOX');
+        $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+        $newEmails = [];
 
-            // $status = 'new';
+        $spamEmails = Spam::pluck('mail_address')->toArray();
+        $spamDomains = Spam::pluck('mail_address')->map(function ($email) {
+            return explode('@', $email)[1]; // Extract domains
+        })->toArray();
 
-            // $deleted_date = null;
+        $existingMessageIds = MailLog::pluck('message_id')->toArray();
 
-            // foreach ($messages as $message) {
-            //     $uid = $message->getUid();
-            //     $messageId = $message->getMessageId();
-            //     $subject = $this->decodeString($message->getSubject()[0]);
+        foreach ($messages as $message) {
+            $uid = $message->getUid();
+            $messageId = $message->getMessageId();
 
-            //     $existingMail = MailLog::where('message_id', $messageId)->first();
+            // Skip if the message already exists in the database
+            if (in_array($messageId, $existingMessageIds)) {
+                continue;
+            }
 
-            //     if (!$existingMail) {
-            //         $senderArray = $message->getFrom();
-            //         $dateSent = $message->getDate();
-            //         $body = $message->getHTMLBody() ?? $message->getTextBody();
-            //         $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+            // Decode subject and sender
+            $subject = $this->decodeString($message->getSubject()[0]);
+            $senderArray = $message->getFrom();
+            $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+            $senderEmail = !empty($senderArray) && isset($senderArray[0]->mail) ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
 
-            //         if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-            //             $senderEmail = $this->decodeString($senderArray[0]->mail);
-            //         } else {
-            //             $senderEmail = 'unknown@example.com';
-            //         }
+            // Check if sender email or domain is in spam list
+            $isSpam = in_array($senderEmail, $spamEmails) || in_array(explode('@', $senderEmail)[1], $spamDomains);
 
-            //         $spamCheck = Spam::where('mail_address', $senderEmail)->first();
+            if ($isSpam) {
+                // Mark as deleted and skip processing
+                $message->delete(false);
+                continue;
+            }
 
-            //         $flags = $message->getFlags()->toArray();
+            // Determine message status based on flags
+            $flags = $message->getFlags()->toArray();
+            $status = in_array('Seen', $flags) ? 'read' : 'new';
 
-            //         if(!empty($spamCheck))
-            //         {
-            //             $message->delete(false);
+            // Get message body and datetime
+            $body = $message->getHTMLBody() ?? $message->getTextBody();
+            $dateSent = $message->getDate();
+            $deleted_date = null;
 
-            //             $status = 'deleted';
-            //         } else {
+            // Handle replies and references in emails
+            $inReplyTo = $message->getHeader()->get('in-reply-to');
+            $references = $message->getHeader()->get('references');
+            if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
+                continue;
+            }
 
-            //             $emailParts = explode('@', $senderEmail);
-            //             $domain = isset($emailParts[1]) ? $emailParts[1] : null;
+            // Create a new mail record in the database
+            $newMail = MailLog::create([
+                'uid' => $uid,
+                'message_id' => $messageId,
+                'subject' => $subject,
+                'sender' => $senderEmail,
+                'name' => $senderName,
+                'body' => $body,
+                'datetime' => $dateSent[0]->toDateTimeString(),
+                'status' => $status,
+                'deleted_at' => $deleted_date
+            ]);
 
-            //             $spamDomainCheck = Spam::where('mail_address', $domain)->first();
+            // Process attachments
+            $attachments = $message->getAttachments();
+            foreach ($attachments as $attachment) {
+                $this->processAttachment($attachment, $newMail);
+            }
 
-            //             if(!empty($spamDomainCheck))
-            //             {
-            //                 $message->delete(false);
+            // Prepare new email for broadcasting
+            $newEmails[] = [
+                'uid' => $uid,
+                'message_id' => $messageId,
+                'subject' => $subject,
+                'sender' => $senderEmail,
+                'name' => $senderName,
+                'body' => $body,
+                'datetime' => $dateSent[0]->toDateTimeString(),
+                'status' => $status,
+            ];
+        }
 
-            //                 $status = 'deleted';
-            //                 $deleted_date = Carbon::now('Asia/Tokyo')->toDateTimeString();
-            //             } else {
-            //                 $status = in_array('Seen', $flags) ? 'read' : 'new';
-            //             }
-            //         }
+        Log::info('Message fetching ended');
 
-            //         $inReplyTo = $message->getHeader()->get('in-reply-to');
-            //         $references = $message->getHeader()->get('references');
+        Log::info('Sending to queue started');
 
-            //         if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-            //             continue;
-            //         }
+        $checkNew = count($newEmails) > 0 ? 1 : 0;
 
-            //         $attachments = $message->getAttachments();
+        broadcast(new TakingMail(["new" => $checkNew]));
 
-            //         $newMail = MailLog::create([
-            //             'uid' => $uid,
-            //             'message_id' => $messageId,
-            //             'subject' => $subject,
-            //             'sender' => $senderEmail,
-            //             'name' => $senderName,
-            //             'body' => $body,
-            //             'datetime' => $dateSent[0]->toDateTimeString(),
-            //             'status' => $status,
-            //             'deleted_at' => $deleted_date
-            //         ]);
+        Log::info('Sending to queue ended');
+    }
 
-            //         foreach ($attachments as $attachment) {
-            //             $fileName = $attachment->getName();
-            //             $filePath = 'mails/attachments/' . $fileName;
+    private function processAttachment($attachment, $mail)
+    {
+        // Handle attachment storage and database insert logic
+        $fileName = $attachment->getName();
+        $filePath = 'mails/attachments/' . $fileName;
 
-            //             Storage::disk('public')->put($filePath, $attachment->content);
+        // Save the attachment to disk
+        Storage::disk('public')->put($filePath, $attachment->content);
 
-            //             $mimeType = $attachment->getMimeType();
-            //             $fileSize = $attachment->getSize();
-
-            //             Attachment::create([
-            //                 'file_name' => $fileName,
-            //                 'mime_type' => $mimeType,
-            //                 'file_size' => $fileSize,
-            //                 'path' => 'storage/' . $filePath,
-            //                 'mail_log_id' => $newMail->id
-            //             ]);
-            //         }
-
-            //         $newEmails[] = [
-            //             'uid' => $uid,
-            //             'message_id' => $messageId,
-            //             'subject' => $subject,
-            //             'sender' => $senderEmail,
-            //             'name' => $senderName,
-            //             'body' => $body,
-            //             'datetime' => $dateSent[0]->toDateTimeString(),
-            //             'status' => $status,
-            //         ];
-            //     }
-            // }
-
-            Log::info('Message fetching ended');
-
-            Log::info('Sending to queue started');
-
-            $checkNew = count($newEmails) > 0 ? 1 : 0;
-
-            broadcast(new TakingMail(["new" => $checkNew]));
-
-            Log::info('Sending to queue ended');
-
-        // } catch (Exception $e) {
-        //     logger()->error("Error fetching emails: " . $e->getMessage());
-        // }
+        // Store attachment information in the database
+        Attachment::create([
+            'file_name' => $fileName,
+            'mime_type' => $attachment->getMimeType(),
+            'file_size' => $attachment->getSize(),
+            'path' => 'storage/' . $filePath,
+            'mail_log_id' => $mail->id,
+        ]);
     }
 
     public function folderMatching()
