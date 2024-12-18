@@ -180,7 +180,7 @@ class MailRepository implements MailRepositoryInterface
                     if (!empty($senderArray) && isset($senderArray[0]->mail)) {
                         $senderEmail = $this->decodeString($senderArray[0]->mail);
                     } else {
-                        $senderEmail = 'unknown@example.com'; 
+                        $senderEmail = 'unknown@example.com';
                     }
 
                     $spamCheck = Spam::where('mail_address', $senderEmail)->first();
@@ -353,7 +353,11 @@ class MailRepository implements MailRepositoryInterface
                 ? $this->decodeString($threadMessage->getSubject()[0])
                 : 'No Subject';
                 $senderArray = $threadMessage->getFrom();
-                $senderEmail = $senderArray[0]->mail ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
+                if (!empty($senderArray) && isset($senderArray[0]->mail)) {
+                    $senderEmail = $this->decodeString($senderArray[0]->mail);
+                } else {
+                    $senderEmail = 'unknown@example.com';
+                }
                 $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
 
                 if ($threadMessage->hasHTMLBody()) {
