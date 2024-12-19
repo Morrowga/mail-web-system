@@ -91,7 +91,6 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                // Base query for inbox, excluding deleted emails
                 $query = MailLog::where('status', '!=', 'deleted');
 
                 // Apply filters if available
@@ -172,86 +171,87 @@ class MailRepository implements MailRepositoryInterface
         Log::info('Message fetching started');
 
         $inbox = $this->client->getFolder('INBOX');
-        $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+        $messages = $inbox->messages()->all()->setFetchOrder("desc")->limit(100)->get();
         $newEmails = [];
 
         $spamEmails = Spam::pluck('mail_address')->toArray();
         $spamDomains = Spam::pluck('mail_address')->map(function ($email) {
-            return explode('@', $email)[1]; // Extract domains
+            return explode('@', $email)[1];
         })->toArray();
 
-        $existingMessageIds = MailLog::pluck('message_id')->toArray();
+        $existingMessageIds = MailLog::select('message_id')
+        ->pluck('message_id')
+        ->toArray();
 
-        foreach ($messages as $message) {
-            $uid = $message->getUid();
-            $messageId = $message->getMessageId();
+        foreach (array_chunk($messages->toArray(), 10) as $messageChunk) {
+            foreach ($messageChunk as $message) {
+                $uid = $message->getUid();
+                $messageId = $message->getMessageId();
 
-            // Skip if the message already exists in the database
-            if (in_array($messageId, $existingMessageIds)) {
-                continue;
+                if (in_array($messageId, $existingMessageIds)) {
+                    continue;
+                }
+
+                $subject = $this->decodeString($message->getSubject()[0]);
+                $senderArray = $message->getFrom();
+                $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
+                $senderEmail = !empty($senderArray) && isset($senderArray[0]->mail) ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
+
+                $isSpam = in_array($senderEmail, $spamEmails) || in_array(explode('@', $senderEmail)[1], $spamDomains);
+
+                if ($isSpam) {
+                    $message->delete(false);
+                    continue;
+                }
+
+                $flags = $message->getFlags()->toArray();
+                $status = in_array('Seen', $flags) ? 'read' : 'new';
+
+                $body = '';
+
+                if ($message->hasTextBody()) {
+                    $body = $message->getTextBody();
+                } else {
+                    $body = $message->getHTMLBody();
+                }
+
+                $dateSent = $message->getDate();
+                $deleted_date = null;
+
+                $inReplyTo = $message->getHeader()->get('in-reply-to');
+                $references = $message->getHeader()->get('references');
+                if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
+                    continue;
+                }
+
+                $newMail = MailLog::create([
+                    'uid' => $uid,
+                    'message_id' => $messageId,
+                    'subject' => $subject,
+                    'sender' => $senderEmail,
+                    'name' => $senderName,
+                    'body' => $body,
+                    'datetime' => $dateSent[0]->toDateTimeString(),
+                    'status' => $status,
+                    'deleted_at' => $deleted_date
+                ]);
+
+                $attachments = $message->getAttachments();
+                foreach ($attachments as $attachment) {
+                    $this->processAttachment($attachment, $newMail);
+                }
+
+                $newEmails[] = [
+                    'uid' => $uid,
+                    'message_id' => $messageId,
+                    'subject' => $subject,
+                    'sender' => $senderEmail,
+                    'name' => $senderName,
+                    'body' => $body,
+                    'datetime' => $dateSent[0]->toDateTimeString(),
+                    'status' => $status,
+                ];
             }
-
-            // Decode subject and sender
-            $subject = $this->decodeString($message->getSubject()[0]);
-            $senderArray = $message->getFrom();
-            $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-            $senderEmail = !empty($senderArray) && isset($senderArray[0]->mail) ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
-
-            // Check if sender email or domain is in spam list
-            $isSpam = in_array($senderEmail, $spamEmails) || in_array(explode('@', $senderEmail)[1], $spamDomains);
-
-            if ($isSpam) {
-                // Mark as deleted and skip processing
-                $message->delete(false);
-                continue;
-            }
-
-            // Determine message status based on flags
-            $flags = $message->getFlags()->toArray();
-            $status = in_array('Seen', $flags) ? 'read' : 'new';
-
-            // Get message body and datetime
-            $body = $message->getHTMLBody() ?? $message->getTextBody();
-            $dateSent = $message->getDate();
-            $deleted_date = null;
-
-            // Handle replies and references in emails
-            $inReplyTo = $message->getHeader()->get('in-reply-to');
-            $references = $message->getHeader()->get('references');
-            if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 're:') === 0) {
-                continue;
-            }
-
-            // Create a new mail record in the database
-            $newMail = MailLog::create([
-                'uid' => $uid,
-                'message_id' => $messageId,
-                'subject' => $subject,
-                'sender' => $senderEmail,
-                'name' => $senderName,
-                'body' => $body,
-                'datetime' => $dateSent[0]->toDateTimeString(),
-                'status' => $status,
-                'deleted_at' => $deleted_date
-            ]);
-
-            // Process attachments
-            $attachments = $message->getAttachments();
-            foreach ($attachments as $attachment) {
-                $this->processAttachment($attachment, $newMail);
-            }
-
-            // Prepare new email for broadcasting
-            $newEmails[] = [
-                'uid' => $uid,
-                'message_id' => $messageId,
-                'subject' => $subject,
-                'sender' => $senderEmail,
-                'name' => $senderName,
-                'body' => $body,
-                'datetime' => $dateSent[0]->toDateTimeString(),
-                'status' => $status,
-            ];
         }
 
         Log::info('Message fetching ended');
@@ -267,14 +267,11 @@ class MailRepository implements MailRepositoryInterface
 
     private function processAttachment($attachment, $mail)
     {
-        // Handle attachment storage and database insert logic
         $fileName = $attachment->getName();
         $filePath = 'mails/attachments/' . $fileName;
 
-        // Save the attachment to disk
         Storage::disk('public')->put($filePath, $attachment->content);
 
-        // Store attachment information in the database
         Attachment::create([
             'file_name' => $fileName,
             'mime_type' => $attachment->getMimeType(),
@@ -349,75 +346,88 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        $mailLog = MailLog::find($id);
+        // Eager load mail_histories and attachments in single query
+        $mailLog = MailLog::with(['mail_histories', 'attachments'])
+            ->find($id);
 
-        $inbox = $this->client->getFolder('INBOX');
-
-        $message = $inbox->query()->getMessageByUid($mailLog->uid);
-
-        $histories = [];
-
-
-        if ($message) {
-            $threadMessages = $message->thread($inbox);
-
-            foreach ($threadMessages as $threadMessage) {
-                $uid = $threadMessage->getUid();
-                $messageId = $threadMessage->getMessageId()[0];
-                $subject = isset($threadMessage->getSubject()[0])
-                ? $this->decodeString($threadMessage->getSubject()[0])
-                : 'No Subject';
-                $senderArray = $threadMessage->getFrom();
-                if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-                    $senderEmail = $this->decodeString($senderArray[0]->mail);
-                } else {
-                    $senderEmail = 'unknown@example.com';
-                }
-                $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
-
-                if ($threadMessage->hasHTMLBody()) {
-                    $body = $threadMessage->getHTMLBody();
-                } else {
-                    $body = $threadMessage->getTextBody();
-                }
-
-                $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
-                $status = in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
-
-                $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
-
-                $histories[] = [
-                    'uid' => $uid,
-                    'message_id' => $messageId,
-                    'subject' => $subject,
-                    'sender' => $senderEmail,
-                    'name' => $this->decodeString($senderName),
-                    'body' => $body,
-                    'datetime' => $dateSent->toDateTimeString(),
-                    'status' => $status,
-                    'attachments' => $findAttachement != null ? $findAttachement->attachments : []
-                ];
-            }
-
-            $systemMailHistories = $mailLog->mail_histories->toArray();
-
-            $mergedHistories = array_merge($histories, $systemMailHistories);
-
-            usort($mergedHistories, function ($a, $b) {
-                return strtotime($b['datetime']) - strtotime($a['datetime']);
-            });
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Email histories fetched successfully.',
-                'data' => $mergedHistories,
-            ]);
-        } else {
+        if (!$mailLog) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Email not found.',
             ], 404);
         }
+
+        $inbox = $this->client->getFolder('INBOX');
+        $message = $inbox->query()->getMessageByUid($mailLog->uid);
+
+        if (!$message) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email not found.',
+            ], 404);
+        }
+
+        // Cache UIDs to reduce database queries
+        $threadMessages = $message->thread($inbox);
+        $uids = collect($threadMessages)->pluck('uid')->toArray();
+
+        // Fetch all related MailLogs with attachments in single query
+        $relatedMails = MailLog::with('attachments')
+            ->whereIn('uid', $uids)
+            ->get()
+            ->keyBy('uid');
+
+        $histories = [];
+        foreach ($threadMessages as $threadMessage) {
+            $uid = $threadMessage->getUid();
+
+            // Process message data
+            $messageData = $this->processThreadMessage($threadMessage);
+
+            // Get attachments from cached relation
+            $relatedMail = $relatedMails->get($uid);
+            $messageData['attachments'] = $relatedMail ? $relatedMail->attachments : [];
+
+            $histories[] = $messageData;
+        }
+
+        // Use cached mail_histories relation
+        $mergedHistories = array_merge($histories, $mailLog->mail_histories->toArray());
+
+        // Sort histories
+        usort($mergedHistories, function ($a, $b) {
+            return strtotime($b['datetime']) - strtotime($a['datetime']);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email histories fetched successfully.',
+            'data' => $mergedHistories,
+        ]);
+    }
+
+    private function processThreadMessage($threadMessage)
+    {
+        $senderArray = $threadMessage->getFrom();
+
+        return [
+            'uid' => $threadMessage->getUid(),
+            'message_id' => $threadMessage->getMessageId()[0],
+            'subject' => isset($threadMessage->getSubject()[0])
+                ? $this->decodeString($threadMessage->getSubject()[0])
+                : 'No Subject',
+            'sender' => !empty($senderArray) && isset($senderArray[0]->mail)
+                ? $this->decodeString($senderArray[0]->mail)
+                : 'unknown@example.com',
+            'name' => $this->decodeString(
+                isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender'
+            ),
+            'body' => $threadMessage->hasHTMLBody()
+                ? $threadMessage->getHTMLBody()
+                : $threadMessage->getTextBody(),
+            'datetime' => ($threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo'))->toDateTimeString(),
+            'status' => in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread',
+        ];
     }
 
     private function decodeString($value)
