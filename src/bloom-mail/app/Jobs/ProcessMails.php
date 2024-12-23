@@ -11,7 +11,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 class ProcessMails implements ShouldQueue
 {
-    use Dispatchable, Queueable;  // Only these two traits
+    use Dispatchable, Queueable;
+
+    // public $timeout = 120;
+    // public $tries = 3;
+    // public $backoff = [30, 60, 120];
 
     public function __construct()
     {
