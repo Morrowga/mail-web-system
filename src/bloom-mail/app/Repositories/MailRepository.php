@@ -374,27 +374,7 @@ class MailRepository implements MailRepositoryInterface
             ], 404);
         }
 
-        // Define a unique cache key for the thread messages based on the mail log ID
-        $cacheKey = "mail_history_{$mailLog->id}_thread_messages";
-
-        // Check if the thread messages are already cached
-        $cachedThreadMessages = Cache::get($cacheKey);
-
-        if ($cachedThreadMessages) {
-            // If the thread messages are found in cache, use them
-            \Log::info("Cache hit for thread messages of mail log ID: {$mailLog->id}");
-
-            $threadMessages = $cachedThreadMessages;
-        } else {
-            // If the thread messages are not found in cache, fetch them from the mail server
-            \Log::info("Cache miss for thread messages of mail log ID: {$mailLog->id}");
-
-            // Fetch thread messages from the mail server
-            $threadMessages = $message->thread($inbox);
-
-            // Cache the thread messages for future use (e.g., for 1 hour)
-            Cache::put($cacheKey, $threadMessages, now()->addHour());
-        }
+        $threadMessages = $message->thread($inbox);
 
         // Process each message in the thread
         $uids = collect($threadMessages)->pluck('uid')->toArray();
@@ -408,10 +388,11 @@ class MailRepository implements MailRepositoryInterface
         $histories = [];
         foreach ($threadMessages as $threadMessage) {
             $uid = $threadMessage->getUid();
-            $messageId = $threadMessage->getMessageId(); // Get the message ID for the current thread message
+            $messageId = $threadMessage->getMessageId();
+
+            $messageCacheKey = "mail_history_{$mailLog->id}_{$messageId}";
 
             // Check if the history exists in the cache for this specific message
-            $messageCacheKey = "mail_history_{$mailLog->id}_{$messageId}";
             $cachedHistory = Cache::get($messageCacheKey);
 
             if (!$cachedHistory) {
@@ -437,13 +418,16 @@ class MailRepository implements MailRepositoryInterface
             }
         }
 
+        // Merge system-level histories (the ones stored in the database)
         $systemMailHistories = $mailLog->mail_histories->toArray();
 
+        // Merge the histories from thread messages and system mail histories
         $mergedHistories = array_merge($histories, $systemMailHistories);
+
+        // Sort the merged histories by datetime
         usort($mergedHistories, function ($a, $b) {
             return strtotime($b['datetime']) - strtotime($a['datetime']);
         });
-
 
         return response()->json([
             'status' => 'success',
@@ -451,6 +435,7 @@ class MailRepository implements MailRepositoryInterface
             'data' => $mergedHistories,
         ]);
     }
+
 
 
     private function processThreadMessage($threadMessage)
