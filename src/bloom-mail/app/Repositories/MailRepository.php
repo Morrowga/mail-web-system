@@ -66,6 +66,7 @@ class MailRepository implements MailRepositoryInterface
         $inboxCount = MailLog::where('status', 'new')
         ->doesntHave('folders')
         ->count();
+
         $trashCount = MailLog::where('status', 'deleted')->count();
 
         // Fetch folders with the count of mails with 'new' status for each folder
@@ -118,8 +119,9 @@ class MailRepository implements MailRepositoryInterface
                     $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
                 }
 
+
                 // Apply pagination
-                $data = $query->orderBy('datetime', 'desc')->paginate(10);
+                $data = $query->orderBy('datetime', 'desc')->doesntHave('folders')->paginate(10);
                 break;
         }
 
