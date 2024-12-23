@@ -64,7 +64,7 @@ class MailRepository implements MailRepositoryInterface
 
         // Pre-fetch the counts for inbox and trash to avoid redundant queries
         $inboxCount = MailLog::where('status', 'new')
-        ->doesntHave('folders') 
+        ->doesntHave('folders')
         ->count();
         $trashCount = MailLog::where('status', 'deleted')->count();
 
@@ -137,13 +137,15 @@ class MailRepository implements MailRepositoryInterface
     {
         $folderId = $folder->id;
 
-        $counts = MailLog::selectRaw('
-                sum(status = "new") as inbox,
-                sum(status = "deleted") as trash
-            ')->first();
+        $inboxCount = MailLog::where('status', 'new')
+        ->doesntHave('folders')
+        ->count();
 
-        $inbox = $counts->inbox ?? 0;
-        $trash = $counts->trash ?? 0;
+        $trashCount = MailLog::where('status', 'deleted')
+        ->count();
+
+        $inbox = $inboxCount ?? 0;
+        $trash = $trashCount ?? 0;
 
         $sent = SentMail::where('type', 'sent')->count();
 
