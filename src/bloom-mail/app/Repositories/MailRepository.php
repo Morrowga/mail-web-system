@@ -374,7 +374,38 @@ class MailRepository implements MailRepositoryInterface
             ], 404);
         }
 
-        $threadMessages = $message->thread($inbox);
+        // Define a unique cache key for the thread messages based on the mail log ID
+        $cacheKey = "mail_history_{$mailLog->id}_thread_messages";
+
+        // Check if the thread messages are already cached
+        $cachedThreadMessages = Cache::get($cacheKey);
+
+        if ($cachedThreadMessages) {
+            // If the thread messages are found in cache, use them
+            \Log::info("Cache hit for thread messages of mail log ID: {$mailLog->id}");
+            $threadMessages = $cachedThreadMessages;
+        } else {
+            // If the thread messages are not found in cache, fetch them from the mail server
+            \Log::info("Cache miss for thread messages of mail log ID: {$mailLog->id}");
+
+            // Fetch thread messages from the mail server
+            $threadMessages = $message->thread($inbox);
+
+            // Prepare simple data for caching (uid, subject, from, date, etc.)
+            $simpleThreadMessages = [];
+            foreach ($threadMessages as $threadMessage) {
+                $simpleThreadMessages[] = [
+                    'uid' => $threadMessage->getUid(),
+                    'subject' => $threadMessage->getSubject(),
+                    'from' => $threadMessage->getFrom(),
+                    'date' => $threadMessage->getDate(),
+                ];
+            }
+
+            // Cache the simplified thread messages for future use (e.g., for 1 hour)
+            Cache::put($cacheKey, $simpleThreadMessages, now()->addHour());
+            $threadMessages = $simpleThreadMessages;
+        }
 
         // Process each message in the thread
         $uids = collect($threadMessages)->pluck('uid')->toArray();
@@ -386,10 +417,11 @@ class MailRepository implements MailRepositoryInterface
             ->keyBy('uid');
 
         $histories = [];
-        foreach ($threadMessages as $threadMessage) {
-            $uid = $threadMessage->getUid();
-            $messageId = $threadMessage->getMessageId();
+        foreach ($threadMessages as $threadMessageData) {
+            $uid = $threadMessageData['uid'];
+            $messageId = $threadMessageData['uid']; // You can use UID as message ID or another unique identifier
 
+            // Define the cache key for individual message history
             $messageCacheKey = "mail_history_{$mailLog->id}_{$messageId}";
 
             // Check if the history exists in the cache for this specific message
@@ -398,6 +430,9 @@ class MailRepository implements MailRepositoryInterface
             if (!$cachedHistory) {
                 // If not in cache, fetch and store in cache
                 \Log::info("Cache miss for message ID: {$messageId}");
+
+                // Rehydrate the IMAP message object (fetch it again from the server)
+                $threadMessage = $inbox->query()->getMessageByUid($uid);
 
                 // Process message data
                 $messageData = $this->processThreadMessage($threadMessage);
@@ -435,7 +470,6 @@ class MailRepository implements MailRepositoryInterface
             'data' => $mergedHistories,
         ]);
     }
-
 
 
     private function processThreadMessage($threadMessage)
