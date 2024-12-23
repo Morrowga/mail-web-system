@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Mime\Part\TextPart;
 use App\Interfaces\MailRepositoryInterface;
@@ -352,7 +353,7 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        // Eager load mail_histories and attachments in single query
+        // Eager load mail_histories and attachments in a single query
         $mailLog = MailLog::with(['mail_histories', 'attachments'])
             ->find($id);
 
@@ -377,27 +378,41 @@ class MailRepository implements MailRepositoryInterface
         $threadMessages = $message->thread($inbox);
         $uids = collect($threadMessages)->pluck('uid')->toArray();
 
-        // Fetch all related MailLogs with attachments in single query
+        // Fetch all related MailLogs with attachments in a single query
         $relatedMails = MailLog::with('attachments')
             ->whereIn('uid', $uids)
             ->get()
             ->keyBy('uid');
 
+        // Iterate through the thread and check cache for history
         $histories = [];
         foreach ($threadMessages as $threadMessage) {
             $uid = $threadMessage->getUid();
+            $messageId = $threadMessage->getMessageId(); // Get the message ID for the current thread message
 
-            // Process message data
-            $messageData = $this->processThreadMessage($threadMessage);
+            // Check if the history exists in the cache
+            $cacheKey = "mail_history_{$mailLog->id}_{$messageId}"; // Unique cache key based on mail_log_id and message_id
+            $cachedHistory = Cache::get($cacheKey);
 
-            // Get attachments from cached relation
-            $relatedMail = $relatedMails->get($uid);
-            $messageData['attachments'] = $relatedMail ? $relatedMail->attachments : [];
+            if (!$cachedHistory) {
+                // If not in cache, process the message and fetch data from the mail server
+                $messageData = $this->processThreadMessage($threadMessage);
 
-            $histories[] = $messageData;
+                // Get attachments from cached relation
+                $relatedMail = $relatedMails->get($uid);
+                $messageData['attachments'] = $relatedMail ? $relatedMail->attachments : [];
+
+                // Store the message data in the cache (for 1 hour or set an expiration time based on your requirements)
+                Cache::put($cacheKey, $messageData, now()->addHour());
+
+                $histories[] = $messageData;
+            } else {
+                // If history exists in cache, use it
+                $histories[] = $cachedHistory;
+            }
         }
 
-        // Use cached mail_histories relation
+        // Use cached mail_histories relation (from the database)
         $mergedHistories = array_merge($histories, $mailLog->mail_histories->toArray());
 
         // Sort histories
@@ -411,6 +426,7 @@ class MailRepository implements MailRepositoryInterface
             'data' => $mergedHistories,
         ]);
     }
+
 
     private function processThreadMessage($threadMessage)
     {
