@@ -83,13 +83,13 @@ class MailRepository implements MailRepositoryInterface
                 $data = SentMail::with('template')
                     ->orderBy('datetime', 'desc')
                     ->where('type', 'sent')
-                    ->paginate(10);
+                    ->paginate(100);
                 break;
 
             case 'trash':
                 $data = MailLog::where('status', 'deleted')
                     ->orderBy('datetime', 'desc')
-                    ->paginate(10);
+                    ->paginate(100);
                 break;
 
             case 'inbox':
@@ -121,7 +121,7 @@ class MailRepository implements MailRepositoryInterface
 
 
                 // Apply pagination
-                $data = $query->orderBy('datetime', 'desc')->doesntHave('folders')->paginate(10);
+                $data = $query->orderBy('datetime', 'desc')->doesntHave('folders')->paginate(100);
                 break;
         }
 
@@ -160,7 +160,7 @@ class MailRepository implements MailRepositoryInterface
                 $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
             })
             ->orderBy('datetime', 'desc')
-            ->paginate(10);
+            ->paginate(100);
 
         return [
             "data" => $data,
