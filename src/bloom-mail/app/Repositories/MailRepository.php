@@ -374,51 +374,76 @@ class MailRepository implements MailRepositoryInterface
             ], 404);
         }
 
-        // Cache UIDs to reduce database queries
-        $threadMessages = $message->thread($inbox);
+        // Define a unique cache key for the thread messages based on the mail log ID
+        $cacheKey = "mail_history_{$mailLog->id}_thread_messages";
+
+        // Check if the thread messages are already cached
+        $cachedThreadMessages = Cache::get($cacheKey);
+
+        if ($cachedThreadMessages) {
+            // If the thread messages are found in cache, use them
+            \Log::info("Cache hit for thread messages of mail log ID: {$mailLog->id}");
+
+            $threadMessages = $cachedThreadMessages;
+        } else {
+            // If the thread messages are not found in cache, fetch them from the mail server
+            \Log::info("Cache miss for thread messages of mail log ID: {$mailLog->id}");
+
+            // Fetch thread messages from the mail server
+            $threadMessages = $message->thread($inbox);
+
+            // Cache the thread messages for future use (e.g., for 1 hour)
+            Cache::put($cacheKey, $threadMessages, now()->addHour());
+        }
+
+        // Process each message in the thread
         $uids = collect($threadMessages)->pluck('uid')->toArray();
 
-        // Fetch all related MailLogs with attachments in a single query
+        // Fetch related mail logs (attachments, histories) from the database or mail server
         $relatedMails = MailLog::with('attachments')
             ->whereIn('uid', $uids)
             ->get()
             ->keyBy('uid');
 
-        // Iterate through the thread and check cache for history
         $histories = [];
         foreach ($threadMessages as $threadMessage) {
             $uid = $threadMessage->getUid();
             $messageId = $threadMessage->getMessageId(); // Get the message ID for the current thread message
 
-            // Check if the history exists in the cache
-            $cacheKey = "mail_history_{$mailLog->id}_{$messageId}"; // Unique cache key based on mail_log_id and message_id
-            $cachedHistory = Cache::get($cacheKey);
+            // Check if the history exists in the cache for this specific message
+            $messageCacheKey = "mail_history_{$mailLog->id}_{$messageId}";
+            $cachedHistory = Cache::get($messageCacheKey);
 
             if (!$cachedHistory) {
-                // If not in cache, process the message and fetch data from the mail server
+                // If not in cache, fetch and store in cache
+                \Log::info("Cache miss for message ID: {$messageId}");
+
+                // Process message data
                 $messageData = $this->processThreadMessage($threadMessage);
 
-                // Get attachments from cached relation
+                // Get attachments from cached relation (or mail server if not cached)
                 $relatedMail = $relatedMails->get($uid);
                 $messageData['attachments'] = $relatedMail ? $relatedMail->attachments : [];
 
-                // Store the message data in the cache (for 1 hour or set an expiration time based on your requirements)
-                Cache::put($cacheKey, $messageData, now()->addHour());
+                // Store the message data in the cache for future use
+                Cache::put($messageCacheKey, $messageData, now()->addHour());
 
                 $histories[] = $messageData;
             } else {
                 // If history exists in cache, use it
+                \Log::info("Cache hit for message ID: {$messageId}");
+
                 $histories[] = $cachedHistory;
             }
         }
 
-        // Use cached mail_histories relation (from the database)
-        $mergedHistories = array_merge($histories, $mailLog->mail_histories->toArray());
+        $systemMailHistories = $mailLog->mail_histories->toArray();
 
-        // Sort histories
+        $mergedHistories = array_merge($histories, $systemMailHistories);
         usort($mergedHistories, function ($a, $b) {
             return strtotime($b['datetime']) - strtotime($a['datetime']);
         });
+
 
         return response()->json([
             'status' => 'success',
