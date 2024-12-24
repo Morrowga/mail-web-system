@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import MailThread from './MailThread.vue';
 import ReplyForwardDialog from './ReplyForwardDialog.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
@@ -13,6 +13,7 @@ const props = defineProps({
     mail: Object,
     threads: Array,
     threadLoading: Boolean,
+    updateThreadLoading: Boolean,
     pageType: String
 });
 
@@ -79,6 +80,10 @@ const handleRemoveClick = () => {
 
 const loadThread = (id) => {
     emit('getThreads', id)
+}
+
+const updateThread = (id) => {
+    emit('updateThreads', id)
 }
 
 const openConfirmDialog = (type) => {
@@ -233,6 +238,19 @@ const handleStatusChange = () => {
             <div v-if="props?.pageType == 'inbox' || props?.pageType == 'trash'">
                 <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
             </div>
+            <div v-if="props?.updateThreadLoading">
+                <v-skeleton-loader
+                :loading="true"
+                type="list-item-two-line"
+                >
+                <v-list-item
+                    lines="two"
+                    subtitle="Subtitle"
+                    title="Title"
+                    rounded
+                ></v-list-item>
+                </v-skeleton-loader>
+            </div>
             <ReplyForwardDialog
                 :createDialog="createDialogVisible"
                 @update:dialog="createDialogVisible = $event"
@@ -240,7 +258,7 @@ const handleStatusChange = () => {
                 @update:mailTypeEevent="mailType = $event"
                 :mailData="props?.mail"
                 @cancelStatus="cancelStatus"
-                @handleLoadThread="loadThread(props?.mail?.id)"
+                @handleLoadThread="updateThread(props?.mail?.id)"
                 :threads="props?.threads"
                 :from="props?.from"
             />

@@ -355,124 +355,76 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        // Eager load mail_histories and attachments in a single query
-        $mailLog = MailLog::with(['mail_histories', 'attachments'])
-            ->find($id);
-
-        if (!$mailLog) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email not found.',
-            ], 404);
-        }
+        $mailLog = MailLog::find($id);
 
         $inbox = $this->client->getFolder('INBOX');
+
         $message = $inbox->query()->getMessageByUid($mailLog->uid);
 
-        if (!$message) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email not found.',
-            ], 404);
-        }
+        $histories = [];
 
-        // Define a unique cache key for the thread messages based on the mail log ID
-        $cacheKey = "mail_history_{$mailLog->id}_thread_messages";
 
-        // Check if the thread messages are already cached
-        $cachedThreadMessages = Cache::get($cacheKey);
-
-        if ($cachedThreadMessages) {
-            // If the thread messages are found in cache, use them
-            \Log::info("Cache hit for thread messages of mail log ID: {$mailLog->id}");
-            $threadMessages = $cachedThreadMessages;
-        } else {
-            // If the thread messages are not found in cache, fetch them from the mail server
-            \Log::info("Cache miss for thread messages of mail log ID: {$mailLog->id}");
-
-            // Fetch thread messages from the mail server
+        if ($message) {
             $threadMessages = $message->thread($inbox);
 
-            // Prepare simple data for caching (uid, subject, from, date, etc.)
-            $simpleThreadMessages = [];
             foreach ($threadMessages as $threadMessage) {
-                $simpleThreadMessages[] = [
-                    'uid' => $threadMessage->getUid(),
-                    'subject' => $threadMessage->getSubject(),
-                    'from' => $threadMessage->getFrom(),
-                    'date' => $threadMessage->getDate(),
+                $uid = $threadMessage->getUid();
+                $messageId = $threadMessage->getMessageId()[0];
+                $subject = isset($threadMessage->getSubject()[0])
+                ? $this->decodeString($threadMessage->getSubject()[0])
+                : 'No Subject';
+                $senderArray = $threadMessage->getFrom();
+                if (!empty($senderArray) && isset($senderArray[0]->mail)) {
+                    $senderEmail = $this->decodeString($senderArray[0]->mail);
+                } else {
+                    $senderEmail = 'unknown@example.com';
+                }
+                $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
+
+                if ($threadMessage->hasHTMLBody()) {
+                    $body = $threadMessage->getHTMLBody();
+                } else {
+                    $body = $threadMessage->getTextBody();
+                }
+
+                $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
+                $status = in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
+
+                $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
+
+                $histories[] = [
+                    'uid' => $uid,
+                    'message_id' => $messageId,
+                    'subject' => $subject,
+                    'sender' => $senderEmail,
+                    'name' => $this->decodeString($senderName),
+                    'body' => $body,
+                    'datetime' => $dateSent->toDateTimeString(),
+                    'status' => $status,
+                    'attachments' => $findAttachement != null ? $findAttachement->attachments : []
                 ];
             }
 
-            // Cache the simplified thread messages for future use (e.g., for 1 hour)
-            Cache::put($cacheKey, $simpleThreadMessages, now()->addHour());
-            $threadMessages = $simpleThreadMessages;
+            $systemMailHistories = $mailLog->mail_histories->toArray();
+
+            $mergedHistories = array_merge($histories, $systemMailHistories);
+
+            usort($mergedHistories, function ($a, $b) {
+                return strtotime($b['datetime']) - strtotime($a['datetime']);
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Email histories fetched successfully.',
+                'data' => $mergedHistories,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email not found.',
+            ], 404);
         }
-
-        // Process each message in the thread
-        $uids = collect($threadMessages)->pluck('uid')->toArray();
-
-        // Fetch related mail logs (attachments, histories) from the database or mail server
-        $relatedMails = MailLog::with('attachments')
-            ->whereIn('uid', $uids)
-            ->get()
-            ->keyBy('uid');
-
-        $histories = [];
-        foreach ($threadMessages as $threadMessageData) {
-            $uid = $threadMessageData['uid'];
-            $messageId = $threadMessageData['uid']; // You can use UID as message ID or another unique identifier
-
-            // Define the cache key for individual message history
-            $messageCacheKey = "mail_history_{$mailLog->id}_{$messageId}";
-
-            // Check if the history exists in the cache for this specific message
-            $cachedHistory = Cache::get($messageCacheKey);
-
-            if (!$cachedHistory) {
-                // If not in cache, fetch and store in cache
-                \Log::info("Cache miss for message ID: {$messageId}");
-
-                // Rehydrate the IMAP message object (fetch it again from the server)
-                $threadMessage = $inbox->query()->getMessageByUid($uid);
-
-                // Process message data
-                $messageData = $this->processThreadMessage($threadMessage);
-
-                // Get attachments from cached relation (or mail server if not cached)
-                $relatedMail = $relatedMails->get($uid);
-                $messageData['attachments'] = $relatedMail ? $relatedMail->attachments : [];
-
-                // Store the message data in the cache for future use
-                Cache::put($messageCacheKey, $messageData, now()->addHour());
-
-                $histories[] = $messageData;
-            } else {
-                // If history exists in cache, use it
-                \Log::info("Cache hit for message ID: {$messageId}");
-
-                $histories[] = $cachedHistory;
-            }
-        }
-
-        // Merge system-level histories (the ones stored in the database)
-        $systemMailHistories = $mailLog->mail_histories->toArray();
-
-        // Merge the histories from thread messages and system mail histories
-        $mergedHistories = array_merge($histories, $systemMailHistories);
-
-        // Sort the merged histories by datetime
-        usort($mergedHistories, function ($a, $b) {
-            return strtotime($b['datetime']) - strtotime($a['datetime']);
-        });
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email histories fetched successfully.',
-            'data' => $mergedHistories,
-        ]);
     }
-
 
     private function processThreadMessage($threadMessage)
     {

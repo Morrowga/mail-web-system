@@ -87,6 +87,8 @@ const selectedMail = ref(null);
 const selectedHistories = ref({})
 const selectedFolder = ref(null);
 const threadLoading = ref(false);
+const updateThreadLoading = ref(false);
+const currentTime = new Date().getTime();
 
 const page = ref(1);
 
@@ -187,25 +189,75 @@ const markAsRead = async (id) => {
 };
 
 const getHistories = async (id) => {
+  // Key to store in localStorage
+  const storageKey = `histories_${id}`;
 
-  if(pageType.value == 'inbox' || pageType.value == 'trash')
-  {
-    selectedHistories.value = {}
-    threadLoading.value = true;
+  // Check if data exists in localStorage and hasn't expired (1 hour expiration)
+  const storedData = JSON.parse(localStorage.getItem(storageKey));
 
-        try {
-            const response = await axios.get(`/mails/histories/${id}`);
-            if (response.data.status === 'success') {
-                selectedHistories.value = response.data.data;
-            }
-        } catch (error) {
-            console.error('Failed to get histories:', error);
-        } finally {
-            threadLoading.value = false;
+  // If data exists and it's not expired, use it from localStorage
+  if (storedData && (currentTime - storedData.timestamp) < 3600000) {  // 3600000ms = 1 hour
+    selectedHistories.value = storedData.data;
+
+    updateHistories(id);
+  } else {
+    // If no data in localStorage or data is expired, fetch from backend
+    if (pageType.value === 'inbox' || pageType.value === 'trash') {
+      selectedHistories.value = {};
+      threadLoading.value = true;
+
+      try {
+        const response = await axios.get(`/mails/histories/${id}`);
+
+        if (response.data.status === 'success') {
+          selectedHistories.value = response.data.data;
+
+          // Store the response in localStorage with a timestamp
+          const dataToStore = {
+            data: response.data.data,
+            timestamp: currentTime,  // Store the current timestamp
+          };
+          localStorage.setItem(storageKey, JSON.stringify(dataToStore));
+
+          console.log('Stored histories in localStorage');
         }
+      } catch (error) {
+        console.error('Failed to get histories:', error);
+      } finally {
+        threadLoading.value = false;
+      }
+    }
   }
 };
 
+const updateHistories = async (id) => {
+    const storageKey = `histories_${id}`;
+
+    if (pageType.value === 'inbox' || pageType.value === 'trash') {
+      updateThreadLoading.value = true;
+
+      try {
+        const response = await axios.get(`/mails/histories/${id}`);
+
+        if (response.data.status === 'success') {
+          selectedHistories.value = response.data.data;
+
+          // Store the response in localStorage with a timestamp
+          const dataToStore = {
+            data: response.data.data,
+            timestamp: currentTime,  // Store the current timestamp
+          };
+          localStorage.setItem(storageKey, JSON.stringify(dataToStore));
+
+          console.log('Stored histories in localStorage');
+        }
+      } catch (error) {
+        console.error('Failed to get histories:', error);
+      } finally {
+        updateThreadLoading.value = false;
+      }
+    }
+};
 
 const cancelMailStatus = (id) => {
   if(selectedMail.value.status != 'resolved' || selectedMail.value.status == 'confirmed')
@@ -405,9 +457,11 @@ onUnmounted(() => {
                                 <VCard class="mt-5" style="border-radius: 20px;">
                                     <MailDetail
                                         @getThreads="getHistories"
+                                        @updateThreads="updateHistories"
                                         :pageType="pageType"
                                         :threads="selectedHistories"
                                         :threadLoading="threadLoading"
+                                        :updateThreadLoading="updateThreadLoading"
                                         :mail="selectedMail"
                                         @handleRemoveRow="removeRow"
                                         @fetchagain="fetchEmails"
