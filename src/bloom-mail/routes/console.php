@@ -19,15 +19,15 @@ Artisan::command('mail-fetching', function () {
 })->purpose('Running Realtime')->everyMinute();
 
 
-Artisan::command('folder-matching', function () {
-    Log::info('Folder Matching Started');
+// Artisan::command('folder-matching', function () {
+//     Log::info('Folder Matching Started');
 
-    $mailRepository = app(MailRepository::class);
-    $mailRepository->folderMatching();
+//     $mailRepository = app(MailRepository::class);
+//     $mailRepository->folderMatching();
 
-    Log::info('Folder Matching ended');
+//     Log::info('Folder Matching ended');
 
-})->purpose('Running Folder Matching')->everyFourMinutes();
+// })->purpose('Running Folder Matching')->everyFourMinutes();
 
 Artisan::command('trash-deletion', function () {
     $mailRepository = app(MailRepository::class);
