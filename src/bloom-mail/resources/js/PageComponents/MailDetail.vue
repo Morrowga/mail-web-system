@@ -178,7 +178,7 @@ const handleStatusChange = () => {
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper">
-                    <VIcon icon="mdi-sync" class="icon-size" @click="loadThread(props?.mail?.id)" />
+                    <VIcon icon="mdi-sync" class="icon-size" @click="updateThread(props?.mail?.id)" />
                     <div class="underline"></div>
                 </div>
                 <div class="icon-wrapper" v-if="permissionGrant(permissions, 'mail_forward')">
