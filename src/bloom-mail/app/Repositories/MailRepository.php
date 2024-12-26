@@ -460,7 +460,6 @@ class MailRepository implements MailRepositoryInterface
 
             return $value;
         } catch (\Exception $e) {
-            logger()->error("Error decoding {$attribute}: " . $e->getMessage());
             return $value;
         }
     }
