@@ -174,18 +174,12 @@ const fetchEmailsWithFolderId = async () => {
 
 
 const markAsRead = async (id) => {
-    try {
-        const response = await axios.post(`/mails/mark-as-read/${id}`);
-        // if (response.data.status === 'success') {
-        //     const mailItem = mails.value.find(mail => mail.id === id);
-        //     console.log(mailItem);
-        //     if (mailItem) {
-        //         mailItem.status = 'read'; // Update status locally
-        //     }
-        // }
-    } catch (error) {
-        console.error('Failed to mark as read:', error);
-    }
+    return;
+    // try {
+    //     const response = await axios.post(`/mails/mark-as-read/${id}`);
+    // } catch (error) {
+    //     console.error('Failed to mark as read:', error);
+    // }
 };
 
 const getHistories = async (id) => {
@@ -384,7 +378,7 @@ onUnmounted(() => {
                 >
                     <div class="py-6 text-gray-900" style="height: 100%;">
                         <VRow>
-                            <VCol cols="12" lg="2">
+                            <VCol cols="12" lg="2"  class="sticky-left">
                                <!-- Inbox -->
                                 <div class="mb-5 cursor-pointer" @click="setPageType('inbox', null)">
                                     <p :class="{ 'active-route': pageType === 'inbox' }">
@@ -421,7 +415,7 @@ onUnmounted(() => {
                                     <p :class="{ 'active-route': pageType === 'trash' }">{{$t('nav.trash') }} ( {{ countData?.trash ?? 0 }} )</p>
                                 </div>
                             </VCol>
-                            <VCol cols="12" :lg="selectedMail ? 5 : 10"
+                            <VCol cols="12" class="scrollable-column" :lg="selectedMail ? 5 : 10"
                             >
                                 <div class="mb-3" v-if="permissionGrant(permissions, 'mail_create')">
                                 <MailCreationDialog
@@ -453,6 +447,7 @@ onUnmounted(() => {
                                 v-if="selectedMail"
                                 cols="12"
                                 lg="5"
+                                class="sticky-right"
                             >
                                 <VCard class="mt-5" style="border-radius: 20px;">
                                     <MailDetail
@@ -506,5 +501,24 @@ onUnmounted(() => {
 {
     font-weight: bold;
     color: #4891dc;
+}
+
+.sticky-left {
+    position: sticky;
+    top: 0; /* Fix it at the top of the container */
+    z-index: 10; /* Ensure it stays above other content */
+}
+
+/* Make the third column (Mail Detail) sticky */
+.sticky-right {
+    position: sticky;
+    top: 0; /* Fix it at the top of the container */
+    z-index: 10; /* Ensure it stays above other content */
+}
+
+/* Allow second column to scroll */
+.scrollable-column {
+    overflow-y: auto;
+    max-height: calc(100vh - 20px); /* Make sure to adjust to your specific height requirements */
 }
 </style>
