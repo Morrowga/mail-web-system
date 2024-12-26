@@ -329,7 +329,10 @@ onMounted(() => {
         mail.status = new_status;
         if(selectedMail.value != null)
         {
-            selectedMail.value.status = new_status
+            if(selectedMail.value.id == mail_id)
+            {
+                selectedMail.value.status = new_status 
+            }
         }
 
         if(mail.status == 'resolved')
