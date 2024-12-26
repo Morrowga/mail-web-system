@@ -121,7 +121,7 @@ const removeRow = (row) => {
 };
 
 const fetchEmails = async () => {
-  removeRow()
+//   removeRow()
 
   loading.value = true;
 
@@ -148,7 +148,7 @@ const fetchEmails = async () => {
 };
 
 const fetchEmailsWithFolderId = async () => {
-  removeRow()
+//   removeRow()
 
   loading.value = true;
 
