@@ -292,7 +292,13 @@ class MailRepository implements MailRepositoryInterface
 
     public function convertToJapanTimezone($dateSent)
     {
-        return $dateSent;
+        $carbonDate = Carbon::parse($dateSent, 'UTC');
+
+        $carbonDate->setTimezone('Asia/Tokyo');
+
+        $formattedDate = $carbonDate->toDateTimeString();
+        
+        return $formattedDate;
     }
 
     public function folderMatching()
