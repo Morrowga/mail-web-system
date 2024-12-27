@@ -331,7 +331,7 @@ onMounted(() => {
         {
             if(selectedMail.value.id == mail_id)
             {
-                selectedMail.value.status = new_status 
+                selectedMail.value.status = new_status
             }
         }
 
@@ -436,7 +436,7 @@ onUnmounted(() => {
 
                                 <div>
                                 <VCard style="border-radius: 20px;">
-                                    <MailTable :headers="headers[pageType]" :pageType="pageType" :loading="loading" :data="mails" @rowSelected="handleRowSelected" />
+                                    <MailTable :headers="headers[pageType]" :mail="selectedMail" :pageType="pageType" :loading="loading" :data="mails" @rowSelected="handleRowSelected" />
                                     <Pagination
                                         :totalPages="totalPages"
                                         :currentPage="page"

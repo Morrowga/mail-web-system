@@ -8,6 +8,10 @@ const props = defineProps({
     type: Array,
     required: true
   },
+  mail: {
+    type: Array,
+    required: true
+  },
   headers: {
     type: Array,
     required: true
@@ -37,6 +41,14 @@ const statusCheck = (status) => {
 
     return true;
 }
+
+const emailClass = (email) => {
+  return {
+    'bg-e1f5fe': props.mail?.id === email.id, // Apply bg-e1f5fe if the condition is true
+    'bg-white': props.mail?.id !== email.id, // Apply bg-white if the condition is false
+  };
+};
+
 </script>
 
 <template>
@@ -57,7 +69,7 @@ const statusCheck = (status) => {
       </tr>
 
       <tr v-else v-for="(email, index) in data" :key="index" @click="handleRowClick(email)" class="cursor-pointer">
-        <td v-for="header in headers" :key="header.value" :style="{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }">
+        <td v-for="header in headers" :key="header.value" :class="emailClass(email)" :style="{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }">
           <template v-if="header.value === 'status' && pageType === 'inbox'">
             <div class="d-flex justify-start">
                 <VChip :style="'background:' + getStatusColor(email[header.value]) + '; color: #fff;'">
@@ -92,10 +104,6 @@ const statusCheck = (status) => {
   padding: 10px;
   border: none;
   position: relative;
-}
-
-.header-cell {
-  /* Add custom styles if needed */
 }
 
 .header-cell:not(:last-child)::after {
@@ -134,5 +142,12 @@ const statusCheck = (status) => {
   justify-content: center;
   align-items: center;
   z-index: 999; /* Ensures the overlay stays above the table content */
+}
+
+.bg-e1f5fe {
+  background-color: #E1F5FE;
+}
+.bg-white {
+  background-color: white;
 }
 </style>

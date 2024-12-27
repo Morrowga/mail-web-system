@@ -238,7 +238,7 @@ class MailRepository implements MailRepositoryInterface
                     'sender' => $senderEmail,
                     'name' => $senderName,
                     'body' => $body,
-                    'datetime' => $dateSent[0]->toDateTimeString(),
+                    'datetime' => $this->convertToJapanTimezone($dateSent[0]->toDateTimeString()),
                     'status' => $status,
                     'deleted_at' => $deleted_date
                 ]);
@@ -255,7 +255,7 @@ class MailRepository implements MailRepositoryInterface
                     'sender' => $senderEmail,
                     'name' => $senderName,
                     'body' => $body,
-                    'datetime' => $dateSent[0]->toDateTimeString(),
+                    'datetime' => $this->convertToJapanTimezone($dateSent[0]->toDateTimeString()),
                     'status' => $status,
                 ];
             }
@@ -288,6 +288,20 @@ class MailRepository implements MailRepositoryInterface
             'path' => 'storage/' . $filePath,
             'mail_log_id' => $mail->id,
         ]);
+    }
+
+    public function convertToJapanTimezone($dateSent)
+    {
+        // Step 1: Parse the input datetime in Burmese Time (MMT), which is UTC +6:30
+        $carbonDate = Carbon::parse($dateSent, 'Asia/Yangon'); // Asia/Yangon corresponds to MMT (UTC +6:30)
+
+        // Step 2: Convert to JST (Asia/Tokyo) time zone (UTC +9)
+        $carbonDate->setTimezone('Asia/Tokyo'); // Asia/Tokyo corresponds to JST (UTC +9)
+
+        // Step 3: Format and return the datetime as string in JST
+        $formattedDate = $carbonDate->toDateTimeString();
+    
+        return $formattedDate;
     }
 
     public function folderMatching()
