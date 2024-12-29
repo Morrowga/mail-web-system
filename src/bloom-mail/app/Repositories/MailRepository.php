@@ -72,7 +72,7 @@ class MailRepository implements MailRepositoryInterface
 
         // Fetch folders with the count of mails with 'new' status for each folder
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            // $query->where('status', 'new');
         }])->get();
 
         // Fetch sent mail count
@@ -153,7 +153,7 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            // $query->where('status', 'new');
         }])->get();
 
         $data = MailLog::where('status', '!=', 'deleted')
