@@ -72,7 +72,7 @@ class MailRepository implements MailRepositoryInterface
 
         // Fetch folders with the count of mails with 'new' status for each folder
         $folders = Folder::withCount(['mails' => function ($query) {
-            // $query->where('status', 'new');
+            $query->where('status', 'new');
         }])->get();
 
         // Fetch sent mail count
@@ -153,7 +153,7 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            // $query->where('status', 'new');
+            $query->where('status', 'new');
         }])->get();
 
         $data = MailLog::where('status', '!=', 'deleted')
@@ -212,7 +212,8 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 $flags = $message->getFlags()->toArray();
-                $status = in_array('Seen', $flags) ? 'read' : 'new';
+                // $status = in_array('Seen', $flags) ? 'read' : 'new';
+                $status = 'new';
 
                 $body = '';
 
@@ -238,10 +239,11 @@ class MailRepository implements MailRepositoryInterface
                     'sender' => $senderEmail,
                     'name' => $senderName,
                     'body' => $body,
-                    'datetime' => $this->convertToJapanTimezone($dateSent[0]->toDateTimeString()),
+                    'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
                     'deleted_at' => $deleted_date
                 ]);
+
 
                 $attachments = $message->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -255,7 +257,7 @@ class MailRepository implements MailRepositoryInterface
                     'sender' => $senderEmail,
                     'name' => $senderName,
                     'body' => $body,
-                    'datetime' => $this->convertToJapanTimezone($dateSent[0]->toDateTimeString()),
+                    'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
                 ];
             }
@@ -290,52 +292,50 @@ class MailRepository implements MailRepositoryInterface
         ]);
     }
 
-    public function convertToJapanTimezone($dateSent)
+    public function convertToJapanTimezone($date)
     {
-        $carbonDate = Carbon::parse($dateSent, 'Asia/Tokyo'); // Force parsing as Japan Time
+        $dateInJapan = $date->setTimezone('Asia/Tokyo');
 
-        $carbonDate->setTimezone('Asia/Tokyo'); // This ensures that the datetime is in JST (Japan Standard Time)
-
-        return $carbonDate->toDateTimeString();
+        return $dateInJapan->toDateTimeString();
     }
 
     public function folderMatching()
     {
-        $folders = Folder::all();
+        Folder::chunk(100, function ($folders) {
+            foreach ($folders as $folder) {
+                $searchCharacter = $folder->search_character;
+                $method = strtolower($folder->method);
 
-        foreach ($folders as $folder) {
-            $searchCharacter = $folder->search_character;
-            $method = strtolower($folder->method);
+                MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method) {
+                    foreach ($allMails as $mail) {
+                        $subject = $mail->subject;
+                        $isMatch = false;
 
-            $allMails = MailLog::all();
+                        if ($method === 'exact_match' && $subject === $searchCharacter) {
+                            $isMatch = true;
+                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                            $isMatch = true;
+                        }
 
-            foreach ($allMails as $mail) {
-                $subject = $mail->subject;
-                $isMatch = false;
-
-                if ($method === 'exact_match' && $subject === $searchCharacter) {
-                    $isMatch = true;
-                } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-                    $isMatch = true;
-                } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-                    $isMatch = true;
-                } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-                    $isMatch = true;
-                }
-
-                if ($isMatch) {
-                    DB::table('folder_mails')->updateOrInsert(
-                        ['mail_log_id' => $mail->id],
-                        ['folder_id' => $folder->id]
-                    );
-                } else {
-                    DB::table('folder_mails')
-                        ->where('mail_log_id', $mail->id)
-                        ->where('folder_id', $folder->id)
-                        ->delete();
-                }
+                        if ($isMatch) {
+                            DB::table('folder_mails')->updateOrInsert(
+                                ['mail_log_id' => $mail->id, 'folder_id' => $folder->id],
+                                []
+                            );
+                        } else {
+                            DB::table('folder_mails')
+                                ->where('mail_log_id', $mail->id)
+                                ->where('folder_id', $folder->id)
+                                ->delete();
+                        }
+                    }
+                });
             }
-        }
+        });
     }
 
     public function markAsRead($id)
