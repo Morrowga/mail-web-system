@@ -50,6 +50,24 @@ const headers = ref({
             value: "datetime"
         }
     ],
+    inbox_folder: [
+        {
+            name: t('table.status'),
+            value: "status"
+        },
+        {
+            name: t('table.sender'),
+            value: "sender"
+        },
+        {
+            name: t('table.subject'),
+            value: "subject"
+        },
+        {
+            name: t('table.datetime'),
+            value: "datetime"
+        }
+    ],
     sent: [
         {
             name: t('table.sender'),
@@ -98,7 +116,12 @@ const isVisibleFloatButton = ref(false);
 
 const handlePageChange = (newPage) => {
   page.value = newPage;
-  fetchEmails(newPage, searchForm.value);
+  if(pageType.value == 'inbox')
+  {
+    fetchEmails(newPage, searchForm.value);
+} else {
+    fetchEmailsWithFolderId()
+  }
 };
 
 const handleRowSelected = (row) => {
@@ -285,7 +308,7 @@ const setPageType = (type, folder_id = null) => {
   page.value = 1
 
   console.log(selectedFolder.value)
-  if(folder_id != null)
+  if(type == 'inbox_folder')
   {
     fetchEmailsWithFolderId()
   } else {
@@ -391,8 +414,8 @@ onUnmounted(() => {
 
                                 <div v-for="folder in folders" :key="folder.id" class="ml-4">
                                     <!-- Top-level folder -->
-                                    <div class="cursor-pointer" @click="setPageType('inbox', folder.id)">
-                                        <p :class="{ 'active-route': pageType === 'inbox' && folder.id === selectedFolder }">├{{ folder.name }} ({{ folder.mails_count ?? 0 }})</p>
+                                    <div class="cursor-pointer" @click="setPageType('inbox_folder', folder.id)">
+                                        <p :class="{ 'active-route': pageType === 'inbox_folder' && folder.id === selectedFolder }">├{{ folder.name }} ({{ folder.mails_count ?? 0 }})</p>
                                     </div>
                                 </div>
 
