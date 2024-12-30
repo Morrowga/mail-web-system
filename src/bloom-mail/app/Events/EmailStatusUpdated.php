@@ -41,7 +41,10 @@ class EmailStatusUpdated implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        $countData = MailLog::where('status', 'new')->count();
+        $countData =  MailLog::where('status', 'new')
+        ->doesntHave('folders')
+        ->count();
+
         $folders = Folder::withCount(['mails' => function ($query) {
             $query->where('status', 'new');
         }])->get();
