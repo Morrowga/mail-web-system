@@ -330,13 +330,13 @@ onMounted(() => {
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
         let result = event.mails;
-        if (result?.new == 1 && page.value == 1 && (pageType.value == 'inbox' || pageType.value == 'inbox_folder')) {
-            fetchEmails();
-        } else {
-            if (selectedFolder.value == null) {
-                fetchEmails();
+        if(result?.new == 1 && page.value == 1 && (pageType.value == 'inbox'  || pageType.value == 'inbox_folder' ))
+        {
+            if(selectedFolder.value == null)
+            {
+                fetchEmails()
             } else {
-                fetchEmailsWithFolderId();
+                fetchEmailsWithFolderId()
             }
         }
     })
