@@ -99,12 +99,12 @@ const handleDelete = async () => {
     try {
         let url;
 
-        if(props?.pageType == 'inbox') {
-           url = `/mails/delete/${props?.mail?.id}`
-        } else if(props?.pageType == 'trash') {
-            url = `/mails/delete-forever/${props?.mail?.id}`
+        if (props?.pageType == 'inbox' || props?.pageType == 'inbox_folder') {
+            url = `/mails/delete/${props?.mail?.id}`;
+        } else if (props?.pageType == 'trash') {
+            url = `/mails/delete-forever/${props?.mail?.id}`;
         } else {
-            url = `/mails/sent/delete/${props?.mail?.id}`
+            url = `/mails/sent/delete/${props?.mail?.id}`;
         }
 
         form.delete(url, {
@@ -171,7 +171,7 @@ const handleStatusChange = () => {
                 <VIcon icon="mdi-trash-can-outline" v-if="permissionGrant(permissions, 'mail_delete')" @click="openConfirmDialog('delete')" />
                 <VIcon icon="mdi-redo" class="ml-2" v-if="props?.pageType == 'trash'"@click="openConfirmDialog('redo')" />
             </VCol>
-            <VCol cols="12" lg="6" v-if="props?.pageType == 'inbox'">
+            <VCol cols="12" lg="6" v-if="props?.pageType == 'inbox' || props?.pageType == 'inbox_folder'">
                 <div class="icon-container">
                 <div class="icon-wrapper" v-if="permissionGrant(permissions, 'mail_reply')">
                     <VIcon icon="mdi-arrow-left-top" @click="openDialog('reply')" class="icon-size cursor-pointer" />
@@ -207,7 +207,7 @@ const handleStatusChange = () => {
                             {{ $t('input.person_in_charge_text') }}: {{ props?.mail?.person_in_charge ?? '' }}
                         </p>
                     </div>
-                    <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status != 'confirmed'">
+                    <div class="mb-2" v-if="(props?.pageType == 'inbox' || props?.pageType == 'inbox_folder') && props?.mail?.status != 'confirmed'">
                         <VSelect
                         v-model="selectedStatus"
                         :items="statusOptions"
@@ -221,7 +221,7 @@ const handleStatusChange = () => {
                         >
                         </VSelect>
                     </div>
-                    <div class="mb-2" v-if="props?.pageType == 'inbox' && props?.mail?.status == 'confirmed'">
+                    <div class="mb-2" v-if="(props?.pageType == 'inbox' || props?.pageType == 'inbox_folder') && props?.mail?.status == 'confirmed'">
                         <VBtn prepend-icon="mdi-triangle-down" style="background-color: transparent; border: 2px solid #000; box-shadow: none;">
                             {{ getTranslatedStatus(t, props?.mail?.status) }}
                         </VBtn>
@@ -235,7 +235,7 @@ const handleStatusChange = () => {
             <div v-if="threadLoading" class="loading-overlay d-flex justify-center my-5">
                 <v-progress-circular indeterminate color="blue"></v-progress-circular>
             </div>
-            <div v-if="props?.pageType == 'inbox' || props?.pageType == 'trash'">
+            <div v-if="['inbox', 'trash', 'inbox_folder'].includes(props?.pageType)">
                 <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
             </div>
             <div v-if="props?.updateThreadLoading">

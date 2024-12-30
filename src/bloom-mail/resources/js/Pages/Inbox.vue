@@ -216,11 +216,13 @@ const getHistories = async (id) => {
   if (storedData && (currentTime - storedData.timestamp) < 3600000) {  // 3600000ms = 1 hour
     selectedHistories.value = storedData.data;
 
+    console.log(selectedHistories.value)
+
     updateHistories(id);
   } else {
     // If no data in localStorage or data is expired, fetch from backend
-    if (pageType.value === 'inbox' || pageType.value === 'trash') {
-      selectedHistories.value = {};
+    if (['inbox', 'trash', 'inbox_folder'].includes(pageType.value)) {
+        selectedHistories.value = {};
       threadLoading.value = true;
 
       try {
@@ -229,6 +231,7 @@ const getHistories = async (id) => {
         if (response.data.status === 'success') {
           selectedHistories.value = response.data.data;
 
+            console.log(selectedHistories.value)
           // Store the response in localStorage with a timestamp
           const dataToStore = {
             data: response.data.data,
@@ -250,8 +253,8 @@ const getHistories = async (id) => {
 const updateHistories = async (id) => {
     const storageKey = `histories_${id}`;
 
-    if (pageType.value === 'inbox' || pageType.value === 'trash') {
-      updateThreadLoading.value = true;
+    if (['inbox', 'trash', 'inbox_folder'].includes(pageType.value)) {
+        updateThreadLoading.value = true;
 
       try {
         const response = await axios.get(`/mails/histories/${id}`);
@@ -327,13 +330,13 @@ onMounted(() => {
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
         let result = event.mails;
-        if(result?.new == 1 && page.value == 1 && pageType.value == 'inbox')
-        {
-            if(selectedFolder.value == null)
-            {
-                fetchEmails()
+        if (result?.new == 1 && page.value == 1 && (pageType.value == 'inbox' || pageType.value == 'inbox_folder')) {
+            fetchEmails();
+        } else {
+            if (selectedFolder.value == null) {
+                fetchEmails();
             } else {
-                fetchEmailsWithFolderId()
+                fetchEmailsWithFolderId();
             }
         }
     })
