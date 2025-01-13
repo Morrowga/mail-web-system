@@ -65,15 +65,18 @@ class MailRepository implements MailRepositoryInterface
 
         // Pre-fetch the counts for inbox and trash to avoid redundant queries
         $inboxCount = MailLog::where('status', 'new')
-        ->where('parent_id', null)
+        // ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
-        $trashCount = MailLog::where('status', 'deleted')->where('parent_id', null)->count();
+        $trashCount = MailLog::where('status', 'deleted')
+        // ->where('parent_id', null)
+        ->count();
 
         // Fetch folders with the count of mails with 'new' status for each folder
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new')->where('parent_id', null);
+            $query->where('status', 'new');
+            // ->where('parent_id', null);
         }])->get();
 
         // Fetch sent mail count
@@ -96,7 +99,8 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
+                $query = MailLog::where('status', '!=', 'deleted');
+                // ->where('parent_id', null);
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -142,12 +146,12 @@ class MailRepository implements MailRepositoryInterface
         $folderId = $folder->id;
 
         $inboxCount = MailLog::where('status', 'new')
-        ->where('parent_id', null)
+        // ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
-        ->where('parent_id', null)
+        // ->where('parent_id', null)
         ->count();
 
         $inbox = $inboxCount ?? 0;
@@ -156,11 +160,12 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new')->where('parent_id', null);
+            $query->where('status', 'new');
+            // ->where('parent_id', null);
         }])->get();
 
         $data = MailLog::where('status', '!=', 'deleted')
-            ->where('parent_id', null)
+            // ->where('parent_id', null)
             ->when($folderId, function ($query) use ($folderId) {
                 $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
             })
