@@ -9,11 +9,28 @@ import { useI18n } from 'vue-i18n';
 const props = defineProps(['folder']);
 const { t, locale } = useI18n();
 
+
 const form = useForm({
     name: props?.folder?.name,
     search_character: props?.folder?.search_character ?? '',
     method: props?.folder?.method ?? '',
+    extra_search: props?.folder?.extra_searches ?? [], // Initialize as an array
 })
+
+console.log(props?.folder?.extra_searches);
+
+const addCondition = () => {
+    form.extra_search.push({
+        is_exclude: false,
+        search_character: '',
+        method: '',
+    });
+};
+
+// Remove a condition by index
+const removeCondition = (index) => {
+    form.extra_search.splice(index, 1);
+};
 
 const methods = ref([
     {
@@ -131,6 +148,55 @@ const formSubmit = () => {
                                                 </div>
                                                 <InputError class="mb-2" :message="form.errors.method" />
                                             </VCol>
+                                            <VCol cols="12" class="py-0">
+                                                <VBtn color="primary" @click="addCondition">+ Add Condition</VBtn>
+                                                <div v-for="(condition, index) in form.extra_search" :key="index" class="my-2 px-3" style="border: 1px solid gray; border-radius: 10px;">
+                                                    <div class="d-flex justify-between">
+                                                    <VCheckbox
+                                                        v-model="condition.is_exclude"
+                                                        :id="'is_exclude-' + index"
+                                                        :label="$t('input.is_exclude')"
+                                                    />
+                                                    <div class="py-2" style="cursor: pointer;" @click="removeCondition(index)">
+                                                        <VIcon icon="mdi-close"></VIcon>
+                                                    </div>
+                                                    </div>
+                                                    <div class="d-flex justify-start">
+                                                    <div style="width: 17%; padding: 10px;">
+                                                        <InputLabel for="search" :value="$t('input.search_character')" />
+                                                    </div>
+                                                    <div style="width: 83%;">
+                                                        <VTextField
+                                                        v-model="condition.search_character"
+                                                        density="compact"
+                                                        variant="outlined"
+                                                        id="search"
+                                                        type="text"
+                                                        class="mt-1 block w-full"
+                                                        required
+                                                        />
+                                                    </div>
+                                                    </div>
+                                                    <div class="d-flex justify-start">
+                                                    <div style="width: 17%; padding: 10px;">
+                                                        <InputLabel for="method" :value="$t('input.method')" />
+                                                    </div>
+                                                    <div style="width: 83%;">
+                                                        <v-radio-group
+                                                        v-model="condition.method"
+                                                        inline
+                                                        >
+                                                        <v-radio
+                                                            v-for="(method, index) in methods"
+                                                            :key="index"
+                                                            :label="method.name"
+                                                            :value="method.value"
+                                                        />
+                                                        </v-radio-group>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </VCol>
                                         </VRow>
                                         <div>
                                             <VBtn color="customBtnColor" prepend-icon="mdi-content-save-all-outline"  type="submit" class="text-white text-capitalize">{{ props?.folder ? $t('buttons.update') : $t('buttons.registration') }}</VBtn>

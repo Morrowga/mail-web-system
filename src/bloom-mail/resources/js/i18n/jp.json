@@ -65,6 +65,7 @@
         "message_content": "本文",
         "address": "アドレス",
         "from": "From",
+        "is_exclude": "Exclude",
         "to": "宛先",
         "attach_to_og": "元メールを入れる",
         "template": "テンプレート",
