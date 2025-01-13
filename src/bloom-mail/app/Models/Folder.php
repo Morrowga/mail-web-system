@@ -14,4 +14,9 @@ class Folder extends Model
     {
         return $this->belongsToMany(MailLog::class, 'folder_mails', 'folder_id', 'mail_log_id');
     }
+
+    public function extra_searches()
+    {
+        return $this->hasMany(FolderAdvanceSearch::class, 'folder_id');
+    }
 }

@@ -6,6 +6,7 @@ use App\Models\Folder;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
+use App\Models\FolderAdvanceSearch;
 use App\Interfaces\FolderRepositoryInterface;
 
 class FolderRepository implements FolderRepositoryInterface
@@ -34,7 +35,15 @@ class FolderRepository implements FolderRepositoryInterface
         DB::beginTransaction();
 
         try {
-            $category = Folder::create($request->all());
+            $folder = Folder::create($request->all());
+
+            $extra_searches = $request->extra_search;
+            if (is_array($extra_searches) && count($extra_searches) > 0) {
+                foreach ($extra_searches as &$extra_search) {
+                    $extra_search['folder_id'] = $folder->id;
+                }
+                FolderAdvanceSearch::insert($extra_searches);
+            }
 
             DB::commit();
 
@@ -54,7 +63,22 @@ class FolderRepository implements FolderRepositoryInterface
         try {
             if($folder)
             {
+                $folder->load('extra_searches');
+                $folder->extra_searches()->delete();
                 $folder->update($request->all());
+                $extra_searches = $request->extra_search ?? [];
+                $purifiedArray = [];
+                if (is_array($extra_searches) && count($extra_searches) > 0) {
+                    foreach ($extra_searches as &$extra_search) {
+                        array_push($purifiedArray, [
+                            "search_character" => $extra_search['search_character'],
+                            "method" => $extra_search['method'],
+                            "is_exclude" => $extra_search['is_exclude'],
+                            "folder_id" => $folder->id
+                        ]);
+                    }
+                    FolderAdvanceSearch::insert($purifiedArray);
+                }
 
                 DB::commit();
 

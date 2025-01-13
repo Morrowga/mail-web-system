@@ -65,14 +65,15 @@ class MailRepository implements MailRepositoryInterface
 
         // Pre-fetch the counts for inbox and trash to avoid redundant queries
         $inboxCount = MailLog::where('status', 'new')
+        ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
-        $trashCount = MailLog::where('status', 'deleted')->count();
+        $trashCount = MailLog::where('status', 'deleted')->where('parent_id', null)->count();
 
         // Fetch folders with the count of mails with 'new' status for each folder
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
         // Fetch sent mail count
@@ -95,7 +96,7 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted');
+                $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -141,10 +142,12 @@ class MailRepository implements MailRepositoryInterface
         $folderId = $folder->id;
 
         $inboxCount = MailLog::where('status', 'new')
+        ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
+        ->where('parent_id', null)
         ->count();
 
         $inbox = $inboxCount ?? 0;
@@ -153,10 +156,11 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
         $data = MailLog::where('status', '!=', 'deleted')
+            ->where('parent_id', null)
             ->when($folderId, function ($query) use ($folderId) {
                 $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
             })
@@ -171,7 +175,6 @@ class MailRepository implements MailRepositoryInterface
             "folders" => $folders
         ];
     }
-
 
     public function newMessage()
     {
@@ -301,12 +304,13 @@ class MailRepository implements MailRepositoryInterface
 
     public function folderMatching()
     {
-        Folder::chunk(100, function ($folders) {
+        Folder::with('extra_searches')->chunk(100, function ($folders) {
             foreach ($folders as $folder) {
                 $searchCharacter = $folder->search_character;
                 $method = strtolower($folder->method);
+                $extraSearches = $folder->extra_searches;
 
-                MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method) {
+                MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method, $extraSearches) {
                     foreach ($allMails as $mail) {
                         $subject = $mail->subject;
                         $isMatch = false;
@@ -321,7 +325,36 @@ class MailRepository implements MailRepositoryInterface
                             $isMatch = true;
                         }
 
-                        if ($isMatch) {
+                        $extraMatch = true;
+
+                        foreach ($extraSearches as $extraSearch) {
+                            $extraSearchCharacter = $extraSearch->search_character;
+                            $extraMethod = strtolower($extraSearch->method);
+                            $isExclude = $extraSearch->is_exclude;
+
+                            $match = false;
+                            if ($extraMethod === 'exact_match' && $subject === $extraSearchCharacter) {
+                                $match = true;
+                            } elseif ($extraMethod === 'partial_match' && str_contains($subject, $extraSearchCharacter)) {
+                                $match = true;
+                            } elseif ($extraMethod === 'front_match' && str_starts_with($subject, $extraSearchCharacter)) {
+                                $match = true;
+                            } elseif ($extraMethod === 'backward_match' && str_ends_with($subject, $extraSearchCharacter)) {
+                                $match = true;
+                            }
+
+                            if ($isExclude && $match) {
+                                $extraMatch = false;
+                                break;
+                            }
+
+                            if (!$isExclude && !$match) {
+                                $extraMatch = false;
+                                break;
+                            }
+                        }
+
+                        if ($isMatch && $extraMatch) {
                             DB::table('folder_mails')->updateOrInsert(
                                 ['mail_log_id' => $mail->id, 'folder_id' => $folder->id],
                                 []
