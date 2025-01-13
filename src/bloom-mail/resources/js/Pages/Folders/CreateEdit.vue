@@ -149,7 +149,7 @@ const formSubmit = () => {
                                                 <InputError class="mb-2" :message="form.errors.method" />
                                             </VCol>
                                             <VCol cols="12" class="py-0">
-                                                <VBtn color="primary" @click="addCondition">+ Add Condition</VBtn>
+                                                <VBtn color="primary" @click="addCondition">+ {{ $t('input.add_condition') }}</VBtn>
                                                 <div v-for="(condition, index) in form.extra_search" :key="index" class="my-2 px-3" style="border: 1px solid gray; border-radius: 10px;">
                                                     <div class="d-flex justify-between">
                                                     <VCheckbox
