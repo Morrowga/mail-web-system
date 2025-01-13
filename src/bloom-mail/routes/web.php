@@ -2,6 +2,7 @@
 
 use Inertia\Inertia;
 use App\Models\MailLog;
+use App\Repositories\MailRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\AuthController;
@@ -31,6 +32,15 @@ Route::get('/', function () {
 Route::get('/connection-error', function(){
     return Inertia::render('Errors/ConnectionError');
 })->name('connection-error');
+
+Route::get('/old-data', function() {
+    $mailRepository = app(MailRepository::class);
+
+    $mailRepository->oldData();
+
+    return "success";
+
+});
 
 Route::middleware(['auth'])->group(function () {
 
