@@ -271,7 +271,7 @@ class MailRepository implements MailRepositoryInterface
 
         Log::info('Message fetching ended');
 
-        // $this->singleFolderMatching();
+        $this->singleFolderMatching();
 
         Log::info('Sending to queue started');
 
