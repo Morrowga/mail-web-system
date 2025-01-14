@@ -21,7 +21,8 @@ class MailLog extends Model
         'datetime',
         'previous_status',
         'person_in_charge',
-        'deleted_at'
+        'deleted_at',
+        'is_match'
     ];
 
     public function mail_histories()

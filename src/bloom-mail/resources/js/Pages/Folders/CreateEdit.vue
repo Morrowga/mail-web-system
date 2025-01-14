@@ -1,6 +1,7 @@
 <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import LoadingProgress from '@/Components/LoadingProgress.vue';
 import MailLayout from '@/Layouts/MailLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -26,6 +27,8 @@ const addCondition = () => {
         method: '',
     });
 };
+
+const showProgress = ref(false);
 
 // Remove a condition by index
 const removeCondition = (index) => {
@@ -58,11 +61,16 @@ const formSubmit = () => {
     const routeLink = isEdit ? route('folders.update', props.folder.id) : route('folders.store');
     const method = isEdit ? 'put' : 'post';
 
+    showProgress.value = true;
+
     form[method](routeLink, {
         onSuccess: () => {
             form.reset();  // Reset the form upon success
+            showProgress.value = false;
+
         },
         onError: (error) => {
+            showProgress.value = false;
             console.error("Form submission error:", error); // Handle the error if needed
         },
     });
@@ -202,6 +210,7 @@ const formSubmit = () => {
                                             <VBtn color="customBtnColor" prepend-icon="mdi-content-save-all-outline"  type="submit" class="text-white text-capitalize">{{ props?.folder ? $t('buttons.update') : $t('buttons.registration') }}</VBtn>
                                         </div>
                                     </VCardText>
+                                    <LoadingProgress :visible="showProgress" @update:visible="showProgress = $event" />
                                 </VCard>
                             </VForm>
                         </div>

@@ -146,6 +146,7 @@
         "user_edit_title": "アカウント更新",
         "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。",
         "edit_templatecategory": "テンプレート カテゴリ編集",
-        "create_templatecategory": "テンプレートカテゴリ登録"
+        "create_templatecategory": "テンプレートカテゴリ登録",
+        "matchingfolder": "フォルダへの振り分け中です。しばらくお待ちください．．．"
     }
 }

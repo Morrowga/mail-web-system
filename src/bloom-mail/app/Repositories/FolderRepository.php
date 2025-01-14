@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
 use App\Models\FolderAdvanceSearch;
+use App\Repositories\MailRepository;
 use App\Interfaces\FolderRepositoryInterface;
 
 class FolderRepository implements FolderRepositoryInterface
@@ -45,6 +46,10 @@ class FolderRepository implements FolderRepositoryInterface
                 FolderAdvanceSearch::insert($extra_searches);
             }
 
+            $mailRepository = app(MailRepository::class);
+
+            $mailRepository->folderMatching();
+
             DB::commit();
 
             return $this->success('Folder has been created successfully.');
@@ -79,6 +84,10 @@ class FolderRepository implements FolderRepositoryInterface
                     }
                     FolderAdvanceSearch::insert($purifiedArray);
                 }
+
+                $mailRepository = app(MailRepository::class);
+
+                $mailRepository->folderMatching();
 
                 DB::commit();
 

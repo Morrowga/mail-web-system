@@ -145,7 +145,8 @@
         "user_edit": "Edit Staffs Accounts",
         "welcome": "Welcome...",
         "edit_templatecategory": "Edit Template Category",
-        "create_templatecategory": "Create Template Category"
+        "create_templatecategory": "Create Template Category",
+        "matchingfolder": "Please Wait ! This Folder matching with mails..."
     }
 }
 
