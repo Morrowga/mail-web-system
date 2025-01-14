@@ -246,7 +246,8 @@ class MailRepository implements MailRepositoryInterface
                     'body' => $body,
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
-                    'deleted_at' => $deleted_date
+                    'deleted_at' => $deleted_date,
+                    'is_match' => 0
                 ]);
 
 
@@ -270,7 +271,7 @@ class MailRepository implements MailRepositoryInterface
 
         Log::info('Message fetching ended');
 
-        $this->singleFolderMatching();
+        // $this->singleFolderMatching();
 
         Log::info('Sending to queue started');
 
@@ -306,91 +307,91 @@ class MailRepository implements MailRepositoryInterface
 
     public function singleFolderMatching()
     {
-        Folder::with('extra_searches')->chunk(100, function ($folders) {
-            foreach ($folders as $folder) {
-                $searchCharacter = $folder->search_character;
-                $method = strtolower($folder->method);
-                $extraSearches = $folder->extra_searches;
+        $idArray = [];
 
-                Log::info('did not reach');
+        $folders = Folder::with('extra_searches')->get();
 
-                MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method, $extraSearches) {
-                    Log::info('reached to under found');
+        foreach ($folders as $folder) {
+            $searchCharacter = $folder->search_character;
+            $method = strtolower($folder->method);
+            $extraSearches = $folder->extra_searches;
 
-                    foreach ($allMails as $mail) {
+            $allMails = MailLog::where('is_match', 0)->get();
 
-                        $mail->is_match = 1;
-                        $mail->save();
+            foreach ($allMails as $mail) {
 
-                        $subject = $mail->subject;
-                        $isMatch = false;
+                $idArray[] = $mail->id;
 
-                        if ($method === 'exact_match' && $subject === $searchCharacter) {
-                            $isMatch = true;
-                        } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
-                            $isMatch = true;
-                        }
+                $subject = $mail->subject;
 
-                        // $extraMatch = true;
+                $isMatch = false;
 
-                        // foreach ($extraSearches as $extraSearch) {
-                        //     $extraSearchCharacter = $extraSearch->search_character;
-                        //     $extraMethod = strtolower($extraSearch->method);
-                        //     $isExclude = $extraSearch->is_exclude;
+                if ($method === 'exact_match' && $subject === $searchCharacter) {
+                    $isMatch = true;
+                } elseif ($method === 'partial_match' && str_contains($subject, $searchCharacter)) {
+                    $isMatch = true;
+                } elseif ($method === 'front_match' && str_starts_with($subject, $searchCharacter)) {
+                    $isMatch = true;
+                } elseif ($method === 'backward_match' && str_ends_with($subject, $searchCharacter)) {
+                    $isMatch = true;
+                }
 
-                        //     $match = false;
-                        //     if ($extraMethod === 'exact_match' && $subject === $extraSearchCharacter) {
-                        //         $match = true;
-                        //     } elseif ($extraMethod === 'partial_match' && str_contains($subject, $extraSearchCharacter)) {
-                        //         $match = true;
-                        //     } elseif ($extraMethod === 'front_match' && str_starts_with($subject, $extraSearchCharacter)) {
-                        //         $match = true;
-                        //     } elseif ($extraMethod === 'backward_match' && str_ends_with($subject, $extraSearchCharacter)) {
-                        //         $match = true;
-                        //     }
+                $extraMatch = true;
 
-                        //     if ($isExclude && $match) {
-                        //         $extraMatch = false;
-                        //         break;
-                        //     }
+                foreach ($extraSearches as $extraSearch) {
+                    $extraSearchCharacter = $extraSearch->search_character;
+                    $extraMethod = strtolower($extraSearch->method);
+                    $isExclude = $extraSearch->is_exclude;
 
-                        //     if (!$isExclude && !$match) {
-                        //         $extraMatch = false;
-                        //         break;
-                        //     }
-                        // }
-
-                        if ($isMatch) {
-                            DB::table('folder_mails')->updateOrInsert(
-                                ['mail_log_id' => $mail->id, 'folder_id' => $folder->id],
-                                []
-                            );
-                        } else {
-                            DB::table('folder_mails')
-                                ->where('mail_log_id', $mail->id)
-                                ->where('folder_id', $folder->id)
-                                ->delete();
-                        }
+                    $match = false;
+                    if ($extraMethod === 'exact_match' && $subject === $extraSearchCharacter) {
+                        $match = true;
+                    } elseif ($extraMethod === 'partial_match' && str_contains($subject, $extraSearchCharacter)) {
+                        $match = true;
+                    } elseif ($extraMethod === 'front_match' && str_starts_with($subject, $extraSearchCharacter)) {
+                        $match = true;
+                    } elseif ($extraMethod === 'backward_match' && str_ends_with($subject, $extraSearchCharacter)) {
+                        $match = true;
                     }
-                });
+
+                    if ($isExclude && $match) {
+                        $extraMatch = false;
+                    }
+
+                    if (!$isExclude && !$match) {
+                        $extraMatch = false;
+                    }
+                }
+
+
+                if ($isMatch && $extraMatch) {
+                    DB::table('folder_mails')->updateOrInsert(
+                        ['mail_log_id' => $mail->id, 'folder_id' => $folder->id],
+                        []
+                    );
+                } else {
+                    DB::table('folder_mails')
+                        ->where('mail_log_id', $mail->id)
+                        ->where('folder_id', $folder->id)
+                        ->delete();
+                }
             }
-        });
+        }
+
+        MailLog::whereIn('id', $idArray)->update(['is_match' => 1]);
     }
+
 
     public function folderMatching()
     {
-        Folder::with('extra_searches')->chunk(100, function ($folders) {
-            foreach ($folders as $folder) {
-                $searchCharacter = $folder->search_character;
-                $method = strtolower($folder->method);
-                $extraSearches = $folder->extra_searches;
+        $folders = Folder::with('extra_searches')->get();
 
-                $allMails = MailLog::where('is_match', '=', 0)->get();
+        foreach ($folders as $folder) {
+            $searchCharacter = $folder->search_character;
+            $method = strtolower($folder->method);
+            $extraSearches = $folder->extra_searches;
 
+            MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method, $extraSearches) {
                 foreach ($allMails as $mail) {
 
                     $mail->is_match = 1;
@@ -450,8 +451,8 @@ class MailRepository implements MailRepositoryInterface
                             ->delete();
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     public function markAsRead($id)

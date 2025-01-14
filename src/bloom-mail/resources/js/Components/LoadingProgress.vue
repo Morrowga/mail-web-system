@@ -2,7 +2,7 @@
     <div class="pa-4 text-center">
       <v-dialog
         v-model="dialog"
-        max-width="500"
+        max-width="600"
         persistent
       >
         <v-list
@@ -13,7 +13,7 @@
         >
           <v-list-item
             prepend-icon="$vuetify-outline"
-            title="Please Wait ! This Folder matching with mails..."
+            :title="$t('other.matchingfolder')"
           >
             <template v-slot:prepend>
               <div class="pe-4">
@@ -37,6 +37,7 @@
 
   <script setup>
   import { ref, watch,defineEmits } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   // Props
   const props = defineProps({
@@ -46,8 +47,11 @@
     },
   });
 
+    const { t, locale } = useI18n();
+
   // Reactive Dialog State
   const dialog = ref(props.visible);
+  const emit = defineEmits(['update:visible']);
 
   // Watch for Prop Changes
   watch(
@@ -57,17 +61,16 @@
       if (newVal) {
         setTimeout(() => {
           dialog.value = false;
+          emit('update:visible', false);
         }, 4000);
       }
     }
   );
 
-  // Emit Event on Close
-  defineEmits(['update:visible']);
   watch(dialog, (newVal) => {
     if (!newVal) {
       // Emit event to inform parent component
-      defineEmits(['update:visible'])(false);
+      emit('update:visible', false);
     }
   });
   </script>
