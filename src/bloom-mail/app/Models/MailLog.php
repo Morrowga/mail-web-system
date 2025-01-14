@@ -53,14 +53,15 @@ class MailLog extends Model
     {
         try {
             if (preg_match('/=\?[^?]+\?/', $value)) {
-                $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
-                return $decodedValue ?: $value;
+                $decodedValue = @iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+                return $decodedValue !== false ? $decodedValue : $value; // Return decoded value if successful
             }
 
-            return $value;
+            return $value; // Return original value if not MIME-encoded
         } catch (\Exception $e) {
+            // Log only if necessary
             logger()->error("Error decoding {$attribute}: " . $e->getMessage());
-            return $value;
+            return $value; // Return the original value as a fallback
         }
     }
 

@@ -501,10 +501,9 @@ class MailRepository implements MailRepositoryInterface
     {
         try {
             if (preg_match('/=\?[^?]+\?/', $value)) {
-                $decodedValue = iconv_mime_decode($value, 0, 'UTF-8');
-                return $decodedValue ?: $value;
+                $decodedValue = @iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+                return $decodedValue !== false ? $decodedValue : $value;
             }
-
             return $value;
         } catch (\Exception $e) {
             return $value;
