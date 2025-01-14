@@ -17,9 +17,6 @@ const form = useForm({
     method: props?.folder?.method ?? '',
     extra_search: props?.folder?.extra_searches ?? [], // Initialize as an array
 })
-
-console.log(props?.folder?.extra_searches);
-
 const addCondition = () => {
     form.extra_search.push({
         is_exclude: false,

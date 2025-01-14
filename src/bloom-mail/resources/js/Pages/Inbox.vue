@@ -326,24 +326,31 @@ const goToSpam = () => {
 onMounted(() => {
   fetchEmails()
 
+//   axios.post(`/mails/folder-matching`)
+//     .then((response) => {
+//         if(selectedFolder.value == null)
+//         {
+//             fetchEmails()
+//         } else {
+//             fetchEmailsWithFolderId()
+//         }
+//     })
+//     .catch((error) => {
+//         console.error('Error canceling status', error);
+//     });
+
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
         console.log(event.mails);
         let result = event.mails;
         if(result?.new == 1 && page.value == 1 && (pageType.value == 'inbox'  || pageType.value == 'inbox_folder' ))
         {
-            axios.post(`/mails/folder-matching`)
-            .then((response) => {
-                if(selectedFolder.value == null)
-                {
-                    fetchEmails()
-                } else {
-                    fetchEmailsWithFolderId()
-                }
-            })
-            .catch((error) => {
-                console.error('Error canceling status', error);
-            });
+            if(selectedFolder.value == null)
+            {
+                fetchEmails()
+            } else {
+                fetchEmailsWithFolderId()
+            }
         }
     })
     .error((error) => {

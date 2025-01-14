@@ -18,17 +18,6 @@ Artisan::command('mail-fetching', function () {
     ProcessMails::dispatch();
 })->purpose('Running Realtime')->everyMinute();
 
-
-// Artisan::command('folder-matching', function () {
-//     Log::info('Folder Matching Started');
-
-//     $mailRepository = app(MailRepository::class);
-//     $mailRepository->folderMatching();
-
-//     Log::info('Folder Matching ended');
-
-// })->purpose('Running Folder Matching')->everyFourMinutes();
-
 Artisan::command('trash-deletion', function () {
     $mailRepository = app(MailRepository::class);
 

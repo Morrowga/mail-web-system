@@ -38,6 +38,9 @@ const vuetify = createVuetify({
     components: {
         ...components,
     },
+    icons: {
+        iconfont: 'mdi'
+    },
     directives,
     theme: {
         defaultTheme: "customeTheme",
