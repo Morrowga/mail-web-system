@@ -268,7 +268,7 @@ class MailRepository implements MailRepositoryInterface
             }
         }
 
-        $this->singleFolderMatching();
+        // $this->singleFolderMatching();
 
         Log::info('Message fetching ended');
 

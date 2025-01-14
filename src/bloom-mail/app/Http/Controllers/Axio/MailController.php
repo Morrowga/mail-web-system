@@ -99,4 +99,10 @@ class MailController extends Controller
             "message" => "success"
         ]);
     }
+
+    public function folderMatching()
+    {
+        $mails = $this->mailRepository->singleFolderMatching();
+
+    }
 }

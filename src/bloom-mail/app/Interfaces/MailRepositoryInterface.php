@@ -40,4 +40,6 @@ interface MailRepositoryInterface
     public function redoProcess(MailLog $mailLog);
 
     public function deleteSentMail(SentMail $sent_mail);
+
+    public function singleFolderMatching();
 }

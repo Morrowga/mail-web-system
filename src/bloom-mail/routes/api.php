@@ -32,4 +32,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('mails/change-status/{mail_Log}', [MailController::class, 'changeStatus'])
         ->name('change-status');
+
+    Route::post('mails/folder-matching', [MailController::class, 'folderMatching']);
 });

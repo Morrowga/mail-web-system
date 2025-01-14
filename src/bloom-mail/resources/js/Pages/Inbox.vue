@@ -332,12 +332,18 @@ onMounted(() => {
         let result = event.mails;
         if(result?.new == 1 && page.value == 1 && (pageType.value == 'inbox'  || pageType.value == 'inbox_folder' ))
         {
-            if(selectedFolder.value == null)
-            {
-                fetchEmails()
-            } else {
-                fetchEmailsWithFolderId()
-            }
+            axios.post(`/mails/folder-matching`)
+            .then((response) => {
+                if(selectedFolder.value == null)
+                {
+                    fetchEmails()
+                } else {
+                    fetchEmailsWithFolderId()
+                }
+            })
+            .catch((error) => {
+                console.error('Error canceling status', error);
+            });
         }
     })
     .error((error) => {

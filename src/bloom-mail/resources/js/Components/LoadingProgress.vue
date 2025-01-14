@@ -36,7 +36,7 @@
   </template>
 
   <script setup>
-  import { ref, watch } from 'vue';
+  import { ref, watch,defineEmits } from 'vue';
 
   // Props
   const props = defineProps({
