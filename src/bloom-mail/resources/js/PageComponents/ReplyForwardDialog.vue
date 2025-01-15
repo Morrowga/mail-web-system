@@ -35,7 +35,7 @@ const form = useForm({
 });
 
 const formattedDateTime = ref(null);
-const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent']);
+const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent', 'minimizeReply']);
 
 const onClose = () => {
     if(props?.type == 'reply')
@@ -52,6 +52,15 @@ const formatDateTime = () => {
   const formattedTime = currentDate.toTimeString().split(' ')[0];
   formattedDateTime.value = `${formattedDate} ${formattedTime}`;
 };
+
+const typeOfMail = ref(props.type);
+
+watch(
+    () => typeOfMail.value,
+    (newValue) => {
+        emit('update:mailTypeEevent', newValue)
+    }
+);
 
 const formSubmit = () => {
     isDisabled.value = true;
@@ -73,6 +82,7 @@ const formSubmit = () => {
         },
     });
 };
+
 
 watch(() => props.mailData, (newMailData) => {
     if (newMailData) {
@@ -141,6 +151,12 @@ const onTemplateChange = (templateId) => {
     }
 }
 
+const minimizeDialog = () =>
+{
+    emit('update:visibleFloat', true);
+    emit('update:dialog', false);
+    emit('minimizeReply')
+};
 
 onMounted(() => {
   formatDateTime();
@@ -157,10 +173,20 @@ watch(() => props.type, (newType) => {
         <VForm @submit.prevent="formSubmit">
             <VCard>
                 <VCardTitle class="d-flex justify-between align-center">
-                    <h3>
-                        {{ props?.type == 'reply' ? $t('other.reply_form') : $t('other.forward_form')}}
-                    </h3>
+                    <div>
+                        <h3>
+                            {{ props?.type == 'reply' ? $t('other.reply_form') : $t('other.forward_form')}}
+                        </h3>
+                    </div>
                     <div class="d-flex justify-end">
+                        <div class="icon-border d-flex justify-center align-items-center">
+                            <VIcon
+                                icon="mdi-minus"
+                                class="minimize-icon"
+                                style="color: #a5a5a5; font-weight: bold;"
+                                @click="minimizeDialog"
+                            ></VIcon>
+                        </div>
                         <div class="icon-border text-center">
                             <VIcon
                                 icon="mdi-close"
@@ -275,15 +301,23 @@ watch(() => props.type, (newType) => {
                                         <div style="width: 20%; align-items: center;">
                                             <InputLabel :value="$t('input.template')" for="template" />
                                         </div>
-                                        <div style="width: 80%;">
+                                        <div style="width: 60%;">
                                             <VSelect
                                             placeholder="Select Template"
                                             v-model="form.template_id"
-                                            variant="outlined" density="compact" required hide-details
+                                            variant="outlined" density="compact"
+                                            required hide-details
                                             :items="modifiedTemplates"
                                             :item-props="itemProps"
                                             @update:model-value="onTemplateChange"
                                             ></VSelect>
+                                        </div>
+                                        <div style="width: 20%;" class="mx-3">
+                                            <v-select
+                                            variant="outlined" density="compact" required hide-details
+                                            v-model="typeOfMail"
+                                            :items="['reply', 'forward']"
+                                            ></v-select>
                                         </div>
                                         <InputError class="mt-1" :message="form.errors.template" />
                                     </div>

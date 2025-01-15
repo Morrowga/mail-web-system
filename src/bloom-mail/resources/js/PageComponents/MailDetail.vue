@@ -14,7 +14,9 @@ const props = defineProps({
     threads: Array,
     threadLoading: Boolean,
     updateThreadLoading: Boolean,
-    pageType: String
+    replyDialogVisible: Boolean,
+    pageType: String,
+    isVisibleReplyFloatButton: Boolean
 });
 
 const confirmDialog = ref(false);
@@ -22,6 +24,24 @@ const confirmDialog = ref(false);
 console.log(props?.pageType)
 
 const { t, locale } = useI18n();
+
+const floatVisibility = ref(props.isVisibleReplyFloatButton)
+
+const createDialogVisible = ref(props.replyDialogVisible);
+
+watch(
+    () => props.replyDialogVisible,
+    (newValue) => {
+        createDialogVisible.value = newValue;
+    }
+);
+
+watch(
+    createDialogVisible,
+    (newValue) => {
+        emit('update:replyDialog', newValue);
+    }
+);
 
 const page = usePage();
 
@@ -58,8 +78,6 @@ const selectedStatus = ref(t('table.' + props?.mail?.status) || '');
 const selectedConfirmType = ref('delete');
 
 const form = useForm({});
-
-const createDialogVisible = ref(false);
 
 const openDialog = (type) => {
     if (type === 'reply' && props?.mail?.status !== 'resolved' && props?.mail?.status !== 'confirmed') {
@@ -159,6 +177,12 @@ const handleStatusChange = () => {
     changeStatus()
 };
 
+
+const minimizeReply = () => {
+    emit('replyMinimize')
+    createDialogVisible.value = false
+};
+
 </script>
 
 <template>
@@ -255,9 +279,11 @@ const handleStatusChange = () => {
                 :createDialog="createDialogVisible"
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
+                @update:visibleFloat="floatVisibility = $event"
                 @update:mailTypeEevent="mailType = $event"
                 :mailData="props?.mail"
                 @cancelStatus="cancelStatus"
+                @minimizeReply="minimizeReply"
                 @handleLoadThread="updateThread(props?.mail?.id)"
                 :threads="props?.threads"
                 :from="props?.from"

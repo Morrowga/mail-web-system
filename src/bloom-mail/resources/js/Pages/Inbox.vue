@@ -10,10 +10,15 @@ import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import MailLayout from '@/Layouts/MailLayout.vue';
 import { permissionGrant } from '@/Helper/permissionUtils';
+import FloatReplyButton from '@/PageComponents/FloatReplyButton.vue';
 
 const createDialogVisible = ref(false);
 
 const props = defineProps(['templates', 'from', 'auth'])
+
+const isVisibleReplyFloatButton = ref(false);
+
+const replyDialogVisible = ref(false);
 
 const { t, locale } = useI18n();
 
@@ -107,6 +112,7 @@ const selectedFolder = ref(null);
 const threadLoading = ref(false);
 const updateThreadLoading = ref(false);
 const currentTime = new Date().getTime();
+const floatMails = ref([]);
 
 const page = ref(1);
 
@@ -206,14 +212,11 @@ const markAsRead = async (id) => {
 };
 
 const getHistories = async (id) => {
-  // Key to store in localStorage
   const storageKey = `histories_${id}`;
 
-  // Check if data exists in localStorage and hasn't expired (1 hour expiration)
   const storedData = JSON.parse(localStorage.getItem(storageKey));
 
-  // If data exists and it's not expired, use it from localStorage
-  if (storedData && (currentTime - storedData.timestamp) < 3600000) {  // 3600000ms = 1 hour
+  if (storedData && (currentTime - storedData.timestamp) < 3600000) {
     selectedHistories.value = storedData.data;
 
     console.log(selectedHistories.value)
@@ -403,6 +406,33 @@ const handleSearch = (form) => {
     fetchEmails()
 }
 
+const changeMailDetail = (item) => {
+    selectedMail.value = item
+    replyDialogVisible.value = true
+}
+
+const replyMinimize = () => {
+    if (!floatMails.value.some(mail => mail.id === selectedMail.value.id)) {
+        floatMails.value.push(selectedMail.value);
+    }
+
+    if (floatMails.value.length > 5) {
+        floatMails.value.shift();
+    }
+
+    isVisibleReplyFloatButton.value = true;
+};
+
+
+const removeMail = (item) => {
+    const index = floatMails.value.findIndex(mail => mail.id === item.id); // Find the index of the item
+
+    if (index !== -1) {
+        floatMails.value.splice(index, 1); // Remove the item at the found index
+    }
+};
+
+
 onUnmounted(() => {
     Echo.leaveChannel('mails');
     console.log('disconnected')
@@ -496,10 +526,15 @@ onUnmounted(() => {
                                         @getThreads="getHistories"
                                         @updateThreads="updateHistories"
                                         :pageType="pageType"
+                                        :isVisibleReplyFloatButton="isVisibleReplyFloatButton"
+                                        @update:hideFloat="isVisibleReplyFloatButton = $event"
+                                        :replyDialogVisible="replyDialogVisible"
+                                        @update:replyDialog="replyDialogVisible = $event"
                                         :threads="selectedHistories"
                                         :threadLoading="threadLoading"
                                         :updateThreadLoading="updateThreadLoading"
                                         :mail="selectedMail"
+                                        @replyMinimize="replyMinimize"
                                         @handleRemoveRow="removeRow"
                                         @fetchagain="fetchEmails"
                                         @changeMailStatus="changeMailStatus"
@@ -516,6 +551,15 @@ onUnmounted(() => {
                 v-if="isVisibleFloatButton"
                 @update:onOpenDialog="createDialogVisible = $event"
                 @update:hideFloat="isVisibleFloatButton = $event"
+            />
+
+            <FloatReplyButton
+                :label="'Replies'"
+                :floatMails="floatMails"
+                v-if="isVisibleReplyFloatButton && floatMails.length > 0"
+                @changeMailDetail="changeMailDetail"
+                @removeMail="removeMail"
+                @update:hideFloat="isVisibleReplyFloatButton = $event"
             />
         </div>
     </MailLayout>
