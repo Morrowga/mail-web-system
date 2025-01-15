@@ -17,6 +17,7 @@ const form = useForm({
     method: props?.folder?.method ?? '',
     extra_search: props?.folder?.extra_searches ?? [], // Initialize as an array
 })
+
 const addCondition = () => {
     form.extra_search.push({
         is_exclude: false,
@@ -24,8 +25,6 @@ const addCondition = () => {
         method: '',
     });
 };
-
-const showProgress = ref(false);
 
 // Remove a condition by index
 const removeCondition = (index) => {

@@ -89,6 +89,23 @@ class FolderRepository implements FolderRepositoryInterface
 
                 $mailRepository->folderMatching();
 
+                $extra_searches = $request->extra_search ?? [];
+
+                $purifiedArray = [];
+
+                if (is_array($extra_searches) && count($extra_searches) > 0) {
+                    foreach ($extra_searches as &$extra_search) {
+                        array_push($purifiedArray, [
+                            "search_character" => $extra_search['search_character'],
+                            "method" => $extra_search['method'],
+                            "is_exclude" => $extra_search['is_exclude'],
+                            "folder_id" => $folder->id
+                        ]);
+                    }
+
+                    FolderAdvanceSearch::insert($purifiedArray);
+                }
+
                 DB::commit();
 
                 return $this->success('folder has been updated successfully.');

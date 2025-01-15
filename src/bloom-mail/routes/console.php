@@ -15,7 +15,7 @@ Artisan::command('inspire', function () {
 
 Artisan::command('mail-fetching', function () {
     Log::info('Dispatched ProcessMails');
-    ProcessMails::dispatch();
+    ProcessMails::dispatch()->onQueue('mail-fetching');
 })->purpose('Running Realtime')->everyMinute();
 
 Artisan::command('trash-deletion', function () {
