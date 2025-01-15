@@ -1,7 +1,6 @@
 <?php
 
 use Inertia\Inertia;
-use App\Models\MailLog;
 use App\Repositories\MailRepository;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;

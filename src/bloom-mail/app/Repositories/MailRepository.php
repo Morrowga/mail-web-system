@@ -749,10 +749,8 @@ class MailRepository implements MailRepositoryInterface
                         ->subject($emailData['subject']);
             });
 
-
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
         } catch (\Exception $e) {
-            // Log the error if email sending fails
             Log::error('Error sending forward email: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
         }
