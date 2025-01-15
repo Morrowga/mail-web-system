@@ -63,7 +63,6 @@ class MailRepository implements MailRepositoryInterface
     {
         $pageType = request()->query('page_type');
 
-        // Pre-fetch the counts for inbox and trash to avoid redundant queries
         $inboxCount = MailLog::where('status', 'new')
         ->where('parent_id', null)
         ->doesntHave('folders')
