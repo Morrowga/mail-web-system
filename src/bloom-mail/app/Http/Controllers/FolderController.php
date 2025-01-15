@@ -75,8 +75,6 @@ class FolderController extends Controller
             return abort(401);
         }
 
-        $folder->load('extra_searches');
-
         return Inertia::render('Folders/CreateEdit', [
             "folder" => $folder
         ]);

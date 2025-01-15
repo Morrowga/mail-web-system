@@ -65,8 +65,6 @@
         "message_content": "Message Content",
         "address": "Address",
         "from": "From",
-        "is_exclude": "Exclude",
-        "add_condition": "Add Condition",
         "to": "To",
         "attach_to_og": "Attach the original email",
         "template": "Template",
