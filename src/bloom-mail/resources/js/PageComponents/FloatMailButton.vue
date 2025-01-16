@@ -50,7 +50,7 @@ const changeValue = (id) => {
                 >
                  <v-list-item-title>
                     <span class="p-5">
-                        Mail Creation {{ item.subject == '' ?  index : item.subject }}
+                        新規メール {{ item.subject == '' ?  index : item.subject }}
                     </span>
                     <VIcon icon="mdi-close-circle" style="color:red;" @click="handleRemoveItem(item.id)"></VIcon>
                 </v-list-item-title>
