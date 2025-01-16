@@ -185,7 +185,7 @@ watch(() => props.type, (newType) => {
                         </h3>
                     </div>
                     <div class="d-flex justify-end">
-                        <div class="icon-border d-flex justify-center align-items-center">
+                        <div class="icon-border d-flex justify-center align-items-center" v-if="props?.type == 'reply'">
                             <VIcon
                                 icon="mdi-minus"
                                 class="minimize-icon"

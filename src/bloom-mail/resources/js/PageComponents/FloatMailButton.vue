@@ -37,7 +37,7 @@ const changeValue = (id) => {
                 class="floating-button"
                 v-bind="props"
                 >
-                    Mail Creation
+                    新規メール
                     <VIcon icon="mdi-close-box" @click="handleRemove" class="ml-5"></VIcon>
                 </v-chip>
             </template>
