@@ -215,7 +215,7 @@ watch(() => props.type, (newType) => {
                                         </div>
                                         <div style="width: 90%;">
                                             <VTextField
-                                                variant="plain"
+                                                variant="outlined"
                                                 density="compact"
                                                 required
                                                 v-model="form.subject"
@@ -236,7 +236,7 @@ watch(() => props.type, (newType) => {
                                     </div>
                                 </VCol>
                             </VRow>
-                            <VDivider class="mt-1" />
+                            <VDivider class="mt-3" />
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
@@ -268,7 +268,7 @@ watch(() => props.type, (newType) => {
                                     </div>
                                 </VCol>
                             </VRow>
-                            <VDivider class="mt-1" />
+                            <VDivider class="my-3" />
                             <VRow>
                                 <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
@@ -277,11 +277,10 @@ watch(() => props.type, (newType) => {
                                         </div>
                                         <div style="width: 90%;">
                                             <VTextField
-                                                variant="plain"
+                                                variant="outlined"
                                                 density="compact"
                                                 type="email"
                                                 required
-                                                readonly
                                                 hide-details
                                                 v-model="form.to"
                                             ></VTextField>

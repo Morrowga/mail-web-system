@@ -338,7 +338,7 @@ const generateRandomId = (length = 8) => {
                                         </div>
                                         <div style="width: 80%;">
                                             <VSelect
-                                                placeholder="テンプレートを選択"
+                                            placeholder="テンプレートを選択"
                                                 v-model="form.template_id"
                                                 variant="outlined"
                                                 density="compact"
