@@ -113,6 +113,8 @@ const threadLoading = ref(false);
 const updateThreadLoading = ref(false);
 const currentTime = new Date().getTime();
 const floatMails = ref([]);
+const newFloatMails = ref([])
+const selectedNewMail = ref(null)
 
 const page = ref(1);
 
@@ -407,6 +409,29 @@ const handleSearch = (form) => {
     fetchEmails()
 }
 
+const changeNewMailValue = (id) => {
+    const mail = newFloatMails.value.find(mail => mail.id === id); // Find the mail with the given id
+    if (mail) {
+        selectedNewMail.value = mail; // Set the selected mail to the found item
+    }
+}
+
+const pushValueToNewEmails = (item) => {
+    const index = newFloatMails.value.findIndex(mail => mail.id === item.id);
+
+    if (index !== -1) {
+        newFloatMails.value[index] = item;
+    } else {
+        newFloatMails.value.push(item);
+    }
+
+    if (newFloatMails.value.length > 5) {
+        newFloatMails.value.shift();
+    }
+
+    console.log(newFloatMails.value);
+}
+
 const changeMailDetail = (item) => {
     selectedMail.value = item
     replyDialogVisible.value = true
@@ -424,6 +449,21 @@ const replyMinimize = () => {
     isVisibleReplyFloatButton.value = true;
 };
 
+const removeNewMail = (id) => {
+    const index = newFloatMails.value.findIndex(mail => mail.id === id);
+
+    if (index !== -1) {
+        newFloatMails.value.splice(index, 1);
+
+        if (selectedNewMail.value && selectedNewMail.value.id === id) {
+            selectedNewMail.value = null;
+        }
+    }
+};
+
+const setNullToSelectedNewMail = () => {
+    selectedNewMail.value = null
+}
 
 const removeMail = (item) => {
 
@@ -496,9 +536,12 @@ onUnmounted(() => {
                                     :label="label"
                                     @update:labelValue="label = $event"
                                     :createDialog="createDialogVisible"
+                                    :selectedNewMail="selectedNewMail"
                                     :floatButton="isVisibleFloatButton"
+                                    @setNullToSelectedNewMail="setNullToSelectedNewMail"
                                     @update:dialog="createDialogVisible = $event"
                                     @update:visibleFloat="isVisibleFloatButton = $event"
+                                    @pushValueToNewEmails="pushValueToNewEmails"
                                     :templates="props?.templates"
                                     :from="props?.from"
                                     @fetchMail="fetchEmails"
@@ -550,9 +593,12 @@ onUnmounted(() => {
             </div>
             <FloatMailButton
                 :label="label"
-                v-if="isVisibleFloatButton"
+                v-if="isVisibleFloatButton && newFloatMails.length > 0"
                 @update:onOpenDialog="createDialogVisible = $event"
                 @update:hideFloat="isVisibleFloatButton = $event"
+                :newFloatMails="newFloatMails"
+                @removeNewMail="removeNewMail"
+                @changeNewMailValue="changeNewMailValue"
             />
 
             <FloatReplyButton

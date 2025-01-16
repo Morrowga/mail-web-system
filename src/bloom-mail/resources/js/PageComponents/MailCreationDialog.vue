@@ -11,6 +11,7 @@ createDialog: Boolean,
 floatButton: Boolean,
 templates: Array,
 from: String,
+selectedNewMail: Array,
 label: String
 });
 
@@ -22,23 +23,30 @@ const replaceDialog = ref(false);
 const formattedDateTime = ref(null);
 const isDisabled = ref(false);
 
-const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue']);
+const emit = defineEmits(['update:dialog', 'update:visibleFloat', 'update:labelValue', 'pushValueToNewEmails', 'setNullToSelectedNewMail']);
 
 watch(() => props.createDialog, (newVal) => {
     dialog.value = newVal;
 });
 
-const minimizeDialog = () =>
-{
-    dialog.value = false;
-    emit('update:visibleFloat', true);
-    emit('update:dialog', false);
-};
+watch(() => props.selectedNewMail, (newVal) => {
+    updateFloatMail(newVal)
+});
+
+const updateFloatMail = (newVal) => {
+    form.subject = newVal?.subject
+    form.template_id = newVal?.template_id
+    form.to = newVal?.to
+    form.cc = newVal?.cc
+    form.bcc = newVal?.bcc
+    form.message_content = newVal?.message_content
+}
 
 const onClose = () =>
 {
     dialog.value = false;
     emit('update:dialog', false);
+    emit('setNullToSelectedNewMail');
     emit('update:visibleFloat', false);
 }
 
@@ -50,13 +58,13 @@ const onOpen = () =>
 }
 
 const form = useForm({
-    subject: "",
+    subject: props?.selectedNewMail?.subject ?? '',
     from: props?.from,
-    to: "",
-    template_id: "",
-    cc: "",
-    bcc: "",
-    message_content: ""
+    to: props?.selectedNewMail?.to ?? '',
+    template_id: props?.selectedNewMail?.template_id ?? '',
+    cc: props?.selectedNewMail?.cc ?? '',
+    bcc: props?.selectedNewMail?.bcc ?? '',
+    message_content: props?.selectedNewMail?.message_content ?? ''
 })
 
 const handleSubjectChange = (event) =>
@@ -149,6 +157,39 @@ const onTemplateChange = (templateId) => {
     }
 }
 
+const minimizeDialog = () =>
+{
+    dialog.value = false;
+    emit('update:visibleFloat', true);
+
+    const randomId = generateRandomId(10);  // You can specify the length you want
+
+    emit('pushValueToNewEmails', {
+        id: props.selectedNewMail == null ? randomId : props.selectedNewMail?.id,
+        subject: form.subject,
+        to: form.to,
+        template_id: form.template_id,
+        cc: form.cc,
+        bcc: form.bcc,
+        message_content: form.message_content
+    })
+
+    emit('setNullToSelectedNewMail')
+    form.reset();
+
+    emit('update:dialog', false);
+};
+
+
+const generateRandomId = (length = 8) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomId = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomId += characters[randomIndex];
+    }
+    return randomId;
+};
 </script>
 <template>
     <div class="text-left">
