@@ -53,7 +53,7 @@ const truncatedSubject = (label) => {
                 class="floating-button"
                 v-bind="props"
                 >
-                    Recently Replies
+                    返信メール
                     <VIcon icon="mdi-close-box" @click="handleRemove" class="ml-5"></VIcon>
                 </v-chip>
             </template>
