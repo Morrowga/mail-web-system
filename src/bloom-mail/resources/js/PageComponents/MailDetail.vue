@@ -180,6 +180,7 @@ const handleStatusChange = () => {
 
 const minimizeReply = () => {
     emit('replyMinimize')
+    emit('cancelMailStatus', props?.mail?.id)
     createDialogVisible.value = false
 };
 

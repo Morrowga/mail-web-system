@@ -89,11 +89,11 @@ class MailController extends Controller
         $previousStatus = $mail_Log->previous_status;
 
         $mail_Log->update([
-            'status' => $previousStatus,
+            'status' => $previousStatus ?? 'read',
             'previous_status' => null,
         ]);
 
-        broadcast(new EmailStatusUpdated($mail_Log, $previousStatus));
+        broadcast(new EmailStatusUpdated($mail_Log, $previousStatus ?? 'read'));
 
         return response()->json([
             "message" => "success"
