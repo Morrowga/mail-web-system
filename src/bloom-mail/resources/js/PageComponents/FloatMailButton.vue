@@ -66,7 +66,7 @@ const changeValue = (id) => {
 .floating-button {
     position: fixed;
     bottom: 0;
-    right: 15%;
+    right: 5%;
     width: auto;
     height: 50px;
     font-weight: bold !important;

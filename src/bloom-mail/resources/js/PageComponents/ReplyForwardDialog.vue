@@ -307,9 +307,9 @@ watch(() => props.type, (newType) => {
                                         <div style="width: 20%; align-items: center;">
                                             <InputLabel :value="$t('input.template')" for="template" />
                                         </div>
-                                        <div style="width: 60%;">
+                                        <div style="width: 80%;">
                                             <VSelect
-                                            placeholder="Select Template"
+                                            placeholder="テンプレートを選択"
                                             v-model="form.template_id"
                                             variant="outlined" density="compact"
                                             required hide-details
@@ -318,13 +318,21 @@ watch(() => props.type, (newType) => {
                                             @update:model-value="onTemplateChange"
                                             ></VSelect>
                                         </div>
-                                        <div style="width: 20%;" class="mx-3">
+                                        <!-- <div style="width: 20%;" class="mx-3">
                                             <v-select
-                                            variant="outlined" density="compact" required hide-details
+                                            variant="outlined"
+                                            density="compact"
+                                            required
+                                            hide-details
                                             v-model="typeOfMail"
-                                            :items="['reply', 'forward']"
+                                            :items="[
+                                                { text: '返信', value: 'reply' },
+                                                { text: '転送', value: 'forward' }
+                                            ]"
+                                            item-text="text"
+                                            item-value="value"
                                             ></v-select>
-                                        </div>
+                                        </div> -->
                                         <InputError class="mt-1" :message="form.errors.template" />
                                     </div>
                                 </VCol>

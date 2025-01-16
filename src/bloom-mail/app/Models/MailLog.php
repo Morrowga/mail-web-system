@@ -16,7 +16,6 @@ class MailLog extends Model
         'sender',
         'subject',
         'name',
-        'parent_id',
         'uid',
         'datetime',
         'previous_status',
@@ -28,11 +27,6 @@ class MailLog extends Model
     public function mail_histories()
     {
         return $this->hasMany(SentMail::class, 'parent_id')->with('template');
-    }
-
-    public function mail_threads()
-    {
-        return $this->hasMany(MailLog::class, 'parent_id');
     }
 
     public function getSenderAttribute($value)
