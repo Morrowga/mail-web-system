@@ -83,7 +83,8 @@ const openDialog = (type) => {
     if (type === 'reply' && props?.mail?.status !== 'resolved' && props?.mail?.status !== 'confirmed') {
         emit('changeMailStatus', props?.mail?.id);
     }
-
+    console.log(mailType.value);
+    
     mailType.value = type;
     createDialogVisible.value = true;
 }

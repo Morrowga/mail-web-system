@@ -24,6 +24,8 @@ const currentActiveTemplateId = ref(null)
 const  replaceDialog = ref(false);
 const isDisabled = ref(false);
 
+const typeOfMail = ref(props.type);
+
 const form = useForm({
     subject: props?.mailData?.subject,
     from: page?.props?.from,
@@ -31,14 +33,26 @@ const form = useForm({
     to: props?.mailData?.sender,
     message_content: "",
     og_message_id: props?.mailData?.message_id,
-    type: props?.type
+    type: typeOfMail.value
 });
+
+console.log('hellotest', typeOfMail.value)
+
+watch(
+    () => typeOfMail.value,
+    (newValue) => {
+        emit('update:mailTypeEevent', newValue)
+        form.type = newValue
+    }
+);
+
+console.log(form)
 
 const formattedDateTime = ref(null);
 const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent', 'minimizeReply']);
 
 const onClose = () => {
-    if(props?.type == 'reply')
+    if(typeOfMail.value == 'reply')
     {
         emit('cancelStatus');
     }
@@ -52,15 +66,6 @@ const formatDateTime = () => {
   const formattedTime = currentDate.toTimeString().split(' ')[0];
   formattedDateTime.value = `${formattedDate} ${formattedTime}`;
 };
-
-const typeOfMail = ref(props.type);
-
-watch(
-    () => typeOfMail.value,
-    (newValue) => {
-        emit('update:mailTypeEevent', newValue)
-    }
-);
 
 const formSubmit = () => {
     isDisabled.value = true;
@@ -92,7 +97,7 @@ watch(() => props.mailData, (newMailData) => {
         form.to = newMailData.sender || "";
         form.message_content = "";
         form.og_message_id = newMailData.message_id || null;
-        form.type = props.type || null;
+        form.type = typeOfMail.value || null;
 
         // Reset template selection and dialog state
         currentActiveTemplateId.value = null;
@@ -163,6 +168,7 @@ onMounted(() => {
 });
 
 watch(() => props.type, (newType) => {
+    typeOfMail.value = newType
     form.type = newType;
 });
 </script>
