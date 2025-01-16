@@ -283,6 +283,7 @@ const updateHistories = async (id) => {
 };
 
 const cancelMailStatus = (id) => {
+    console.log(id);
   if(selectedMail.value.status != 'resolved' || selectedMail.value.status == 'confirmed')
   {
     axios
@@ -425,6 +426,7 @@ const replyMinimize = () => {
 
 
 const removeMail = (item) => {
+
     const index = floatMails.value.findIndex(mail => mail.id === item.id); // Find the index of the item
 
     if (index !== -1) {
@@ -559,6 +561,7 @@ onUnmounted(() => {
                 v-if="isVisibleReplyFloatButton && floatMails.length > 0"
                 @changeMailDetail="changeMailDetail"
                 @removeMail="removeMail"
+                @cancelMailStatus="cancelMailStatus"
                 @update:hideFloat="isVisibleReplyFloatButton = $event"
             />
         </div>

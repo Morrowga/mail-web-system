@@ -5,7 +5,7 @@ const props = defineProps({
     floatMails: Array
 });
 
-const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat', 'changeMailDetail', 'removeMail']);
+const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat', 'changeMailDetail', 'removeMail', 'cancelMailStatus']);
 const hover = ref(false);  // Track hover state
 
 const handleClick = (item) => {
@@ -22,10 +22,15 @@ const handleClick = (item) => {
 
 const handleRemove = () => {
     emit('update:hideFloat', false);
+
+    props.floatMails.forEach(mail => {
+        emit('cancelMailStatus', mail.id);
+    });
 };
 
 const handleRemoveItem = (item) => {
     emit('removeMail', item);
+    emit('cancelMailStatus', item.id);
 };
 
 const truncatedLabel = computed(() => {
