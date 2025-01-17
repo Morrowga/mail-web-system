@@ -202,11 +202,9 @@ class MailRepository implements MailRepositoryInterface
     {
         Log::info('Message fetching started');
 
-        // Fetch messages with limit
         $inbox = $this->client->getFolder('INBOX');
         $messages = $inbox->messages()->all()->setFetchOrder("desc")->limit(100)->get();
 
-        // Cache spam and existing message data
         $spamData = $this->getSpamData();
         $existingMessageIds = MailLog::pluck('message_id')->toArray();
         $newEmails = [];
@@ -216,9 +214,14 @@ class MailRepository implements MailRepositoryInterface
             $this->processMessageChunk($messageChunk, $spamData, $existingMessageIds, $newEmails);
         }
 
+        Log::info('Message fetching ended');
+
+
+        Log::info('Folder scanning started');
+
         $this->folderMatching();
 
-        Log::info('Message fetching ended');
+        Log::info('Folder scanning ended');
 
         // Broadcast only if new emails exist
         if (!empty($newEmails)) {
