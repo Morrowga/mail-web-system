@@ -9,6 +9,8 @@ interface FolderRepositoryInterface
 {
     public function index();
 
+    public function getOnlyFolders();
+
     public function store(Request $request);
 
     public function update(Request $request, Folder $folder);

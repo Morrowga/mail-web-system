@@ -26,7 +26,8 @@ class MailController extends Controller
             "from" => $request->query('from'),
             "to" => $request->query('to'),
             "keyword" => $request->query('keyword'),
-            "person_in_charge" => $request->query('person_in_charge')
+            "person_in_charge" => $request->query('person_in_charge'),
+            "folder_id" => $request->query('folder_id')
         ];
 
         $mails = $this->mailRepository->inbox($filter);
@@ -34,9 +35,18 @@ class MailController extends Controller
         return response()->json($mails);
     }
 
-    public function indexWithFolderId(Folder $folder)
+    public function indexWithFolderId(Folder $folder, Request $request)
     {
-        $mails = $this->mailRepository->inboxWithFolderId($folder);
+        $filter = [
+            "status" => $request->query('status'),
+            "from" => $request->query('from'),
+            "to" => $request->query('to'),
+            "keyword" => $request->query('keyword'),
+            "person_in_charge" => $request->query('person_in_charge'),
+            "folder_id" => $request->query('folder_id')
+        ];
+
+        $mails = $this->mailRepository->inboxWithFolderId($folder, $filter);
 
         return response()->json($mails);
     }

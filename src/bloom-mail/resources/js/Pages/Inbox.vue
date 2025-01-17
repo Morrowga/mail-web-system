@@ -124,12 +124,13 @@ const isVisibleFloatButton = ref(false);
 
 const handlePageChange = (newPage) => {
   page.value = newPage;
-  if(pageType.value == 'inbox')
+  if(pageType.value == 'inbox_folder')
   {
-    fetchEmails(newPage, searchForm.value);
-} else {
     fetchEmailsWithFolderId()
+  } else {
+    fetchEmails(newPage, searchForm.value);
   }
+
 };
 
 const handleRowSelected = (row) => {
@@ -186,7 +187,9 @@ const fetchEmailsWithFolderId = async () => {
   try {
     const response = await axios.get(`/mails/fetch/folder/` + selectedFolder.value, {
       params: {
-        page: page.value ?? 1
+        page: page.value ?? 1,
+        page_type: pageType.value,
+        ...searchForm.value
       },
     });
 
@@ -316,7 +319,6 @@ const setPageType = (type, folder_id = null) => {
   selectedFolder.value = folder_id
   page.value = 1
 
-  console.log(selectedFolder.value)
   if(type == 'inbox_folder')
   {
     fetchEmailsWithFolderId()
@@ -405,8 +407,14 @@ onMounted(() => {
 const handleSearch = (form) => {
     console.log(form)
     searchForm.value = form
+    if(form.folder_id == null || form.folder_id == '')
+    {
+        fetchEmails()
+    } else {
+        setPageType('inbox_folder', form.folder_id)
 
-    fetchEmails()
+        fetchEmailsWithFolderId()
+    }
 }
 
 const changeNewMailValue = (id) => {

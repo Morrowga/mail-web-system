@@ -16,6 +16,8 @@ const { t, locale } = useI18n();
 
 const person_in_charges = ref(page?.props?.person_in_charges)
 
+const folders = ref(page?.props?.folders);
+
 const dialog = ref(filterProps.filterDialog);
 
 const emit = defineEmits(['update:filterDialog']);
@@ -144,6 +146,25 @@ const onSearch = () => {
                                             variant="outlined" density="compact" required hide-details
                                             :items="person_in_charges"
                                             item-value="name"
+                                            clearable
+                                            item-title="name"
+                                        ></VSelect>
+                                        <InputError class="my-2" :message="''" />
+                                    </div>
+                                </div>
+                            </VCol>
+                            <VCol cols="12">
+                                <div class="d-flex justify-start">
+                                    <div style="width: 30%; padding: 10px;">
+                                        <InputLabel for="Person In Charge" :value="$t('input.person_in_charge')"/>
+                                    </div>
+                                    <div style="width: 40%;">
+                                        <VSelect
+                                            v-model="form.folder_id"
+                                            :placeholder="'Select Person In Charge'"
+                                            variant="outlined" density="compact" required hide-details
+                                            :items="folders"
+                                            item-value="id"
                                             clearable
                                             item-title="name"
                                         ></VSelect>

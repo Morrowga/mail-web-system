@@ -11,7 +11,7 @@ interface MailRepositoryInterface
 {
     public function inbox($filter);
 
-    public function inboxWithFolderId(Folder $folder);
+    public function inboxWithFolderId(Folder $folder, $filter);
 
     public function newMessage();
 

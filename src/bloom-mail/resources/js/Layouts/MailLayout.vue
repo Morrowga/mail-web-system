@@ -20,6 +20,7 @@ const form = ref({
     status: "",
     from: "",
     to: "",
+    folder_id: "",
     person_in_charge: "",
     keyword: ""
 })

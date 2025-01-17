@@ -141,7 +141,7 @@ const handleReplace = () =>
         (template) => template.id === currentActiveTemplateId.value
     );
 
-    form.subject = templateSelected?.subject;
+    form.subject = form.subject + ' ' + templateSelected?.subject;
     form.message_content = templateSelected?.message_content;
 }
 

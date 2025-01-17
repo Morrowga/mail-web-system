@@ -27,7 +27,21 @@ class FolderRepository implements FolderRepositoryInterface
             return $this->error($e->getMessage());
 
         }
+    }
 
+    public function getOnlyFolders()
+    {
+        try {
+
+            $folders = Folder::get();
+
+            return $this->success('Fetched Folders', $folders);
+
+        } catch (\Exception $e) {
+
+            return $this->error($e->getMessage());
+
+        }
     }
 
 

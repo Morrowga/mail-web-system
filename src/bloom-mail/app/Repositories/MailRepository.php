@@ -81,7 +81,7 @@ class MailRepository implements MailRepositoryInterface
                 $data = SentMail::with('template')
                     ->orderBy('datetime', 'desc')
                     ->where('type', 'sent')
-                    ->paginate(100);
+                    ->paginate(2);
                 break;
 
             case 'trash':
@@ -117,7 +117,6 @@ class MailRepository implements MailRepositoryInterface
                     $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
                 }
 
-
                 // Apply pagination
                 $data = $query->orderBy('datetime', 'desc')->doesntHave('folders')->paginate(100);
                 break;
@@ -133,7 +132,7 @@ class MailRepository implements MailRepositoryInterface
         ];
     }
 
-    public function inboxWithFolderId(Folder $folder)
+    public function inboxWithFolderId(Folder $folder, $filter = [])
     {
         $folderId = $folder->id;
 
@@ -151,13 +150,34 @@ class MailRepository implements MailRepositoryInterface
 
         $folders = Folder::withCount(['mails' => function ($query) {
             $query->where('status', 'new');
-            // ->where('parent_id', null);
         }])->get();
 
-        $data = MailLog::where('status', '!=', 'deleted')
-            // ->where('parent_id', null)
-            ->when($folderId, function ($query) use ($folderId) {
-                $query->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
+        $query = MailLog::where('status', '!=', 'deleted');
+
+        if (!empty($filter['status'])) {
+            $query->where('status', $filter['status']);
+        }
+
+        if (!empty($filter['keyword'])) {
+            $query->where(function ($q) use ($filter) {
+                $q->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
+                ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+            });
+        }
+
+        if (!empty($filter['person_in_charge'])) {
+            $query->where('person_in_charge', $filter['person_in_charge']);
+        }
+
+        if (!empty($filter['from']) && !empty($filter['to'])) {
+            $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
+        }
+
+        $data = $query->when($folderId, function ($inQuery) use ($folderId) {
+                $inQuery->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
             })
             ->orderBy('datetime', 'desc')
             ->paginate(100);
@@ -593,7 +613,7 @@ class MailRepository implements MailRepositoryInterface
             'from' => $request->from,
             'to' => $request->to,
             'template_id' => $request->template_id ?? null,
-            'message_content' => $request->message_content,
+            'message_content' => str_replace("\n", "<br />", $request->message_content),
             'in_reply_to' => $mail_log->message_id,
             'references' => $mail_log->message_id,
         ];
@@ -612,11 +632,24 @@ class MailRepository implements MailRepositoryInterface
                 'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
             ]);
 
-            // Send the reply email
+            $originalEmailContent = "---- Original Message ----\n";
+            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
+            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
+            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
+            $originalEmailContent .= nl2br($mail_log->body);
+
+            $replyContent = "\n\n---- Reply Message ----\n";
+            $replyContent .= "From: " . $emailData['from'] . "\n";
+            $replyContent .= "To: " . $emailData['to'] . "\n";
+            $replyContent .= "Subject: " . $emailData['subject'] . "\n\n";
+            $replyContent .= $emailData['message_content'];
+
             Mail::send('emails.reply', [
                 'emailData' => $emailData,
                 'replyMailData' => $replyMailData,
                 'originalEmail' => $mail_log,
+                'originalEmailContent' => $originalEmailContent,
+                'replyContent' => $replyContent,
             ], function ($message) use ($emailData) {
                 $message->from($emailData['from'])
                         ->to($emailData['to'])

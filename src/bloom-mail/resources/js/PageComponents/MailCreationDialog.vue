@@ -237,7 +237,7 @@ const generateRandomId = (length = 8) => {
                     <VRow dense>
                         <VCol cols="12" md="12" sm="6">
                             <VRow>
-                                <VCol cols="8">
+                                <!-- <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.subject')" for="subject" />
@@ -254,13 +254,13 @@ const generateRandomId = (length = 8) => {
                                             <InputError class="mt-1" :message="form.errors.subject" />
                                         </div>
                                     </div>
-                                </VCol>
-                                <VCol cols="4">
-                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
-                                        <div style="width: 50%; align-self: flex-end;">
+                                </VCol> -->
+                                <VCol cols="12">
+                                    <div class="d-flex justify-end align-items-center" style="height: 100%;">
+                                        <div class="mx-2" style="align-self: flex-end;">
                                             <span class="font-bold">{{ $t('input.sent_datetime') }}</span>
                                         </div>
-                                        <div style="width: 50%; align-self: flex-end;">
+                                        <div style="align-self: flex-end;">
                                             {{formattedDateTime}}
                                         </div>
                                     </div>
@@ -269,7 +269,7 @@ const generateRandomId = (length = 8) => {
                             <VDivider class="mt-1" />
                             <VRow>
                                 <VCol cols="8">
-                                    <div class="d-flex justify-between align-items-center" style="height: 100%;">
+                                    <div class="d-flex justify-between align-items-center mb-2" style="height: 100%;">
                                         <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.from')" for="from" />
                                         </div>
@@ -298,9 +298,9 @@ const generateRandomId = (length = 8) => {
                                     </div>
                                 </VCol> -->
                             </VRow>
-                            <VDivider class="mt-1" />
-                            <VRow>
-                                <VCol cols="8">
+                            <!-- <VDivider class="mt-1" /> -->
+                            <!-- <VRow> -->
+                                <!-- <VCol cols="8">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 20%; align-self: flex-end;">
                                             <InputLabel :value="$t('input.to')" for="to" />
@@ -317,7 +317,7 @@ const generateRandomId = (length = 8) => {
                                             <InputError class="mt-1" :message="form.errors.to" />
                                         </div>
                                     </div>
-                                </VCol>
+                                </VCol> -->
                                 <!-- <VCol cols="4">
                                     <div class="d-flex justify-between align-items-center" style="height: 100%;">
                                         <div style="width: 50%; align-self: flex-end;">
@@ -328,7 +328,7 @@ const generateRandomId = (length = 8) => {
                                         </div>
                                     </div>
                                 </VCol> -->
-                            </VRow>
+                            <!-- </VRow> -->
                             <VDivider class="" />
                             <VRow>
                                 <VCol cols="8" class="mt-3">
@@ -363,9 +363,14 @@ const generateRandomId = (length = 8) => {
                                         </div>
                                         <div style="width: 80%;">
                                             <VTextField
-                                            v-model="form.to"
-                                            variant="outlined" density="compact" required hide-details
+                                                variant="outlined"
+                                                density="compact"
+                                                type="email"
+                                                required
+                                                hide-details
+                                                v-model="form.to"
                                             ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.to" />
                                         </div>
                                     </div>
                                 </VCol>
@@ -413,9 +418,14 @@ const generateRandomId = (length = 8) => {
                                         </div>
                                         <div style="width: 80%;">
                                             <VTextField
-                                            v-model="form.subject"
-                                            variant="outlined" density="compact" hide-details
+                                                variant="outlined"
+                                                density="compact"
+                                                required
+                                                v-model="form.subject"
+                                                 @change="handleSubjectChange"
+                                                hide-details
                                             ></VTextField>
+                                            <InputError class="mt-1" :message="form.errors.subject" />
                                         </div>
                                     </div>
                                 </VCol>

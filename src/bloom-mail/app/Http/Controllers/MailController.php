@@ -11,22 +11,30 @@ use Illuminate\Http\Request;
 use App\Http\Requests\MailRequest;
 use App\Http\Requests\ReplyForwardRequest;
 use App\Interfaces\MailRepositoryInterface;
+use App\Interfaces\FolderRepositoryInterface;
 use App\Interfaces\TemplateRepositoryInterface;
 
 class MailController extends Controller
 {
     private MailRepositoryInterface $mailRepository;
     private TemplateRepositoryInterface $templateRepository;
+    private FolderRepositoryInterface $folderRepository;
 
-    public function __construct(MailRepositoryInterface $mailRepository, TemplateRepositoryInterface $templateRepository)
+    public function __construct(
+        MailRepositoryInterface $mailRepository,
+        TemplateRepositoryInterface $templateRepository,
+        FolderRepositoryInterface $folderRepository
+    )
     {
         $this->mailRepository = $mailRepository;
         $this->templateRepository = $templateRepository;
+        $this->folderRepository = $folderRepository;
     }
 
     public function index()
     {
         $templates = $this->templateRepository->getOnlyTemplates();
+        $folders = $this->folderRepository->getOnlyFolders();
 
         $person_in_charges = User::get();
 
@@ -35,6 +43,7 @@ class MailController extends Controller
         return Inertia::render('Inbox', [
             "templates" => $templates['data'],
             "from" => $from,
+            "folders" => $folders['data'],
             "person_in_charges" => $person_in_charges
         ]);
     }
