@@ -156,12 +156,12 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Person In Charge" :value="$t('input.person_in_charge')"/>
+                                        <InputLabel for="フォルダー" :value="'フォルダー'"/>
                                     </div>
                                     <div style="width: 40%;">
                                         <VSelect
                                             v-model="form.folder_id"
-                                            :placeholder="'Select Person In Charge'"
+                                            :placeholder="'フォルダー'"
                                             variant="outlined" density="compact" required hide-details
                                             :items="folders"
                                             item-value="id"
