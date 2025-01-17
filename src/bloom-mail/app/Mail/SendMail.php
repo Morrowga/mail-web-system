@@ -4,7 +4,9 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Symfony\Component\Mime\Email;
 use Illuminate\Queue\SerializesModels;
+use Symfony\Component\Mime\Header\IdentificationHeader;
 
 class SendMail extends Mailable
 {
@@ -35,9 +37,11 @@ class SendMail extends Mailable
                         'message_content' => $this->data->body,
                         'template' => $this->data->template,
                     ])
-                    // Add custom headers such as Message-ID
-                    ->withSwiftMessage(function ($message) {
-                        $message->getHeaders()->addTextHeader('Message-ID', $this->data['message_id']);
+                    ->withSymfonyMessage(function (Email $message) {
+                        $headers = $message->getHeaders();
+
+                        $headers->add(new IdentificationHeader('Message-ID', $this->data->message_id));
+                        $headers->add(new IdentificationHeader('References', $this->data->message_id));
                     });
     }
 }

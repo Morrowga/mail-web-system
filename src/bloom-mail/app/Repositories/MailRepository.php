@@ -251,6 +251,7 @@ class MailRepository implements MailRepositoryInterface
                 $references = $message->getHeader()->get('references');
 
                 $parentId = null;
+                $referencesString = null;
 
                 if (!$parentId && $references) {
                     $referencesArray = explode(' ', $references);
@@ -264,6 +265,7 @@ class MailRepository implements MailRepositoryInterface
                             break;
                         }
                     }
+                    $referencesString = implode(', ', $referencesArray);
                 }
 
                 $newMail = MailLog::create([
@@ -277,6 +279,7 @@ class MailRepository implements MailRepositoryInterface
                     'status' => $status,
                     'deleted_at' => $deleted_date,
                     'parent_id' => $parentId,
+                    'references' => $referencesString
                 ]);
 
                 $attachments = $message->getAttachments();
@@ -591,6 +594,31 @@ class MailRepository implements MailRepositoryInterface
             ];
         }
 
+        if ($mailLog->references != null) {
+            $referencesArray = explode(',', $mailLog->references);
+
+            foreach ($referencesArray as $reference) {
+                $reference = trim($reference);
+
+                $sentMail = SentMail::where('message_id', $reference)->first();
+
+                if ($sentMail) {
+                    $histories[] = [
+                        'uid' => $sentMail->uid,
+                        'message_id' => $sentMail->message_id,
+                        'subject' => $sentMail->subject,
+                        'sender' => $sentMail->sender,
+                        'name' => $this->decodeString($sentMail->name),
+                        'body' => $sentMail->body,
+                        'datetime' => $sentMail->datetime,
+                        'status' => $sentMail->status,
+                        'attachments' => $sentMail->attachments != null ? $sentMail->attachments : []
+                    ];
+                    break;
+                }
+            }
+        }
+
         $systemMailHistories = $mailLog->mail_histories->toArray();
 
         $mergedHistories = array_merge($histories, $systemMailHistories);
@@ -884,7 +912,7 @@ class MailRepository implements MailRepositoryInterface
     public function store(Request $request)
     {
         try {
-            $messageId = '<' . uniqid('email-', true) . '@' . config('app.url') . '>';
+            $messageId = md5(uniqid(time())) . '@voyager-web.com';
 
             $data = [
                 'subject' => $request->subject,

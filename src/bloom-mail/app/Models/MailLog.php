@@ -21,6 +21,7 @@ class MailLog extends Model
         'datetime',
         'previous_status',
         'person_in_charge',
+        'references',
         'deleted_at',
         'is_match'
     ];

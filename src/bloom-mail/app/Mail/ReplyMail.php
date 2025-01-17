@@ -31,7 +31,6 @@ class ReplyMail extends Mailable
             ->withSymfonyMessage(function (Email $message) {
                 $headers = $message->getHeaders();
 
-                // Use proper header types for message identification
                 $headers->add(new IdentificationHeader('Message-ID', $this->emailData['message_id']));
                 $headers->add(new IdentificationHeader('In-Reply-To', $this->emailData['in_reply_to']));
                 $headers->add(new IdentificationHeader('References', $this->emailData['in_reply_to']));
