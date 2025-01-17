@@ -81,7 +81,7 @@ class MailRepository implements MailRepositoryInterface
                 $data = SentMail::with('template')
                     ->orderBy('datetime', 'desc')
                     ->where('type', 'sent')
-                    ->paginate(2);
+                    ->paginate(100);
                 break;
 
             case 'trash':
