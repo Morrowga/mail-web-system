@@ -202,137 +202,206 @@ class MailRepository implements MailRepositoryInterface
     {
         Log::info('Message fetching started');
 
+        // Fetch messages with limit
         $inbox = $this->client->getFolder('INBOX');
         $messages = $inbox->messages()->all()->setFetchOrder("desc")->limit(100)->get();
+
+        // Cache spam and existing message data
+        $spamData = $this->getSpamData();
+        $existingMessageIds = MailLog::pluck('message_id')->toArray();
         $newEmails = [];
 
-        $spamEmails = Spam::pluck('mail_address')->toArray();
-        $spamDomains = Spam::pluck('mail_address')->map(function ($email) {
-            return explode('@', $email)[1];
-        })->toArray();
-
-        $existingMessageIds = MailLog::select('message_id')
-            ->pluck('message_id')
-            ->toArray();
-
+        // Process messages in chunks
         foreach (array_chunk($messages->toArray(), 10) as $messageChunk) {
-            foreach ($messageChunk as $message) {
-                $uid = $message->getUid();
-                $messageId = $message->getMessageId();
-
-                if (in_array($messageId, $existingMessageIds)) {
-                    continue;
-                }
-
-                $subject = $this->decodeString($message->getSubject()[0]);
-                $senderArray = $message->getFrom();
-                $senderName = $senderArray[0]->personal ?? 'Unknown Sender';
-                $senderEmail = !empty($senderArray) && isset($senderArray[0]->mail) ? $this->decodeString($senderArray[0]->mail) : 'unknown@example.com';
-
-                $isSpam = in_array($senderEmail, $spamEmails) || in_array(explode('@', $senderEmail)[1], $spamDomains);
-
-                if ($isSpam) {
-                    $message->delete(false);
-                    continue;
-                }
-
-                $flags = $message->getFlags()->toArray();
-                $status = 'new';
-
-                $body = '';
-                $bodies = $message->getBodies();
-
-                $body = isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
-
-                $dateSent = $message->getDate();
-                $deleted_date = null;
-
-                $inReplyTo = $message->getHeader()->get('in-reply-to');
-                $references = $message->getHeader()->get('references');
-
-                $parentId = null;
-                $referencesString = null;
-
-                if ($inReplyTo) {
-                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])
-                        ->first();
-                    if ($parentMessage) {
-                        $parentId = $parentMessage->id;
-
-                        $parentMessage->status = 'new';
-                        $parentMessage->save();
-
-                        broadcast(new EmailStatusUpdated($parentMessage, 'read'));
-                    }
-                }
-
-                if (!$parentId && $references) {
-                    $referencesArray = explode(',', $references);
-
-                    foreach ($referencesArray as $reference) {
-
-                        $parentMessage = MailLog::where('message_id', $reference)->first();
-
-                        if($parentMessage)
-                        {
-                            $parentId = $parentMessage->id;
-
-                            $parentMessage->status = 'new';
-                            $parentMessage->save();
-
-                            broadcast(new EmailStatusUpdated($parentMessage, 'read'));
-
-                            break;
-                        }
-                    }
-                    $referencesString = implode(',', $referencesArray);
-                }
-
-                $newMail = MailLog::create([
-                    'uid' => $uid,
-                    'message_id' => $messageId,
-                    'subject' => $subject,
-                    'sender' => $senderEmail,
-                    'name' => $senderName,
-                    'body' => $body,
-                    'datetime' => $this->convertToJapanTimezone($dateSent[0]),
-                    'status' => $status,
-                    'deleted_at' => $deleted_date,
-                    'parent_id' => $parentId,
-                    'references' => $referencesString
-                ]);
-
-                $attachments = $message->getAttachments();
-                foreach ($attachments as $attachment) {
-                    $this->processAttachment($attachment, $newMail);
-                }
-
-                $newEmails[] = [
-                    'uid' => $uid,
-                    'message_id' => $messageId,
-                    'subject' => $subject,
-                    'sender' => $senderEmail,
-                    'name' => $senderName,
-                    'body' => $body,
-                    'datetime' => $this->convertToJapanTimezone($dateSent[0]),
-                    'status' => $status,
-                    'parent_id' => $parentId,
-                ];
-            }
+            $this->processMessageChunk($messageChunk, $spamData, $existingMessageIds, $newEmails);
         }
-
 
         $this->folderMatching();
 
         Log::info('Message fetching ended');
 
-        Log::info('Sending to queue started');
+        // Broadcast only if new emails exist
+        if (!empty($newEmails)) {
+            Log::info('Sending to queue started');
+            broadcast(new TakingMail(["new" => 1]));
+            Log::info('Sending to queue ended');
+        }
+    }
 
-        $checkNew = count($newEmails) > 0 ? 1 : 0;
+    /**
+     * Get cached spam data
+     */
+    private function getSpamData()
+    {
+        $spamEmails = Spam::pluck('mail_address')->toArray();
+        return [
+            'emails' => $spamEmails,
+            'domains' => array_unique(array_map(function ($email) {
+                return explode('@', $email)[1];
+            }, $spamEmails))
+        ];
+    }
 
-        broadcast(new TakingMail(["new" => $checkNew]));
+    /**
+     * Process chunk of messages
+     */
+    private function processMessageChunk($messageChunk, $spamData, $existingMessageIds, &$newEmails)
+    {
+        foreach ($messageChunk as $message) {
+            $messageData = $this->processMessage($message, $spamData, $existingMessageIds);
+            if ($messageData) {
+                $newEmails[] = $messageData['broadcastData'];
+            }
+        }
+    }
 
-        Log::info('Sending to queue ended');
+    /**
+     * Process individual message
+     */
+    private function processMessage($message, $spamData, $existingMessageIds)
+    {
+        $messageId = $message->getMessageId();
+        if (in_array($messageId, $existingMessageIds)) {
+            return null;
+        }
+
+        $senderData = $this->getSenderInfo($message);
+        if ($this->isSpamSender($senderData['email'], $spamData)) {
+            $message->delete(false);
+            return null;
+        }
+
+        $parentData = $this->findParentMessage($message);
+        $body = $this->getMessageBody($message);
+        $dateSent = $message->getDate();
+
+        $mailLog = $this->createMailLog($message, $senderData, $body, $dateSent, $parentData);
+
+        // Process attachments if any
+        $attachments = $message->getAttachments();
+        foreach ($attachments as $attachment) {
+            $this->processAttachment($attachment, $mailLog);
+        }
+
+        return [
+            'mailLog' => $mailLog,
+            'broadcastData' => $this->prepareBroadcastData($mailLog)
+        ];
+    }
+
+    /**
+     * Get sender information
+     */
+    private function getSenderInfo($message)
+    {
+        $senderArray = $message->getFrom();
+        return [
+            'name' => $senderArray[0]->personal ?? 'Unknown Sender',
+            'email' => !empty($senderArray) && isset($senderArray[0]->mail)
+                ? $this->decodeString($senderArray[0]->mail)
+                : 'unknown@example.com'
+        ];
+    }
+
+    /**
+     * Check if sender is spam
+     */
+    private function isSpamSender($email, $spamData)
+    {
+        $domain = explode('@', $email)[1];
+        return in_array($email, $spamData['emails']) || in_array($domain, $spamData['domains']);
+    }
+
+    /**
+     * Find parent message
+     */
+    private function findParentMessage($message)
+    {
+        $inReplyTo = $message->getHeader()->get('in-reply-to');
+        $references = $message->getHeader()->get('references');
+        $parentId = null;
+        $referencesString = null;
+
+        if ($inReplyTo) {
+            $parentMessage = MailLog::where('message_id', $inReplyTo[0])->first();
+            if ($parentMessage) {
+                $this->updateParentStatus($parentMessage);
+                return ['id' => $parentMessage->id, 'references' => null];
+            }
+        }
+
+        if ($references) {
+            $referencesArray = explode(',', $references);
+            foreach ($referencesArray as $reference) {
+                $parentMessage = MailLog::where('message_id', $reference)->first();
+                if ($parentMessage) {
+                    $this->updateParentStatus($parentMessage);
+                    return [
+                        'id' => $parentMessage->id,
+                        'references' => implode(', ', $referencesArray)
+                    ];
+                }
+            }
+        }
+
+        return ['id' => null, 'references' => null];
+    }
+
+    /**
+     * Update parent message status
+     */
+    private function updateParentStatus($parentMessage)
+    {
+        $parentMessage->status = 'new';
+        $parentMessage->save();
+        broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+    }
+
+    /**
+     * Get message body
+     */
+    private function getMessageBody($message)
+    {
+        $bodies = $message->getBodies();
+        return isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
+    }
+
+    /**
+     * Create mail log entry
+     */
+    private function createMailLog($message, $senderData, $body, $dateSent, $parentData)
+    {
+        return MailLog::create([
+            'uid' => $message->getUid(),
+            'message_id' => $message->getMessageId(),
+            'subject' => $this->decodeString($message->getSubject()[0]),
+            'sender' => $senderData['email'],
+            'name' => $senderData['name'],
+            'body' => $body,
+            'datetime' => $this->convertToJapanTimezone($dateSent[0]),
+            'status' => 'new',
+            'deleted_at' => null,
+            'parent_id' => $parentData['id'],
+            'references' => $parentData['references']
+        ]);
+    }
+
+    /**
+     * Prepare broadcast data
+     */
+    private function prepareBroadcastData($mailLog)
+    {
+        return [
+            'uid' => $mailLog->uid,
+            'message_id' => $mailLog->message_id,
+            'subject' => $mailLog->subject,
+            'sender' => $mailLog->sender,
+            'name' => $mailLog->name,
+            'body' => $mailLog->body,
+            'datetime' => $mailLog->datetime,
+            'status' => $mailLog->status,
+            'parent_id' => $mailLog->parent_id,
+        ];
     }
 
     // public function oldData()
