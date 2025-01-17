@@ -235,17 +235,22 @@ class MailRepository implements MailRepositoryInterface
 
                 $body = '';
 
-                if ($message->hasTextBody()) {
-                    $body = $message->getTextBody();
-                } else {
-                    $body = $message->getHTMLBody();
-                }
+                // if ($message->hasTextBody()) {
+                //     $body = $message->getTextBody();
+                // } else {
+                //     $body = $message->getHTMLBody();
+                // }
+
+                $bodies = $message->getBodies();
+
+                $body = isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
 
                 $dateSent = $message->getDate();
                 $deleted_date = null;
 
                 $inReplyTo = $message->getHeader()->get('in-reply-to');
                 $references = $message->getHeader()->get('references');
+
                 if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
                     continue;
                 }
@@ -679,40 +684,32 @@ class MailRepository implements MailRepositoryInterface
 
     public function forward(Request $request, MailLog $mail_log)
     {
-        try {
+        // try {
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
                 'from' => $request->from,
                 'to' => $request->to,
-                'message_content' => $request->message_content,
+                'message_content' => str_replace("\n", "<br />", $request->message_content),
                 'template_id' => $request->template_id ?? null
             ];
 
-            $originalEmail = [
-                'sender' => $mail_log->sender,
-                'datetime' => $mail_log->datetime,
-                'subject' => $mail_log->subject,
-                'body' => $this->cleanHtmlContent($mail_log->body),
-            ];
+            $originalEmailContent = "\n\n ---- Original Message ----\n";
+            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
+            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
+            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
+            $originalEmailContent .= strip_tags($mail_log->body);
 
-            $forwardedBody = "
-            <div style='margin: 0; padding: 0;'>
-                <p style='margin: 0; padding: 0;'><strong>Forwarded message</strong></p>
-                <p style='margin: 5px 0; padding: 0;'><strong>From:</strong> " . e($emailData['from']) . "</p>
-                <p style='margin: 5px 0; padding: 0;'><strong>Date:</strong> " . e($mail_log->datetime) . "</p>
-                <p style='margin: 5px 0; padding: 0;'><strong>Subject:</strong> " . e($mail_log->subject) . "</p>
-                <p style='margin: 5px 0; padding: 0;'><strong>Body:</strong></p>
-                <div style='margin: 0; padding: 0;'>" . $mail_log->body . "</div> <!-- Don't escape here -->
-            </div>
-            <hr>
-            <div style='margin: 0; padding: 0;'>
-                <p>" . e($request->message_content) . "</p>
-            </div>";
+            $forwardedContent = "
+           ---- Forwarded Message ----\n
+            From: " . e($emailData['from']) . "\n
+            Date: " . e($mail_log->datetime) . "\n
+            Subject: " . e($mail_log->subject) . "\n
+            " . $emailData['message_content'];
 
             $forwardMailData = SentMail::create([
                 'subject' => $emailData['subject'],
                 'sender' => $emailData['from'],
-                'body' => $forwardedBody,
+                'body' => $forwardedContent,
                 'parent_id' => $mail_log->id,
                 'to' => $emailData['to'],
                 'template_id' => $emailData['template_id'],
@@ -720,17 +717,17 @@ class MailRepository implements MailRepositoryInterface
                 'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
             ]);
 
-            Mail::send('emails.forward', compact('emailData', 'originalEmail' , 'forwardMailData'), function ($message) use ($emailData) {
+            Mail::send('emails.forward', compact('emailData' , 'forwardMailData','forwardedContent', 'originalEmailContent'), function ($message) use ($emailData) {
                 $message->from($emailData['from'])
                         ->to($emailData['to'])
                         ->subject($emailData['subject']);
             });
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
-        } catch (\Exception $e) {
-            Log::error('Error sending forward email: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     Log::error('Error sending forward email: ' . $e->getMessage());
+        //     return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
+        // }
     }
 
     public function delete(MailLog $mailLog)
