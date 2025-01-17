@@ -64,14 +64,16 @@ class MailRepository implements MailRepositoryInterface
         $pageType = request()->query('page_type');
 
         $inboxCount = MailLog::where('status', 'new')
+        ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
+        ->where('parent_id', null)
         ->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
         $sentCount = SentMail::where('type', 'sent')->count();
@@ -92,7 +94,7 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted');
+                $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -138,9 +140,11 @@ class MailRepository implements MailRepositoryInterface
 
         $inboxCount = MailLog::where('status', 'new')
         ->doesntHave('folders')
+        ->where('parent_id', null)
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
+        ->where('parent_id', null)
         ->count();
 
         $inbox = $inboxCount ?? 0;
@@ -149,10 +153,11 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
-        $query = MailLog::where('status', '!=', 'deleted');
+        $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
+
 
         if (!empty($filter['status'])) {
             $query->where('status', $filter['status']);
@@ -205,8 +210,8 @@ class MailRepository implements MailRepositoryInterface
         })->toArray();
 
         $existingMessageIds = MailLog::select('message_id')
-        ->pluck('message_id')
-        ->toArray();
+            ->pluck('message_id')
+            ->toArray();
 
         foreach (array_chunk($messages->toArray(), 10) as $messageChunk) {
             foreach ($messageChunk as $message) {
@@ -230,20 +235,13 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 $flags = $message->getFlags()->toArray();
-                // $status = in_array('Seen', $flags) ? 'read' : 'new';
                 $status = 'new';
 
                 $body = '';
-
-                // if ($message->hasTextBody()) {
-                //     $body = $message->getTextBody();
-                // } else {
-                //     $body = $message->getHTMLBody();
-                // }
-
                 $bodies = $message->getBodies();
 
                 $body = isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
+
 
                 $dateSent = $message->getDate();
                 $deleted_date = null;
@@ -251,9 +249,30 @@ class MailRepository implements MailRepositoryInterface
                 $inReplyTo = $message->getHeader()->get('in-reply-to');
                 $references = $message->getHeader()->get('references');
 
-                if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
-                    continue;
+                $parentId = null;
+
+                if ($inReplyTo) {
+                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+                        ->first();
+                    if ($parentMessage) {
+                        $parentId = $parentMessage->id;
+                    }
                 }
+
+                if (!$parentId && $references) {
+                    $referencesArray = explode(' ', $references);
+                    foreach ($referencesArray as $reference) {
+                        $parentMessage = MailLog::where('message_id', $reference)->first();
+                        if ($parentMessage) {
+                            $parentId = $parentMessage->id;
+                            break;
+                        }
+                    }
+                }
+
+                // if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
+                //     continue;
+                // }
 
                 $newMail = MailLog::create([
                     'uid' => $uid,
@@ -265,9 +284,8 @@ class MailRepository implements MailRepositoryInterface
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
                     'deleted_at' => $deleted_date,
-                    'is_match' => 0
+                    'parent_id' => $parentId, // Store parent_id if found
                 ]);
-
 
                 $attachments = $message->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -283,13 +301,15 @@ class MailRepository implements MailRepositoryInterface
                     'body' => $body,
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
+                    'parent_id' => $parentId,
                 ];
             }
         }
 
-        Log::info('Message fetching ended');
 
-        $this->singleFolderMatching();
+        $this->folderMatching();
+
+        Log::info('Message fetching ended');
 
         Log::info('Sending to queue started');
 
@@ -299,6 +319,55 @@ class MailRepository implements MailRepositoryInterface
 
         Log::info('Sending to queue ended');
     }
+
+    public function oldData()
+    {
+        Log::info('Message fetching started');
+        $inbox = $this->client->getFolder('INBOX');
+        $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+        foreach (array_chunk($messages->toArray(), 10) as $messageChunk) {
+            foreach ($messageChunk as $message) {
+                $uid = $message->getUid();
+                $subject = $this->decodeString($message->getSubject()[0]);
+                $findExisting = MailLog::where('uid', $uid)->first();
+                if(!empty($findExisting))
+                {
+                    $body = '';
+                    if ($message->hasTextBody()) {
+                        $body = $message->getTextBody();
+                    } else {
+                        $body = $message->getHTMLBody();
+                    }
+                    $inReplyTo = $message->getHeader()->get('in-reply-to');
+                    $references = $message->getHeader()->get('references');
+                    $parentId = null;
+                    if ($inReplyTo) {
+                        $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+                            ->first();
+                        if ($parentMessage) {
+                            $parentId = $parentMessage->id;
+                        }
+                    }
+                    if (!$parentId && $references) {
+                        $referencesArray = explode(' ', $references);
+                        foreach ($referencesArray as $reference) {
+                            $parentMessage = MailLog::where('message_id', $reference)->first();
+                            if ($parentMessage) {
+                                $parentId = $parentMessage->id;
+                                break;
+                            }
+                        }
+                    }
+                    if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
+                        continue;
+                    }
+                    $findExisting->parent_id = $parentId;
+                    $findExisting->save();
+                }
+            }
+        }
+    }
+
 
     private function processAttachment($attachment, $mail)
     {
@@ -499,75 +568,50 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        $mailLog = MailLog::find($id);
-
-        $inbox = $this->client->getFolder('INBOX');
-
-        $message = $inbox->query()->getMessageByUid($mailLog->uid);
+        $mailLog = MailLog::with(['mail_threads.attachments'])->find($id);
 
         $histories = [];
 
+        $histories[] = [
+            'uid' => $mailLog->uid,
+            'message_id' => $mailLog->message_id,
+            'subject' => $mailLog->subject,
+            'sender' => $mailLog->sender,
+            'name' => $this->decodeString($mailLog->name),
+            'body' => $mailLog->body,
+            'datetime' => $mailLog->datetime,
+            'status' => $mailLog->status,
+            'attachments' => $mailLog->attachments != null ? $mailLog->attachments : []
+        ];
 
-        if ($message) {
-            $threadMessages = $message->thread($inbox);
-
-            foreach ($threadMessages as $threadMessage) {
-                $uid = $threadMessage->getUid();
-                $messageId = $threadMessage->getMessageId()[0];
-                $subject = isset($threadMessage->getSubject()[0])
-                ? $this->decodeString($threadMessage->getSubject()[0])
-                : 'No Subject';
-                $senderArray = $threadMessage->getFrom();
-                if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-                    $senderEmail = $this->decodeString($senderArray[0]->mail);
-                } else {
-                    $senderEmail = 'unknown@example.com';
-                }
-                $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
-
-                if ($threadMessage->hasHTMLBody()) {
-                    $body = $threadMessage->getHTMLBody();
-                } else {
-                    $body = $threadMessage->getTextBody();
-                }
-
-                $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
-                $status = in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
-
-                $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
-
-                $histories[] = [
-                    'uid' => $uid,
-                    'message_id' => $messageId,
-                    'subject' => $subject,
-                    'sender' => $senderEmail,
-                    'name' => $this->decodeString($senderName),
-                    'body' => $body,
-                    'datetime' => $dateSent->toDateTimeString(),
-                    'status' => $status,
-                    'attachments' => $findAttachement != null ? $findAttachement->attachments : []
-                ];
-            }
-
-            $systemMailHistories = $mailLog->mail_histories->toArray();
-
-            $mergedHistories = array_merge($histories, $systemMailHistories);
-
-            usort($mergedHistories, function ($a, $b) {
-                return strtotime($b['datetime']) - strtotime($a['datetime']);
-            });
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Email histories fetched successfully.',
-                'data' => $mergedHistories,
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email not found.',
-            ], 404);
+        foreach($mailLog->mail_threads as $threadMessage)
+        {
+            $histories[] = [
+                'uid' => $threadMessage->uid,
+                'message_id' => $threadMessage->message_id,
+                'subject' => $threadMessage->subject,
+                'sender' => $threadMessage->sender,
+                'name' => $this->decodeString($threadMessage->name),
+                'body' => $threadMessage->body,
+                'datetime' => $threadMessage->datetime,
+                'status' => $threadMessage->status,
+                'attachments' => $threadMessage->attachments != null ? $threadMessage->attachments : []
+            ];
         }
+
+        $systemMailHistories = $mailLog->mail_histories->toArray();
+
+        $mergedHistories = array_merge($histories, $systemMailHistories);
+
+        usort($mergedHistories, function ($a, $b) {
+            return strtotime($b['datetime']) - strtotime($a['datetime']);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email histories fetched successfully.',
+            'data' => $mergedHistories,
+        ]);
     }
 
     private function processThreadMessage($threadMessage)
