@@ -219,7 +219,7 @@ class MailRepository implements MailRepositoryInterface
 
         Log::info('Folder scanning started');
 
-        $this->folderMatching();
+        $this->singleFolderMatching();
 
         Log::info('Folder scanning ended');
 
