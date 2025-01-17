@@ -4,6 +4,7 @@
     $replyContent = nl2br($replyContent);
 @endphp
 
+{!! $replyContent !!}
+
 {!! $originalEmailContent !!}
 
-{!! $replyContent !!}

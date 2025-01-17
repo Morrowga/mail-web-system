@@ -718,7 +718,7 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatOriginalEmail(MailLog $mail_log)
     {
-        return "---- Original Message ----\n" .
+        return "\n---- Original Message ----\n" .
             "From: " . $mail_log->sender . "\n" .
             "Sent: " . $mail_log->datetime . "\n" .
             "Subject: " . $mail_log->subject . "\n\n" .
@@ -730,11 +730,11 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatReplyContent($emailData)
     {
-        return "\n\n---- Reply Message ----\n" .
+        return "---- Reply Message ----\n" .
             "From: " . $emailData['from'] . "\n" .
             "To: " . $emailData['to'] . "\n" .
             "Subject: " . $emailData['subject'] . "\n\n" .
-            $emailData['message_content'];
+            $emailData['message_content'] . "\n";
     }
 
     public function forward(Request $request, MailLog $mail_log)
