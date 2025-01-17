@@ -8,8 +8,10 @@ use App\Models\Spam;
 use App\Models\Reply;
 use App\Mail\SendMail;
 use App\Models\Folder;
+use App\Mail\ReplyMail;
 use App\Models\MailLog;
 use App\Models\SentMail;
+use App\Mail\ForwardMail;
 use Webklex\PHPIMAP\IMAP;
 use App\Events\TakingMail;
 use App\Models\Attachment;
@@ -252,27 +254,34 @@ class MailRepository implements MailRepositoryInterface
                 $parentId = null;
 
                 if ($inReplyTo) {
-                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])
-                        ->first();
-                    if ($parentMessage) {
+                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])->first();
+
+                    if (!$parentMessage) {
+                        $parentMessage = SentMail::where('message_id', $inReplyTo[0])->first();
+                        $parentId = $parentMessage ? $parentMessage->parent_id : null;
+                    } else {
                         $parentId = $parentMessage->id;
                     }
                 }
 
                 if (!$parentId && $references) {
                     $referencesArray = explode(' ', $references);
+
                     foreach ($referencesArray as $reference) {
                         $parentMessage = MailLog::where('message_id', $reference)->first();
-                        if ($parentMessage) {
+
+                        if (!$parentMessage) {
+                            $parentMessage = SentMail::where('message_id', $reference)->first();
+                            if ($parentMessage) {
+                                $parentId = $parentMessage->parent_id;
+                                break;
+                            }
+                        } else {
                             $parentId = $parentMessage->id;
                             break;
                         }
                     }
                 }
-
-                // if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
-                //     continue;
-                // }
 
                 $newMail = MailLog::create([
                     'uid' => $uid,
@@ -284,7 +293,7 @@ class MailRepository implements MailRepositoryInterface
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
                     'deleted_at' => $deleted_date,
-                    'parent_id' => $parentId, // Store parent_id if found
+                    'parent_id' => $parentId,
                 ]);
 
                 $attachments = $message->getAttachments();
@@ -657,84 +666,90 @@ class MailRepository implements MailRepositoryInterface
             return $this->error('Original email not found.');
         }
 
+        if (!$mail_log) {
+            return $this->error('Original email not found.');
+        }
+
+        $originalMessageId = $mail_log->message_id;
+
+        $messageId = md5(uniqid(time())) . '@voyager-web.com';
+
         $emailData = [
             'subject' => $request->subject,
             'from' => $request->from,
             'to' => $request->to,
             'template_id' => $request->template_id ?? null,
             'message_content' => str_replace("\n", "<br />", $request->message_content),
-            'in_reply_to' => $mail_log->message_id,
-            'references' => $mail_log->message_id,
+            'message_id' => $messageId,
+            'in_reply_to' =>  $mail_log->message_id,
+            'replyTo' => $request->to,
         ];
 
-        try {
+        $replyMailData = SentMail::create([
+            'subject' => $emailData['subject'],
+            'sender' => $emailData['from'],
+            'mailto' => $emailData['to'],
+            'body' => $emailData['message_content'],
+            'name' => Auth::user()->name,
+            'parent_id' => $mail_log->id,
+            'template_id' => $emailData['template_id'],
+            'type' => 'reply',
+            'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
+            'message_id' => trim($messageId, '<>'),
+        ]);
 
-            $replyMailData = SentMail::create([
-                'subject' => $emailData['subject'],
-                'sender' => $emailData['from'],
-                'mailto' => $emailData['to'],
-                'body' => $emailData['message_content'],
-                'name' => Auth::user()->name,
-                'parent_id' => $mail_log->id,
-                'template_id' => $emailData['template_id'],
-                'type' => 'reply',
-                'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
-            ]);
+        $originalEmailContent = $this->formatOriginalEmail($mail_log);
+        $replyContent = $this->formatReplyContent($emailData);
 
-            $originalEmailContent = "---- Original Message ----\n";
-            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
-            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
-            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
-            $originalEmailContent .= nl2br($mail_log->body);
+        Mail::to($emailData['to'])->send(new ReplyMail($emailData, $originalEmailContent, $replyContent));
 
-            $replyContent = "\n\n---- Reply Message ----\n";
-            $replyContent .= "From: " . $emailData['from'] . "\n";
-            $replyContent .= "To: " . $emailData['to'] . "\n";
-            $replyContent .= "Subject: " . $emailData['subject'] . "\n\n";
-            $replyContent .= $emailData['message_content'];
-
-            Mail::send('emails.reply', [
-                'emailData' => $emailData,
-                'replyMailData' => $replyMailData,
-                'originalEmail' => $mail_log,
-                'originalEmailContent' => $originalEmailContent,
-                'replyContent' => $replyContent,
-            ], function ($message) use ($emailData) {
-                $message->from($emailData['from'])
-                        ->to($emailData['to'])
-                        ->subject($emailData['subject'])
-                        ->getHeaders()
-                        ->addTextHeader('In-Reply-To', '<' . $emailData['in_reply_to'] . '>')
-                        ->addTextHeader('References', '<' . $emailData['references'] . '>');
-            });
-
-            if($mail_log->status != 'confirmed' || $mail_log->status != 'resolved')
-            {
-                $mail_log->status = 'resolved';
-                $mail_log->previous_status = null;
-                $mail_log->person_in_charge = Auth::user()->name;
-                $mail_log->update();
-            }
-
-            broadcast(new EmailStatusUpdated($mail_log, 'resolved'));
-
-            return $this->success('Email Sent.');
-        } catch (\Exception $e) {
-            \Log::error('Error sending reply email: ' . $e->getMessage());
-
-            return $this->error('Failed to send reply email.');
+        if($mail_log->status != 'confirmed' && $mail_log->status != 'resolved') {
+            $mail_log->status = 'resolved';
+            $mail_log->previous_status = null;
+            $mail_log->person_in_charge = Auth::user()->name;
+            $mail_log->update();
         }
+
+        return $this->success('Email Sent.');
+    }
+
+    /**
+     * Format original email content
+     */
+    private function formatOriginalEmail(MailLog $mail_log)
+    {
+        return "---- Original Message ----\n" .
+            "From: " . $mail_log->sender . "\n" .
+            "Sent: " . $mail_log->datetime . "\n" .
+            "Subject: " . $mail_log->subject . "\n\n" .
+            nl2br($mail_log->body);
+    }
+
+    /**
+     * Format reply content
+     */
+    private function formatReplyContent($emailData)
+    {
+        return "\n\n---- Reply Message ----\n" .
+            "From: " . $emailData['from'] . "\n" .
+            "To: " . $emailData['to'] . "\n" .
+            "Subject: " . $emailData['subject'] . "\n\n" .
+            $emailData['message_content'];
     }
 
     public function forward(Request $request, MailLog $mail_log)
     {
-        // try {
+        try {
+            $messageId = md5(uniqid(time())) . '@voyager-web.com';
+
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
                 'from' => $request->from,
                 'to' => $request->to,
                 'message_content' => str_replace("\n", "<br />", $request->message_content),
-                'template_id' => $request->template_id ?? null
+                'template_id' => $request->template_id ?? null,
+                'message_id' => $messageId,
+                'references' => $mail_log->message_id
             ];
 
             $originalEmailContent = "\n\n ---- Original Message ----\n";
@@ -744,7 +759,7 @@ class MailRepository implements MailRepositoryInterface
             $originalEmailContent .= strip_tags($mail_log->body);
 
             $forwardedContent = "
-           ---- Forwarded Message ----\n
+            ---- Forwarded Message ----\n
             From: " . e($emailData['from']) . "\n
             Date: " . e($mail_log->datetime) . "\n
             Subject: " . e($mail_log->subject) . "\n
@@ -755,23 +770,20 @@ class MailRepository implements MailRepositoryInterface
                 'sender' => $emailData['from'],
                 'body' => $forwardedContent,
                 'parent_id' => $mail_log->id,
-                'to' => $emailData['to'],
+                'mailto' => $emailData['to'],
                 'template_id' => $emailData['template_id'],
                 'type' => 'forward',
                 'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
+                'message_id' => trim($messageId, '<>')
             ]);
 
-            Mail::send('emails.forward', compact('emailData' , 'forwardMailData','forwardedContent', 'originalEmailContent'), function ($message) use ($emailData) {
-                $message->from($emailData['from'])
-                        ->to($emailData['to'])
-                        ->subject($emailData['subject']);
-            });
+            Mail::to($emailData['to'])->send(new ForwardMail($emailData, $originalEmailContent, $forwardedContent));
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
-        // } catch (\Exception $e) {
-        //     Log::error('Error sending forward email: ' . $e->getMessage());
-        //     return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
-        // }
+        } catch (\Exception $e) {
+            Log::error('Error sending forward email: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
+        }
     }
 
     public function delete(MailLog $mailLog)
