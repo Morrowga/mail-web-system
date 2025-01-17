@@ -85,7 +85,7 @@ class MailRepository implements MailRepositoryInterface
                 $data = SentMail::with('template')
                     ->orderBy('datetime', 'desc')
                     ->where('type', 'sent')
-                    ->paginate(2);
+                    ->paginate(100);
                 break;
 
             case 'trash':
@@ -244,7 +244,6 @@ class MailRepository implements MailRepositoryInterface
 
                 $body = isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
 
-
                 $dateSent = $message->getDate();
                 $deleted_date = null;
 
@@ -253,30 +252,14 @@ class MailRepository implements MailRepositoryInterface
 
                 $parentId = null;
 
-                if ($inReplyTo) {
-                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])->first();
-
-                    if (!$parentMessage) {
-                        $parentMessage = SentMail::where('message_id', $inReplyTo[0])->first();
-                        $parentId = $parentMessage ? $parentMessage->parent_id : null;
-                    } else {
-                        $parentId = $parentMessage->id;
-                    }
-                }
-
                 if (!$parentId && $references) {
                     $referencesArray = explode(' ', $references);
 
                     foreach ($referencesArray as $reference) {
                         $parentMessage = MailLog::where('message_id', $reference)->first();
 
-                        if (!$parentMessage) {
-                            $parentMessage = SentMail::where('message_id', $reference)->first();
-                            if ($parentMessage) {
-                                $parentId = $parentMessage->parent_id;
-                                break;
-                            }
-                        } else {
+                        if($parentMessage)
+                        {
                             $parentId = $parentMessage->id;
                             break;
                         }
@@ -718,10 +701,7 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatOriginalEmail(MailLog $mail_log)
     {
-        return "\n---- Original Message ----\n" .
-            "From: " . $mail_log->sender . "\n" .
-            "Sent: " . $mail_log->datetime . "\n" .
-            "Subject: " . $mail_log->subject . "\n\n" .
+        return "\n" .
             nl2br($mail_log->body);
     }
 
@@ -730,10 +710,7 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatReplyContent($emailData)
     {
-        return "---- Reply Message ----\n" .
-            "From: " . $emailData['from'] . "\n" .
-            "To: " . $emailData['to'] . "\n" .
-            "Subject: " . $emailData['subject'] . "\n\n" .
+        return "\n" .
             $emailData['message_content'] . "\n";
     }
 
@@ -752,18 +729,9 @@ class MailRepository implements MailRepositoryInterface
                 'references' => $mail_log->message_id
             ];
 
-            $originalEmailContent = "\n\n ---- Original Message ----\n";
-            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
-            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
-            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
-            $originalEmailContent .= strip_tags($mail_log->body);
+            $originalEmailContent = strip_tags($mail_log->body);
 
-            $forwardedContent = "
-            ---- Forwarded Message ----\n
-            From: " . e($emailData['from']) . "\n
-            Date: " . e($mail_log->datetime) . "\n
-            Subject: " . e($mail_log->subject) . "\n
-            " . $emailData['message_content'];
+            $forwardedContent = "\n" . $emailData['message_content'];
 
             $forwardMailData = SentMail::create([
                 'subject' => $emailData['subject'],
