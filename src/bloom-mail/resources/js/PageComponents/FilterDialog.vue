@@ -156,7 +156,7 @@ const onSearch = () => {
                             <VCol cols="12">
                                 <div class="d-flex justify-start">
                                     <div style="width: 30%; padding: 10px;">
-                                        <InputLabel for="Person In Charge" :value="$t('input.person_in_charge')"/>
+                                        <InputLabel for="Person In Charge" :value="'担当者 is フォルダー'"/>
                                     </div>
                                     <div style="width: 40%;">
                                         <VSelect

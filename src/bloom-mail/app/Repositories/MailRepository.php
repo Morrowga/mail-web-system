@@ -253,19 +253,39 @@ class MailRepository implements MailRepositoryInterface
                 $parentId = null;
                 $referencesString = null;
 
+                if ($inReplyTo) {
+                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+                        ->first();
+                    if ($parentMessage) {
+                        $parentId = $parentMessage->id;
+
+                        $parentMessage->status = 'new';
+                        $parentMessage->save();
+
+                        broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+                    }
+                }
+
                 if (!$parentId && $references) {
-                    $referencesArray = explode(' ', $references);
+                    $referencesArray = explode(',', $references);
 
                     foreach ($referencesArray as $reference) {
+
                         $parentMessage = MailLog::where('message_id', $reference)->first();
 
                         if($parentMessage)
                         {
                             $parentId = $parentMessage->id;
+
+                            $parentMessage->status = 'new';
+                            $parentMessage->save();
+
+                            broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+
                             break;
                         }
                     }
-                    $referencesString = implode(', ', $referencesArray);
+                    $referencesString = implode(',', $referencesArray);
                 }
 
                 $newMail = MailLog::create([
@@ -683,7 +703,7 @@ class MailRepository implements MailRepositoryInterface
 
         $originalMessageId = $mail_log->message_id;
 
-        $messageId = md5(uniqid(time())) . '@voyager-web.com';
+        $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
         $emailData = [
             'subject' => $request->subject,
@@ -729,8 +749,17 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatOriginalEmail(MailLog $mail_log)
     {
-        return "\n" .
-            nl2br($mail_log->body);
+        $formattedBody = str_replace(['<br />', '<br>'], '> ', $mail_log->body);
+
+        // Then ensure that every newline character (\n) is followed by '>'
+        $formattedBody = preg_replace('/\n/', "\n >", $formattedBody);
+
+        // If there were no <br /> or <br> but still newlines, make sure to prepend '>' to the very first line
+        if (!str_contains($formattedBody, '>')) {
+            $formattedBody = '> ' . $formattedBody;
+        }
+
+        return "\n" . $formattedBody;
     }
 
     /**
@@ -745,7 +774,7 @@ class MailRepository implements MailRepositoryInterface
     public function forward(Request $request, MailLog $mail_log)
     {
         try {
-            $messageId = md5(uniqid(time())) . '@voyager-web.com';
+            $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
