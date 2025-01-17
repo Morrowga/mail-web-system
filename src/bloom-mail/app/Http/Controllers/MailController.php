@@ -36,6 +36,8 @@ class MailController extends Controller
         $templates = $this->templateRepository->getOnlyTemplates();
         $folders = $this->folderRepository->getOnlyFolders();
 
+        // return $this->mailRepository->newMessage();
+
         $person_in_charges = User::get();
 
         $from = env('IMAP_USERNAME');

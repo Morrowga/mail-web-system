@@ -8,8 +8,10 @@ use App\Models\Spam;
 use App\Models\Reply;
 use App\Mail\SendMail;
 use App\Models\Folder;
+use App\Mail\ReplyMail;
 use App\Models\MailLog;
 use App\Models\SentMail;
+use App\Mail\ForwardMail;
 use Webklex\PHPIMAP\IMAP;
 use App\Events\TakingMail;
 use App\Models\Attachment;
@@ -64,14 +66,16 @@ class MailRepository implements MailRepositoryInterface
         $pageType = request()->query('page_type');
 
         $inboxCount = MailLog::where('status', 'new')
+        ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
+        ->where('parent_id', null)
         ->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
         $sentCount = SentMail::where('type', 'sent')->count();
@@ -92,7 +96,7 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted');
+                $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -138,9 +142,11 @@ class MailRepository implements MailRepositoryInterface
 
         $inboxCount = MailLog::where('status', 'new')
         ->doesntHave('folders')
+        ->where('parent_id', null)
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
+        ->where('parent_id', null)
         ->count();
 
         $inbox = $inboxCount ?? 0;
@@ -149,10 +155,11 @@ class MailRepository implements MailRepositoryInterface
         $sent = SentMail::where('type', 'sent')->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new');
+            $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
-        $query = MailLog::where('status', '!=', 'deleted');
+        $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
+
 
         if (!empty($filter['status'])) {
             $query->where('status', $filter['status']);
@@ -205,8 +212,8 @@ class MailRepository implements MailRepositoryInterface
         })->toArray();
 
         $existingMessageIds = MailLog::select('message_id')
-        ->pluck('message_id')
-        ->toArray();
+            ->pluck('message_id')
+            ->toArray();
 
         foreach (array_chunk($messages->toArray(), 10) as $messageChunk) {
             foreach ($messageChunk as $message) {
@@ -230,17 +237,9 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 $flags = $message->getFlags()->toArray();
-                // $status = in_array('Seen', $flags) ? 'read' : 'new';
                 $status = 'new';
 
                 $body = '';
-
-                // if ($message->hasTextBody()) {
-                //     $body = $message->getTextBody();
-                // } else {
-                //     $body = $message->getHTMLBody();
-                // }
-
                 $bodies = $message->getBodies();
 
                 $body = isset($bodies['text']) ? $bodies['text'] : $bodies['html'];
@@ -251,8 +250,42 @@ class MailRepository implements MailRepositoryInterface
                 $inReplyTo = $message->getHeader()->get('in-reply-to');
                 $references = $message->getHeader()->get('references');
 
-                if (($inReplyTo || $references) && empty(trim($body)) && stripos($subject, 'Re:') === 0) {
-                    continue;
+                $parentId = null;
+                $referencesString = null;
+
+                if ($inReplyTo) {
+                    $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+                        ->first();
+                    if ($parentMessage) {
+                        $parentId = $parentMessage->id;
+
+                        $parentMessage->status = 'new';
+                        $parentMessage->save();
+
+                        broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+                    }
+                }
+
+                if (!$parentId && $references) {
+                    $referencesArray = explode(',', $references);
+
+                    foreach ($referencesArray as $reference) {
+
+                        $parentMessage = MailLog::where('message_id', $reference)->first();
+
+                        if($parentMessage)
+                        {
+                            $parentId = $parentMessage->id;
+
+                            $parentMessage->status = 'new';
+                            $parentMessage->save();
+
+                            broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+
+                            break;
+                        }
+                    }
+                    $referencesString = implode(',', $referencesArray);
                 }
 
                 $newMail = MailLog::create([
@@ -265,9 +298,9 @@ class MailRepository implements MailRepositoryInterface
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
                     'deleted_at' => $deleted_date,
-                    'is_match' => 0
+                    'parent_id' => $parentId,
+                    'references' => $referencesString
                 ]);
-
 
                 $attachments = $message->getAttachments();
                 foreach ($attachments as $attachment) {
@@ -283,13 +316,15 @@ class MailRepository implements MailRepositoryInterface
                     'body' => $body,
                     'datetime' => $this->convertToJapanTimezone($dateSent[0]),
                     'status' => $status,
+                    'parent_id' => $parentId,
                 ];
             }
         }
 
-        Log::info('Message fetching ended');
 
-        $this->singleFolderMatching();
+        $this->folderMatching();
+
+        Log::info('Message fetching ended');
 
         Log::info('Sending to queue started');
 
@@ -299,6 +334,65 @@ class MailRepository implements MailRepositoryInterface
 
         Log::info('Sending to queue ended');
     }
+
+    public function oldData()
+    {
+        Log::info('Message fetching started');
+        $inbox = $this->client->getFolder('INBOX');
+        $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+        foreach (array_chunk($messages->toArray(), 100) as $messageChunk) {
+            foreach ($messageChunk as $message) {
+                $uid = $message->getUid();
+                $subject = $this->decodeString($message->getSubject()[0]);
+                $findExisting = MailLog::where('uid', $uid)->first();
+                if(!empty($findExisting))
+                {
+                    $body = '';
+                    if ($message->hasTextBody()) {
+                        $body = $message->getTextBody();
+                    } else {
+                        $body = $message->getHTMLBody();
+                    }
+
+                    $inReplyTo = $message->getHeader()->get('in-reply-to');
+                    $references = $message->getHeader()->get('references');
+
+                    $parentId = null;
+                    $referencesString = null;
+
+                    if ($inReplyTo) {
+                        $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+                            ->first();
+                        if ($parentMessage) {
+                            $parentId = $parentMessage->id;
+                        }
+                    }
+
+                    if (!$parentId && $references) {
+                        $referencesArray = explode(',', $references);
+
+                        foreach ($referencesArray as $reference) {
+
+                            $parentMessage = MailLog::where('message_id', $reference)->first();
+
+                            if($parentMessage)
+                            {
+                                $parentId = $parentMessage->id;
+
+                                break;
+                            }
+                        }
+                        $referencesString = implode(',', $referencesArray);
+                    }
+
+                    $findExisting->parent_id = $parentId;
+                    $findExisting->references = $referencesString;
+                    $findExisting->save();
+                }
+            }
+        }
+    }
+
 
     private function processAttachment($attachment, $mail)
     {
@@ -499,75 +593,75 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        $mailLog = MailLog::find($id);
-
-        $inbox = $this->client->getFolder('INBOX');
-
-        $message = $inbox->query()->getMessageByUid($mailLog->uid);
+        $mailLog = MailLog::with(['mail_threads.attachments'])->find($id);
 
         $histories = [];
 
+        $histories[] = [
+            'uid' => $mailLog->uid,
+            'message_id' => $mailLog->message_id,
+            'subject' => $mailLog->subject,
+            'sender' => $mailLog->sender,
+            'name' => $this->decodeString($mailLog->name),
+            'body' => $mailLog->body,
+            'datetime' => $mailLog->datetime,
+            'status' => $mailLog->status,
+            'attachments' => $mailLog->attachments != null ? $mailLog->attachments : []
+        ];
 
-        if ($message) {
-            $threadMessages = $message->thread($inbox);
-
-            foreach ($threadMessages as $threadMessage) {
-                $uid = $threadMessage->getUid();
-                $messageId = $threadMessage->getMessageId()[0];
-                $subject = isset($threadMessage->getSubject()[0])
-                ? $this->decodeString($threadMessage->getSubject()[0])
-                : 'No Subject';
-                $senderArray = $threadMessage->getFrom();
-                if (!empty($senderArray) && isset($senderArray[0]->mail)) {
-                    $senderEmail = $this->decodeString($senderArray[0]->mail);
-                } else {
-                    $senderEmail = 'unknown@example.com';
-                }
-                $senderName = isset($senderArray[0]) ? (string)$senderArray[0]->personal : 'Unknown Sender';
-
-                if ($threadMessage->hasHTMLBody()) {
-                    $body = $threadMessage->getHTMLBody();
-                } else {
-                    $body = $threadMessage->getTextBody();
-                }
-
-                $dateSent = $threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo')->toDateTimeString();
-                $status = in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread';
-
-                $findAttachement = MailLog::where('uid',$uid)->with(['attachments'])->first();
-
-                $histories[] = [
-                    'uid' => $uid,
-                    'message_id' => $messageId,
-                    'subject' => $subject,
-                    'sender' => $senderEmail,
-                    'name' => $this->decodeString($senderName),
-                    'body' => $body,
-                    'datetime' => $dateSent->toDateTimeString(),
-                    'status' => $status,
-                    'attachments' => $findAttachement != null ? $findAttachement->attachments : []
-                ];
-            }
-
-            $systemMailHistories = $mailLog->mail_histories->toArray();
-
-            $mergedHistories = array_merge($histories, $systemMailHistories);
-
-            usort($mergedHistories, function ($a, $b) {
-                return strtotime($b['datetime']) - strtotime($a['datetime']);
-            });
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Email histories fetched successfully.',
-                'data' => $mergedHistories,
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Email not found.',
-            ], 404);
+        foreach($mailLog->mail_threads as $threadMessage)
+        {
+            $histories[] = [
+                'uid' => $threadMessage->uid,
+                'message_id' => $threadMessage->message_id,
+                'subject' => $threadMessage->subject,
+                'sender' => $threadMessage->sender,
+                'name' => $this->decodeString($threadMessage->name),
+                'body' => $threadMessage->body,
+                'datetime' => $threadMessage->datetime,
+                'status' => $threadMessage->status,
+                'attachments' => $threadMessage->attachments != null ? $threadMessage->attachments : []
+            ];
         }
+
+        if ($mailLog->references != null) {
+            $referencesArray = explode(',', $mailLog->references);
+
+            foreach ($referencesArray as $reference) {
+                $reference = trim($reference);
+
+                $sentMail = SentMail::where('message_id', $reference)->first();
+
+                if ($sentMail) {
+                    $histories[] = [
+                        'uid' => $sentMail->uid,
+                        'message_id' => $sentMail->message_id,
+                        'subject' => $sentMail->subject,
+                        'sender' => $sentMail->sender,
+                        'name' => $this->decodeString($sentMail->name),
+                        'body' => $sentMail->body,
+                        'datetime' => $sentMail->datetime,
+                        'status' => $sentMail->status,
+                        'attachments' => $sentMail->attachments != null ? $sentMail->attachments : []
+                    ];
+                    break;
+                }
+            }
+        }
+
+        $systemMailHistories = $mailLog->mail_histories->toArray();
+
+        $mergedHistories = array_merge($histories, $systemMailHistories);
+
+        usort($mergedHistories, function ($a, $b) {
+            return strtotime($b['datetime']) - strtotime($a['datetime']);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Email histories fetched successfully.',
+            'data' => $mergedHistories,
+        ]);
     }
 
     private function processThreadMessage($threadMessage)
@@ -613,121 +707,109 @@ class MailRepository implements MailRepositoryInterface
             return $this->error('Original email not found.');
         }
 
+        if (!$mail_log) {
+            return $this->error('Original email not found.');
+        }
+
+        $originalMessageId = $mail_log->message_id;
+
+        $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
+
         $emailData = [
             'subject' => $request->subject,
             'from' => $request->from,
             'to' => $request->to,
             'template_id' => $request->template_id ?? null,
             'message_content' => str_replace("\n", "<br />", $request->message_content),
-            'in_reply_to' => $mail_log->message_id,
-            'references' => $mail_log->message_id,
+            'message_id' => $messageId,
+            'in_reply_to' =>  $mail_log->message_id,
+            'replyTo' => $request->to,
         ];
 
-        try {
+        $replyMailData = SentMail::create([
+            'subject' => $emailData['subject'],
+            'sender' => $emailData['from'],
+            'mailto' => $emailData['to'],
+            'body' => $emailData['message_content'],
+            'name' => Auth::user()->name,
+            'parent_id' => $mail_log->id,
+            'template_id' => $emailData['template_id'],
+            'type' => 'reply',
+            'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
+            'message_id' => trim($messageId, '<>'),
+        ]);
 
-            $replyMailData = SentMail::create([
-                'subject' => $emailData['subject'],
-                'sender' => $emailData['from'],
-                'mailto' => $emailData['to'],
-                'body' => $emailData['message_content'],
-                'name' => Auth::user()->name,
-                'parent_id' => $mail_log->id,
-                'template_id' => $emailData['template_id'],
-                'type' => 'reply',
-                'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
-            ]);
+        $originalEmailContent = $this->formatOriginalEmail($mail_log);
+        $replyContent = $this->formatReplyContent($emailData);
 
-            $originalEmailContent = "---- Original Message ----\n";
-            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
-            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
-            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
-            $originalEmailContent .= nl2br($mail_log->body);
+        Mail::to($emailData['to'])->send(new ReplyMail($emailData, $originalEmailContent, $replyContent));
 
-            $replyContent = "\n\n---- Reply Message ----\n";
-            $replyContent .= "From: " . $emailData['from'] . "\n";
-            $replyContent .= "To: " . $emailData['to'] . "\n";
-            $replyContent .= "Subject: " . $emailData['subject'] . "\n\n";
-            $replyContent .= $emailData['message_content'];
-
-            Mail::send('emails.reply', [
-                'emailData' => $emailData,
-                'replyMailData' => $replyMailData,
-                'originalEmail' => $mail_log,
-                'originalEmailContent' => $originalEmailContent,
-                'replyContent' => $replyContent,
-            ], function ($message) use ($emailData) {
-                $message->from($emailData['from'])
-                        ->to($emailData['to'])
-                        ->subject($emailData['subject'])
-                        ->getHeaders()
-                        ->addTextHeader('In-Reply-To', '<' . $emailData['in_reply_to'] . '>')
-                        ->addTextHeader('References', '<' . $emailData['references'] . '>');
-            });
-
-            if($mail_log->status != 'confirmed' || $mail_log->status != 'resolved')
-            {
-                $mail_log->status = 'resolved';
-                $mail_log->previous_status = null;
-                $mail_log->person_in_charge = Auth::user()->name;
-                $mail_log->update();
-            }
-
-            broadcast(new EmailStatusUpdated($mail_log, 'resolved'));
-
-            return $this->success('Email Sent.');
-        } catch (\Exception $e) {
-            \Log::error('Error sending reply email: ' . $e->getMessage());
-
-            return $this->error('Failed to send reply email.');
+        if($mail_log->status != 'confirmed' && $mail_log->status != 'resolved') {
+            $mail_log->status = 'resolved';
+            $mail_log->previous_status = null;
+            $mail_log->person_in_charge = Auth::user()->name;
+            $mail_log->update();
         }
+
+        return $this->success('Email Sent.');
+    }
+
+    /**
+     * Format original email content
+     */
+    private function formatOriginalEmail(MailLog $mail_log)
+    {
+        return "\n" .
+            nl2br($mail_log->body);
+    }
+
+    /**
+     * Format reply content
+     */
+    private function formatReplyContent($emailData)
+    {
+        return "\n" .
+            $emailData['message_content'] . "\n";
     }
 
     public function forward(Request $request, MailLog $mail_log)
     {
-        // try {
+        try {
+            $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
+
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
                 'from' => $request->from,
                 'to' => $request->to,
                 'message_content' => str_replace("\n", "<br />", $request->message_content),
-                'template_id' => $request->template_id ?? null
+                'template_id' => $request->template_id ?? null,
+                'message_id' => $messageId,
+                'references' => $mail_log->message_id
             ];
 
-            $originalEmailContent = "\n\n ---- Original Message ----\n";
-            $originalEmailContent .= "From: " . $mail_log->sender . "\n";
-            $originalEmailContent .= "Sent: " . $mail_log->datetime . "\n";
-            $originalEmailContent .= "Subject: " . $mail_log->subject . "\n\n";
-            $originalEmailContent .= strip_tags($mail_log->body);
+            $originalEmailContent = strip_tags($mail_log->body);
 
-            $forwardedContent = "
-           ---- Forwarded Message ----\n
-            From: " . e($emailData['from']) . "\n
-            Date: " . e($mail_log->datetime) . "\n
-            Subject: " . e($mail_log->subject) . "\n
-            " . $emailData['message_content'];
+            $forwardedContent = "\n" . $emailData['message_content'];
 
             $forwardMailData = SentMail::create([
                 'subject' => $emailData['subject'],
                 'sender' => $emailData['from'],
                 'body' => $forwardedContent,
                 'parent_id' => $mail_log->id,
-                'to' => $emailData['to'],
+                'mailto' => $emailData['to'],
                 'template_id' => $emailData['template_id'],
                 'type' => 'forward',
                 'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
+                'message_id' => trim($messageId, '<>')
             ]);
 
-            Mail::send('emails.forward', compact('emailData' , 'forwardMailData','forwardedContent', 'originalEmailContent'), function ($message) use ($emailData) {
-                $message->from($emailData['from'])
-                        ->to($emailData['to'])
-                        ->subject($emailData['subject']);
-            });
+            Mail::to($emailData['to'])->send(new ForwardMail($emailData, $originalEmailContent, $forwardedContent));
 
             return response()->json(['status' => 'success', 'message' => 'Email forwarded successfully.']);
-        // } catch (\Exception $e) {
-        //     Log::error('Error sending forward email: ' . $e->getMessage());
-        //     return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
-        // }
+        } catch (\Exception $e) {
+            Log::error('Error sending forward email: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Failed to send email.'], 500);
+        }
     }
 
     public function delete(MailLog $mailLog)
@@ -860,7 +942,7 @@ class MailRepository implements MailRepositoryInterface
     public function store(Request $request)
     {
         try {
-            $messageId = '<' . uniqid('email-', true) . '@' . config('app.url') . '>';
+            $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
             $data = [
                 'subject' => $request->subject,

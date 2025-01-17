@@ -15,14 +15,21 @@ class MailLog extends Model
         'body',
         'sender',
         'subject',
+        'parent_id',
         'name',
         'uid',
         'datetime',
         'previous_status',
         'person_in_charge',
+        'references',
         'deleted_at',
         'is_match'
     ];
+
+    public function mail_threads()
+    {
+        return $this->hasMany(MailLog::class, 'parent_id');
+    }
 
     public function mail_histories()
     {

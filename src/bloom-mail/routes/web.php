@@ -45,6 +45,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/mails/delete-forever/{mail_log}',[MailController::class, 'destroyForever'])->name('mails.deleteforever');
     Route::delete('/mails/sent/delete/{sent_mail}',[MailController::class, 'sentDestroy'])->name('mails.sent.delete');
 
+    Route::get('/old-data', function() {
+        $mailRepository = app(MailRepository::class);
+        $mailRepository->oldData();
+        return "success";
+    });
 
     Route::get('/templates', function () {
         return Inertia::render('Templates/Index');
