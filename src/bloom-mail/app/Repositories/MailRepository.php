@@ -335,63 +335,63 @@ class MailRepository implements MailRepositoryInterface
         Log::info('Sending to queue ended');
     }
 
-    public function oldData()
-    {
-        Log::info('Message fetching started');
-        $inbox = $this->client->getFolder('INBOX');
-        $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
-        foreach (array_chunk($messages->toArray(), 100) as $messageChunk) {
-            foreach ($messageChunk as $message) {
-                $uid = $message->getUid();
-                $subject = $this->decodeString($message->getSubject()[0]);
-                $findExisting = MailLog::where('uid', $uid)->first();
-                if(!empty($findExisting))
-                {
-                    $body = '';
-                    if ($message->hasTextBody()) {
-                        $body = $message->getTextBody();
-                    } else {
-                        $body = $message->getHTMLBody();
-                    }
+    // public function oldData()
+    // {
+    //     Log::info('Message fetching started');
+    //     $inbox = $this->client->getFolder('INBOX');
+    //     $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
+    //     foreach (array_chunk($messages->toArray(), 100) as $messageChunk) {
+    //         foreach ($messageChunk as $message) {
+    //             $uid = $message->getUid();
+    //             $subject = $this->decodeString($message->getSubject()[0]);
+    //             $findExisting = MailLog::where('uid', $uid)->first();
+    //             if(!empty($findExisting))
+    //             {
+    //                 $body = '';
+    //                 if ($message->hasTextBody()) {
+    //                     $body = $message->getTextBody();
+    //                 } else {
+    //                     $body = $message->getHTMLBody();
+    //                 }
 
-                    $inReplyTo = $message->getHeader()->get('in-reply-to');
-                    $references = $message->getHeader()->get('references');
+    //                 $inReplyTo = $message->getHeader()->get('in-reply-to');
+    //                 $references = $message->getHeader()->get('references');
 
-                    $parentId = null;
-                    $referencesString = null;
+    //                 $parentId = null;
+    //                 $referencesString = null;
 
-                    if ($inReplyTo) {
-                        $parentMessage = MailLog::where('message_id', $inReplyTo[0])
-                            ->first();
-                        if ($parentMessage) {
-                            $parentId = $parentMessage->id;
-                        }
-                    }
+    //                 if ($inReplyTo) {
+    //                     $parentMessage = MailLog::where('message_id', $inReplyTo[0])
+    //                         ->first();
+    //                     if ($parentMessage) {
+    //                         $parentId = $parentMessage->id;
+    //                     }
+    //                 }
 
-                    if (!$parentId && $references) {
-                        $referencesArray = explode(',', $references);
+    //                 if (!$parentId && $references) {
+    //                     $referencesArray = explode(',', $references);
 
-                        foreach ($referencesArray as $reference) {
+    //                     foreach ($referencesArray as $reference) {
 
-                            $parentMessage = MailLog::where('message_id', $reference)->first();
+    //                         $parentMessage = MailLog::where('message_id', $reference)->first();
 
-                            if($parentMessage)
-                            {
-                                $parentId = $parentMessage->id;
+    //                         if($parentMessage)
+    //                         {
+    //                             $parentId = $parentMessage->id;
 
-                                break;
-                            }
-                        }
-                        $referencesString = implode(',', $referencesArray);
-                    }
+    //                             break;
+    //                         }
+    //                     }
+    //                     $referencesString = implode(',', $referencesArray);
+    //                 }
 
-                    $findExisting->parent_id = $parentId;
-                    $findExisting->references = $referencesString;
-                    $findExisting->save();
-                }
-            }
-        }
-    }
+    //                 $findExisting->parent_id = $parentId;
+    //                 $findExisting->references = $referencesString;
+    //                 $findExisting->save();
+    //             }
+    //         }
+    //     }
+    // }
 
 
     private function processAttachment($attachment, $mail)
@@ -759,8 +759,17 @@ class MailRepository implements MailRepositoryInterface
      */
     private function formatOriginalEmail(MailLog $mail_log)
     {
-        return "\n" .
-            nl2br($mail_log->body);
+        $formattedBody = str_replace(['<br />', '<br>'], '> ', $mail_log->body);
+
+        // Then ensure that every newline character (\n) is followed by '>'
+        $formattedBody = preg_replace('/\n/', "\n >", $formattedBody);
+
+        // If there were no <br /> or <br> but still newlines, make sure to prepend '>' to the very first line
+        if (!str_contains($formattedBody, '>')) {
+            $formattedBody = '> ' . $formattedBody;
+        }
+
+        return "\n" . $formattedBody;
     }
 
     /**
