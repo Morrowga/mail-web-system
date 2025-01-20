@@ -821,6 +821,8 @@ class MailRepository implements MailRepositoryInterface
             $mail_log->previous_status = null;
             $mail_log->person_in_charge = Auth::user()->name;
             $mail_log->update();
+
+            broadcast(new EmailStatusUpdated($mailLog, $mail_log->status));
         }
 
         return $this->success('Email Sent.');

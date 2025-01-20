@@ -68,9 +68,9 @@ IMAP_PROTOCOL=imap
 
 php artisan reverb:start --port=8081
 
-php artisan queue:work
+php artisan queue:work --memory=2048
 
-php artisan schedule:run
+php artisan schedule:work
 
 下記URLからアクセス  
 [http://localhost:80](http://localhost:80)
