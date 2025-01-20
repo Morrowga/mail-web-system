@@ -807,6 +807,13 @@ class MailRepository implements MailRepositoryInterface
 
         $originalMessageId = $mail_log->message_id;
 
+        if($mail_log->parent_id != null)
+        {
+            $parentMessage = MailLog::where('id', $mail_log->parent_id)->first();
+
+            $originalMessageId = $parentMessage ? $parentMessage->message_id : $mail_log->message_id;
+        }
+
         $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
         $emailData = [
@@ -882,6 +889,15 @@ class MailRepository implements MailRepositoryInterface
         try {
             $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
+            $originalMessageId = $mail_log->message_id;
+
+            if($mail_log->parent_id != null)
+            {
+                $parentMessage = MailLog::where('id', $mail_log->parent_id)->first();
+
+                $originalMessageId = $parentMessage ? $parentMessage->message_id : $mail_log->message_id;
+            }
+
             $emailData = [
                 'subject' => "Fwd: " . $mail_log->subject,
                 'from' => $request->from,
@@ -889,7 +905,7 @@ class MailRepository implements MailRepositoryInterface
                 'message_content' => str_replace("\n", "<br />", $request->message_content),
                 'template_id' => $request->template_id ?? null,
                 'message_id' => $messageId,
-                'references' => $mail_log->message_id
+                'references' => $originalMessageId
             ];
 
             $originalEmailContent = strip_tags($mail_log->body);
