@@ -98,7 +98,7 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-            
+
             $query = MailLog::query()
                 ->where('mail_logs.status', '!=', 'deleted')
                 ->where('mail_logs.parent_id', null)
@@ -184,8 +184,20 @@ class MailRepository implements MailRepositoryInterface
         ->where('mail_logs.status', '!=', 'deleted')
         ->where('mail_logs.parent_id', null)
         ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
-        ->select('mail_logs.*', DB::raw('MAX(mail_threads.datetime) as latest_datetime'))
-        ->groupBy('mail_logs.id', 'mail_logs.status', 'mail_logs.subject', 'mail_logs.body', 'mail_logs.sender', 'mail_logs.name', 'mail_logs.person_in_charge')
+        ->select(
+            'mail_logs.*',
+            DB::raw('COALESCE(MAX(mail_threads.datetime), mail_logs.datetime) as latest_datetime')
+        )
+        ->groupBy(
+            'mail_logs.id',
+            'mail_logs.status',
+            'mail_logs.subject',
+            'mail_logs.body',
+            'mail_logs.sender',
+            'mail_logs.name',
+            'mail_logs.person_in_charge',
+            'mail_logs.datetime'
+        )
         ->orderBy('latest_datetime', 'desc');
 
 
