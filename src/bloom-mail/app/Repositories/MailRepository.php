@@ -324,29 +324,37 @@ class MailRepository implements MailRepositoryInterface
     {
         $inReplyTo = $message->getHeader()->get('in-reply-to');
         $references = $message->getHeader()->get('references');
+
         $parentId = null;
         $referencesString = null;
 
-        if ($inReplyTo) {
-            $parentMessage = MailLog::where('message_id', $inReplyTo[0])->first();
-            if ($parentMessage) {
-                $this->updateParentStatus($parentMessage);
-                return ['id' => $parentMessage->id, 'references' => null];
-            }
-        }
+        // if ($inReplyTo) {
+        //     $parentMessage = MailLog::where('message_id', $inReplyTo[0])->first();
+        //     if ($parentMessage) {
+        //         $this->updateParentStatus($parentMessage);
+        //         return ['id' => $parentMessage->id, 'references' => null];
+        //     }
+        // }
 
         if ($references) {
             $referencesArray = explode(',', $references);
+
+            $parentMessageId = null;
+
             foreach ($referencesArray as $reference) {
                 $parentMessage = MailLog::where('message_id', $reference)->first();
+
                 if ($parentMessage) {
                     $this->updateParentStatus($parentMessage);
-                    return [
-                        'id' => $parentMessage->id,
-                        'references' => implode(', ', $referencesArray)
-                    ];
+                    $parentMessageId = $parentMessage->id;
+                    break;
                 }
             }
+
+            return [
+                'id' => $parentMessageId,
+                'references' => implode(', ', $referencesArray)
+            ];
         }
 
         return ['id' => null, 'references' => null];
@@ -357,9 +365,9 @@ class MailRepository implements MailRepositoryInterface
      */
     private function updateParentStatus($parentMessage)
     {
-        $parentMessage->status = 'new';
-        $parentMessage->save();
-        broadcast(new EmailStatusUpdated($parentMessage, 'read'));
+        // $parentMessage->status = 'new';
+        // $parentMessage->save();
+        // broadcast(new EmailStatusUpdated($parentMessage, 'new'));
     }
 
     /**
@@ -667,85 +675,106 @@ class MailRepository implements MailRepositoryInterface
 
     public function getHistories($id)
     {
-        $mailLog = MailLog::with(['mail_threads.attachments'])->find($id);
-
         $histories = [];
 
-        $histories[] = [
-            'uid' => $mailLog->uid,
-            'message_id' => $mailLog->message_id,
-            'subject' => $mailLog->subject,
-            'sender' => $mailLog->sender,
-            'name' => $this->decodeString($mailLog->name),
-            'body' => $mailLog->body,
-            'datetime' => $mailLog->datetime,
-            'status' => $mailLog->status,
-            'attachments' => $mailLog->attachments != null ? $mailLog->attachments : []
-        ];
+        $mailLog = MailLog::with(['mail_threads.attachments', 'mail_histories'])->find($id);
 
         if($mailLog->parent_id != null)
         {
-            $parentMail = MailLog::where('id', $mailLog->parent_id)->first();
-            if(!empty($parentMail))
+            $parentMail = MailLog::where('id', $mailLog->parent_id)
+            ->with(['mail_threads.attachments', 'mail_histories'])
+            ->first();
+
+            $histories[] = [
+                'uid' => $parentMail->uid,
+                'message_id' => $parentMail->message_id,
+                'subject' => $parentMail->subject,
+                'sender' => $parentMail->sender,
+                'name' => $this->decodeString($parentMail->name),
+                'body' => $parentMail->body,
+                'datetime' => $parentMail->datetime,
+                'status' => $parentMail->status,
+                'attachments' => $parentMail->attachments != null ? $parentMail->attachments : []
+            ];
+
+            foreach($parentMail->mail_threads as $thread)
             {
-                $histories[] = [
-                    'uid' => $parentMail->uid,
-                    'message_id' => $parentMail->message_id,
-                    'subject' => $parentMail->subject,
-                    'sender' => $parentMail->sender,
-                    'name' => $this->decodeString($parentMail->name),
-                    'body' => $parentMail->body,
-                    'datetime' => $parentMail->datetime,
-                    'status' => $parentMail->status,
-                    'attachments' => $parentMail->attachments != null ? $parentMail->attachments : []
-                ];
+                $histories[] = $this->getThreads($thread);
             }
 
-        }
 
-        foreach($mailLog->mail_threads as $threadMessage)
-        {
-            $histories[] = [
-                'uid' => $threadMessage->uid,
-                'message_id' => $threadMessage->message_id,
-                'subject' => $threadMessage->subject,
-                'sender' => $threadMessage->sender,
-                'name' => $this->decodeString($threadMessage->name),
-                'body' => $threadMessage->body,
-                'datetime' => $threadMessage->datetime,
-                'status' => $threadMessage->status,
-                'attachments' => $threadMessage->attachments != null ? $threadMessage->attachments : []
-            ];
-        }
+            if ($parentMail->references != null) {
+                $referencesArray = explode(',', $parentMail->references);
 
-        if ($mailLog->references != null) {
-            $referencesArray = explode(',', $mailLog->references);
+                foreach ($referencesArray as $reference) {
+                    $reference = trim($reference);
 
-            foreach ($referencesArray as $reference) {
-                $reference = trim($reference);
+                    $sentMail = SentMail::where('message_id', $reference)->first();
 
-                $sentMail = SentMail::where('message_id', $reference)->first();
-
-                if ($sentMail) {
-                    $histories[] = [
-                        'uid' => $sentMail->uid,
-                        'message_id' => $sentMail->message_id,
-                        'subject' => $sentMail->subject,
-                        'sender' => $sentMail->sender,
-                        'name' => $this->decodeString($sentMail->name),
-                        'body' => $sentMail->body,
-                        'datetime' => $sentMail->datetime,
-                        'status' => $sentMail->status,
-                        'attachments' => $sentMail->attachments != null ? $sentMail->attachments : []
-                    ];
-                    break;
+                    if ($sentMail) {
+                        $histories[] = [
+                            'uid' => $sentMail->uid,
+                            'message_id' => $sentMail->message_id,
+                            'subject' => $sentMail->subject,
+                            'sender' => $sentMail->sender,
+                            'name' => $this->decodeString($sentMail->name),
+                            'body' => $sentMail->body,
+                            'datetime' => $sentMail->datetime,
+                            'status' => $sentMail->status,
+                            'attachments' => $sentMail->attachments != null ? $sentMail->attachments : []
+                        ];
+                        break;
+                    }
                 }
             }
+
+            $mergedHistories = array_merge($histories, $parentMail->mail_histories->toArray());
+
+        } else {
+            $histories[] = [
+                'uid' => $mailLog->uid,
+                'message_id' => $mailLog->message_id,
+                'subject' => $mailLog->subject,
+                'sender' => $mailLog->sender,
+                'name' => $this->decodeString($mailLog->name),
+                'body' => $mailLog->body,
+                'datetime' => $mailLog->datetime,
+                'status' => $mailLog->status,
+                'attachments' => $mailLog->attachments != null ? $mailLog->attachments : []
+            ];
+
+            foreach($mailLog->mail_threads as $thread)
+            {
+                $histories[] = $this->getThreads($thread);
+            }
+
+            if ($mailLog->references != null) {
+                $referencesArray = explode(',', $mailLog->references);
+
+                foreach ($referencesArray as $reference) {
+                    $reference = trim($reference);
+
+                    $sentMail = SentMail::where('message_id', $reference)->first();
+
+                    if ($sentMail) {
+                        $histories[] = [
+                            'uid' => $sentMail->uid,
+                            'message_id' => $sentMail->message_id,
+                            'subject' => $sentMail->subject,
+                            'sender' => $sentMail->sender,
+                            'name' => $this->decodeString($sentMail->name),
+                            'body' => $sentMail->body,
+                            'datetime' => $sentMail->datetime,
+                            'status' => $sentMail->status,
+                            'attachments' => $sentMail->attachments != null ? $sentMail->attachments : []
+                        ];
+                        break;
+                    }
+                }
+            }
+
+           $mergedHistories = array_merge($histories, $mailLog->mail_histories->toArray());
         }
-
-        $systemMailHistories = $mailLog->mail_histories->toArray();
-
-        $mergedHistories = array_merge($histories, $systemMailHistories);
 
         usort($mergedHistories, function ($a, $b) {
             return strtotime($b['datetime']) - strtotime($a['datetime']);
@@ -756,6 +785,21 @@ class MailRepository implements MailRepositoryInterface
             'message' => 'Email histories fetched successfully.',
             'data' => $mergedHistories,
         ]);
+    }
+
+    public function getThreads($threadMessage)
+    {
+       return [
+            'uid' => $threadMessage->uid,
+            'message_id' => $threadMessage->message_id,
+            'subject' => $threadMessage->subject,
+            'sender' => $threadMessage->sender,
+            'name' => $this->decodeString($threadMessage->name),
+            'body' => $threadMessage->body,
+            'datetime' => $threadMessage->datetime,
+            'status' => $threadMessage->status,
+            'attachments' => $threadMessage->attachments != null ? $threadMessage->attachments : []
+        ];
     }
 
     private function processThreadMessage($threadMessage)
@@ -807,6 +851,8 @@ class MailRepository implements MailRepositoryInterface
 
         $originalMessageId = $mail_log->message_id;
 
+        $parentMessage = null;
+
         if($mail_log->parent_id != null)
         {
             $parentMessage = MailLog::where('id', $mail_log->parent_id)->first();
@@ -823,7 +869,7 @@ class MailRepository implements MailRepositoryInterface
             'template_id' => $request->template_id ?? null,
             'message_content' => str_replace("\n", "<br />", $request->message_content),
             'message_id' => $messageId,
-            'in_reply_to' =>  $mail_log->message_id,
+            'in_reply_to' =>  $originalMessageId,
             'replyTo' => $request->to,
         ];
 
@@ -833,7 +879,7 @@ class MailRepository implements MailRepositoryInterface
             'mailto' => $emailData['to'],
             'body' => $emailData['message_content'],
             'name' => Auth::user()->name,
-            'parent_id' => $mail_log->id,
+            'parent_id' => $parentMessage ? $parentMessage->id : $mail_log->id,
             'template_id' => $emailData['template_id'],
             'type' => 'reply',
             'datetime' => Carbon::now('Asia/Tokyo')->toDateTimeString(),
@@ -889,6 +935,8 @@ class MailRepository implements MailRepositoryInterface
         try {
             $messageId = md5(uniqid(time())) . env('MAIL_DOMAIN');
 
+            $parentMessage = null;
+
             $originalMessageId = $mail_log->message_id;
 
             if($mail_log->parent_id != null)
@@ -916,7 +964,7 @@ class MailRepository implements MailRepositoryInterface
                 'subject' => $emailData['subject'],
                 'sender' => $emailData['from'],
                 'body' => $forwardedContent,
-                'parent_id' => $mail_log->id,
+                'parent_id' => $parentMessage ? $parentMessage->id : $mail_log->id,
                 'mailto' => $emailData['to'],
                 'template_id' => $emailData['template_id'],
                 'type' => 'forward',
