@@ -75,17 +75,17 @@ class MailRepository implements MailRepositoryInterface
         ->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new')->where('parent_id', null);
+            $query->where('status', 'new');
         }])->get();
 
-        $sentCount = SentMail::where('type', 'sent')->count();
+        $sentCount = SentMail::count();
 
         switch ($pageType) {
             case 'sent':
                 $data = SentMail::select('*', 'datetime as latest_datetime')
                     ->with('template')
                     ->orderBy('datetime', 'desc')
-                    ->where('type', 'sent')
+                    // ->where('type', 'sent')
                     ->paginate(100);
                 break;
 
@@ -174,15 +174,15 @@ class MailRepository implements MailRepositoryInterface
         $inbox = $inboxCount ?? 0;
         $trash = $trashCount ?? 0;
 
-        $sent = SentMail::where('type', 'sent')->count();
+        $sent = SentMail::count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
-            $query->where('status', 'new')->where('parent_id', null);
+            $query->where('status', 'new');
         }])->get();
 
         $query = MailLog::query()
         ->where('mail_logs.status', '!=', 'deleted')
-        ->where('mail_logs.parent_id', null)
+        // ->where('mail_logs.parent_id', null)
         ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
         ->select(
             'mail_logs.*',
