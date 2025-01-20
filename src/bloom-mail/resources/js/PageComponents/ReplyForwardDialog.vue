@@ -341,7 +341,7 @@ watch(() => props.type, (newType) => {
                             </VRow> -->
                             <VDivider class="mt-2" />
                             <VCol cols="12" md="12" lg="12" sm="12" style="height: 40vh; overflow-y: auto;" >
-                                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
+                                <MailThread :mail="props?.mailData" v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
                             </VCol>
                             <VDivider class="mt-2" />
                             <VRow>

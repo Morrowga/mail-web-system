@@ -1,5 +1,5 @@
 <template>
-    <VCard :class="reply?.uid == null ? 'border-green mt-2' : 'border-red mt-2'">
+    <VCard :class="borderClass() + ' mt-2'">
         <VCardText>
             <div class="reply-item">
                 <div class="reply-content">
@@ -46,12 +46,23 @@
   import { computed, defineProps } from 'vue';
 
   const props = defineProps({
-    reply: Object
+    reply: Object,
+    mail: Object
   });
 
   const formattedReplyBody = computed(() => {
   return props?.reply.body.replace(/\n/g, '<br>');
 });
+
+const borderClass = () =>  {
+    if (props?.reply?.uid == null) {
+        return 'border-green';
+    } else if (props?.reply?.uid !== null && props?.reply.uid === props?.mail?.uid) {
+        return 'border-red-thicker';
+    } else {
+        return 'border-red';
+    }
+}
 
 const onDownload = (path) => {
   // Fetch the file from the given path
@@ -91,6 +102,12 @@ const onDownload = (path) => {
     margin-top: 1rem;
     margin-bottom: 2rem;
     padding-left: 1.5rem;
+  }
+
+  .border-red-thicker {
+    border: 3px solid red;
+    box-shadow: 2px 2px 5px #000;
+    border-color: red;
   }
 
   .box-file

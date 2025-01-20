@@ -262,7 +262,7 @@ const minimizeReply = () => {
                 <v-progress-circular indeterminate color="blue"></v-progress-circular>
             </div>
             <div v-if="['inbox', 'trash', 'inbox_folder'].includes(props?.pageType)">
-                <MailThread v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
+                <MailThread :mail="props?.mail" v-for="reply in props?.threads" :key="reply.id" :reply="reply" />
             </div>
             <div v-if="props?.updateThreadLoading">
                 <v-skeleton-loader
