@@ -82,30 +82,31 @@ class MailRepository implements MailRepositoryInterface
 
         switch ($pageType) {
             case 'sent':
-                $data = SentMail::with('template')
+                $data = SentMail::select('*', 'datetime as latest_datetime')
+                    ->with('template')
                     ->orderBy('datetime', 'desc')
                     ->where('type', 'sent')
                     ->paginate(100);
                 break;
 
             case 'trash':
-                $data = MailLog::where('status', 'deleted')
+                $data = MailLog::select('*', 'datetime as latest_datetime')
+                    ->where('status', 'deleted')
                     ->orderBy('datetime', 'desc')
                     ->paginate(100);
                 break;
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted')
-                ->where('parent_id', null);
+                $query = MailLog::query()
+                ->where('mail_logs.status', '!=', 'deleted')
+                ->where('mail_logs.parent_id', null)
+                ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
+                ->select('mail_logs.*', DB::raw('MAX(mail_threads.datetime) as latest_datetime'))
+                ->groupBy('mail_logs.id', 'mail_logs.status', 'mail_logs.subject', 'mail_logs.body', 'mail_logs.sender', 'mail_logs.name', 'mail_logs.person_in_charge')
+                ->orderBy('latest_datetime', 'desc');
 
-                // $query = MailLog::query()
-                // ->where('mail_logs.status', '!=', 'deleted')
-                // ->where('mail_logs.parent_id', null)
-                // ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
-                // ->select('mail_logs.*', DB::raw('MAX(mail_threads.datetime) as latest_datetime'))
-                // ->groupBy('mail_logs.id', 'mail_logs.status', 'mail_logs.subject', 'mail_logs.body', 'mail_logs.sender', 'mail_logs.name', 'mail_logs.person_in_charge')
-                // ->orderBy('latest_datetime', 'desc');
+
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -167,7 +168,13 @@ class MailRepository implements MailRepositoryInterface
             $query->where('status', 'new')->where('parent_id', null);
         }])->get();
 
-        $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
+        $query = MailLog::query()
+        ->where('mail_logs.status', '!=', 'deleted')
+        ->where('mail_logs.parent_id', null)
+        ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
+        ->select('mail_logs.*', DB::raw('MAX(mail_threads.datetime) as latest_datetime'))
+        ->groupBy('mail_logs.id', 'mail_logs.status', 'mail_logs.subject', 'mail_logs.body', 'mail_logs.sender', 'mail_logs.name', 'mail_logs.person_in_charge')
+        ->orderBy('latest_datetime', 'desc');
 
 
         if (!empty($filter['status'])) {
