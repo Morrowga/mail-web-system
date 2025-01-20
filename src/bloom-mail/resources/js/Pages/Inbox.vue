@@ -52,7 +52,7 @@ const headers = ref({
         },
         {
             name: t('table.datetime'),
-            value: "latest_datetime"
+            value: "datetime"
         }
     ],
     inbox_folder: [
@@ -70,7 +70,7 @@ const headers = ref({
         },
         {
             name: t('table.datetime'),
-            value: "latest_datetime"
+            value: "datetime"
         }
     ],
     sent: [
@@ -84,7 +84,7 @@ const headers = ref({
         },
         {
             name: t('table.datetime'),
-            value: "latest_datetime"
+            value: "datetime"
         }
     ],
     trash: [
@@ -98,7 +98,7 @@ const headers = ref({
         },
         {
             name: t('table.datetime'),
-            value: "latest_datetime"
+            value: "datetime"
         }
     ],
 });

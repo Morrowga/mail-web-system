@@ -215,7 +215,7 @@ const minimizeReply = () => {
             </VCol>
             <VCol cols="12" lg="4">
                 <div>
-                    <p>{{ props?.mail?.latest_datetime ?? props?.mail?.datetime }}</p>
+                    <p>{{ props?.mail?.datetime }}</p>
                 </div>
             </VCol>
         </VRow>
