@@ -96,7 +96,16 @@ class MailRepository implements MailRepositoryInterface
 
             case 'inbox':
             default:
-                $query = MailLog::where('status', '!=', 'deleted')->where('parent_id', null);
+                $query = MailLog::where('status', '!=', 'deleted')
+                ->where('parent_id', null);
+
+                // $query = MailLog::query()
+                // ->where('mail_logs.status', '!=', 'deleted')
+                // ->where('mail_logs.parent_id', null)
+                // ->leftJoin('mail_logs as mail_threads', 'mail_logs.id', '=', 'mail_threads.parent_id')
+                // ->select('mail_logs.*', DB::raw('MAX(mail_threads.datetime) as latest_datetime'))
+                // ->groupBy('mail_logs.id', 'mail_logs.status', 'mail_logs.subject', 'mail_logs.body', 'mail_logs.sender', 'mail_logs.name', 'mail_logs.person_in_charge')
+                // ->orderBy('latest_datetime', 'desc');
 
                 // Apply filters if available
                 if (!empty($filter['status'])) {
@@ -822,7 +831,7 @@ class MailRepository implements MailRepositoryInterface
             $mail_log->person_in_charge = Auth::user()->name;
             $mail_log->update();
 
-            broadcast(new EmailStatusUpdated($mailLog, $mail_log->status));
+            broadcast(new EmailStatusUpdated($mail_log, $mail_log->status));
         }
 
         return $this->success('Email Sent.');
