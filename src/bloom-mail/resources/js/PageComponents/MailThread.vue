@@ -131,7 +131,7 @@ const onDownload = (path) => {
 
   .border-green
   {
-    border: 2px solid green;
+    border: 1px solid green;
     border-color: green;
   }
 
