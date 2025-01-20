@@ -225,9 +225,12 @@ const minimizeReply = () => {
 
                 <div class="d-flex justify-between">
                     <div>
-                        <p>{{ props?.mail?.name }}</p>
+                        <p v-if="props?.pageType == 'sent'">
+                            To: {{ props?.mail?.mailto }}
+                        </p>
+                        <p class="mt-2">{{ props?.mail?.name }}</p>
                         <p >
-                            {{ props?.mail?.sender }}
+                            From: {{ props?.mail?.sender }}
                         </p>
                         <p v-if="props?.mail?.status == 'resolved'" class="my-3">
                             {{ $t('input.person_in_charge_text') }}: {{ props?.mail?.person_in_charge ?? '' }}
