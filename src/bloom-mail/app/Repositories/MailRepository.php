@@ -66,12 +66,10 @@ class MailRepository implements MailRepositoryInterface
         $pageType = request()->query('page_type');
 
         $inboxCount = MailLog::where('status', 'new')
-        ->where('parent_id', null)
         ->doesntHave('folders')
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
-        ->where('parent_id', null)
         ->count();
 
         $folders = Folder::withCount(['mails' => function ($query) {
@@ -99,7 +97,6 @@ class MailRepository implements MailRepositoryInterface
 
             $query = MailLog::query()
                 ->where('status', '!=', 'deleted')
-                ->where('parent_id', null)
                 ->orderBy('datetime', 'desc');
 
 
@@ -147,11 +144,9 @@ class MailRepository implements MailRepositoryInterface
 
         $inboxCount = MailLog::where('status', 'new')
         ->doesntHave('folders')
-        ->where('parent_id', null)
         ->count();
 
         $trashCount = MailLog::where('status', 'deleted')
-        ->where('parent_id', null)
         ->count();
 
         $inbox = $inboxCount ?? 0;
