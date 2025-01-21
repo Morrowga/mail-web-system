@@ -417,65 +417,6 @@ class MailRepository implements MailRepositoryInterface
         ];
     }
 
-    // public function oldData()
-    // {
-    //     Log::info('Message fetching started');
-    //     $inbox = $this->client->getFolder('INBOX');
-    //     $messages = $inbox->messages()->all()->setFetchOrder("desc")->get();
-    //     foreach (array_chunk($messages->toArray(), 100) as $messageChunk) {
-    //         foreach ($messageChunk as $message) {
-    //             $uid = $message->getUid();
-    //             $subject = $this->decodeString($message->getSubject()[0]);
-    //             $findExisting = MailLog::where('uid', $uid)->first();
-    //             if(!empty($findExisting))
-    //             {
-    //                 $body = '';
-    //                 if ($message->hasTextBody()) {
-    //                     $body = $message->getTextBody();
-    //                 } else {
-    //                     $body = $message->getHTMLBody();
-    //                 }
-
-    //                 $inReplyTo = $message->getHeader()->get('in-reply-to');
-    //                 $references = $message->getHeader()->get('references');
-
-    //                 $parentId = null;
-    //                 $referencesString = null;
-
-    //                 if ($inReplyTo) {
-    //                     $parentMessage = MailLog::where('message_id', $inReplyTo[0])
-    //                         ->first();
-    //                     if ($parentMessage) {
-    //                         $parentId = $parentMessage->id;
-    //                     }
-    //                 }
-
-    //                 if (!$parentId && $references) {
-    //                     $referencesArray = explode(',', $references);
-
-    //                     foreach ($referencesArray as $reference) {
-
-    //                         $parentMessage = MailLog::where('message_id', $reference)->first();
-
-    //                         if($parentMessage)
-    //                         {
-    //                             $parentId = $parentMessage->id;
-
-    //                             break;
-    //                         }
-    //                     }
-    //                     $referencesString = implode(',', $referencesArray);
-    //                 }
-
-    //                 $findExisting->parent_id = $parentId;
-    //                 $findExisting->references = $referencesString;
-    //                 $findExisting->save();
-    //             }
-    //         }
-    //     }
-    // }
-
-
     private function processAttachment($attachment, $mail)
     {
         $fileName = $attachment->getName();
@@ -822,7 +763,7 @@ class MailRepository implements MailRepositoryInterface
                 ? $threadMessage->getHTMLBody()
                 : $threadMessage->getTextBody(),
             'datetime' => ($threadMessage->getDate()[0] ?? Carbon::now('Asia/Tokyo'))->toDateTimeString(),
-            'status' => in_array('Seen', $threadMessage->getFlags()->toArray()) ? 'read' : 'unread',
+            'status' => 'new',
         ];
     }
 
@@ -1021,7 +962,7 @@ class MailRepository implements MailRepositoryInterface
 
         $message->restore(false);
 
-        $mailLog->status = $mailLog->previous_status ?? 'read';
+        $mailLog->status = $mailLog->previous_status ?? 'new';
         $mailLog->previous_status = '';
         $mailLog->deleted_at = null;
         $mailLog->update();

@@ -52,10 +52,10 @@ const emit = defineEmits();
 const mailType = ref(null);
 
 const statusOptions = ref([
-    {
-    name: t('table.' + props?.mail?.status),
-    value: props?.mail?.status
-  },
+//   {
+//     name: t('table.' + props?.mail?.status),
+//     value: props?.mail?.status
+//   },
   {
     name: t('table.under_review'),
     value: "under_review"
