@@ -57,6 +57,10 @@ const statusOptions = ref([
 //     value: props?.mail?.status
 //   },
   {
+    name: t('table.new'),
+    value: "new"
+  },
+  {
     name: t('table.under_review'),
     value: "under_review"
   },

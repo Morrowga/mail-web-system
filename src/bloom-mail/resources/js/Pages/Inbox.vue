@@ -136,10 +136,10 @@ const handlePageChange = (newPage) => {
 const handleRowSelected = (row) => {
   selectedMail.value = row;
 
-  if(row?.status == 'replying')
-  {
-    cancelMailStatus(row?.id)
-  }
+//   if(row?.status == 'replying')
+//   {
+//     cancelMailStatus(row?.id)
+//   }
 
   getHistories(row.id)
   if(row?.status == 'new')
