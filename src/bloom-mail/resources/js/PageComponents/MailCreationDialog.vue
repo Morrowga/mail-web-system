@@ -202,7 +202,7 @@ const generateRandomId = (length = 8) => {
         </VBtn>
     </div>
 
-    <VDialog v-model="dialog" max-width="1250">
+    <VDialog v-model="dialog" max-width="1250" persistent>
         <VForm @submit.prevent="formSubmit">
             <VCard>
                 <!-- Card Header with Icons -->

@@ -105,11 +105,11 @@ class MailController extends Controller
             'previous_status' => null,
         ]);
 
-        broadcast(new EmailStatusUpdated($mail_Log, $previousStatus ?? 'new'));
+        broadcast(new EmailStatusUpdated($mail_Log, $previousStatus ? ($previousStatus == 'replying' ? 'new' : $previousStatus) : 'new'));
 
         return response()->json([
             "message" => "success",
-            "status" => $previousStatus ?? 'new'
+            "status" => $previousStatus ? ($previousStatus == 'replying' ? 'new' : $previousStatus) : 'new'
         ]);
     }
 
