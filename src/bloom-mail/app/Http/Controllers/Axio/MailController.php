@@ -101,7 +101,7 @@ class MailController extends Controller
         $previousStatus = $mail_Log->previous_status;
 
         $mail_Log->update([
-            'status' => $previousStatus ?? 'new',
+            'status' => $previousStatus ? ($previousStatus == 'replying' ? 'new' : $previousStatus) : 'new',
             'previous_status' => null,
         ]);
 

@@ -645,6 +645,8 @@ class MailRepository implements MailRepositoryInterface
 
         $mailLog = MailLog::with(['mail_threads.attachments', 'mail_histories'])->find($id);
 
+        return $mailLog;
+
         if($mailLog->parent_id != null)
         {
             $parentMail = MailLog::where('id', $mailLog->parent_id)
