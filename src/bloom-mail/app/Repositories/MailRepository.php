@@ -106,12 +106,23 @@ class MailRepository implements MailRepositoryInterface
                 }
 
                 if (!empty($filter['keyword'])) {
-                    $query->where(function ($q) use ($filter) {
-                        $q->where('subject', 'like', '%' . $filter['keyword'] . '%')
-                        ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
-                        ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
-                        ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
-                        ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+                    $query->where(function($q) use ($filter) {
+                        $q->where(function($subQ) use ($filter) {
+                            $subQ->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                                ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
+                                ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                                ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                                ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+                        });
+
+                        $q->orWhereHas('mail_histories', function($historyQ) use ($filter) {
+                            $historyQ->where(function($subHistoryQ) use ($filter) {
+                                $subHistoryQ->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                                    ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                                    ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                                    ->orWhere('body', 'like', '%' . $filter['keyword'] . '%');
+                            });
+                        });
                     });
                 }
 
@@ -159,21 +170,37 @@ class MailRepository implements MailRepositoryInterface
         }])->get();
 
         $query = MailLog::query()
-        ->where('status', '!=', 'deleted')
-        ->orderBy('datetime', 'desc');
+            ->where('status', '!=', 'deleted')
+            ->orderBy('datetime', 'desc');
 
+        if ($folderId) {
+            $query->whereHas('folders', function ($q) use ($folderId) {
+                $q->where('folder_id', $folderId);
+            });
+        }
 
         if (!empty($filter['status'])) {
             $query->where('status', $filter['status']);
         }
 
         if (!empty($filter['keyword'])) {
-            $query->where(function ($q) use ($filter) {
-                $q->where('subject', 'like', '%' . $filter['keyword'] . '%')
-                ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
-                ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
-                ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
-                ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+            $query->where(function($q) use ($filter) {
+                $q->where(function($subQ) use ($filter) {
+                    $subQ->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('body', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                        ->orWhere('person_in_charge', 'like', '%' . $filter['keyword'] . '%');
+                });
+
+                $q->orWhereHas('mail_histories', function($historyQ) use ($filter) {
+                    $historyQ->where(function($subHistoryQ) use ($filter) {
+                        $subHistoryQ->where('subject', 'like', '%' . $filter['keyword'] . '%')
+                            ->orWhere('sender', 'like', '%' . $filter['keyword'] . '%')
+                            ->orWhere('name', 'like', '%' . $filter['keyword'] . '%')
+                            ->orWhere('body', 'like', '%' . $filter['keyword'] . '%');
+                    });
+                });
             });
         }
 
@@ -185,11 +212,9 @@ class MailRepository implements MailRepositoryInterface
             $query->whereBetween('datetime', [$filter['from'], $filter['to']]);
         }
 
-        $data = $query->when($folderId, function ($inQuery) use ($folderId) {
-                $inQuery->whereHas('folders', fn($q) => $q->where('folder_id', $folderId));
-            })
-            ->orderBy('datetime', 'desc')
+        $data = $query->orderBy('datetime', 'desc')
             ->paginate(100);
+
 
         return [
             "data" => $data,
