@@ -44,8 +44,8 @@ const statusCheck = (status) => {
 
 const emailClass = (email) => {
   return {
-    'bg-e1f5fe': props.mail?.id === email.id, // Apply bg-e1f5fe if the condition is true
-    'bg-white': props.mail?.id !== email.id, // Apply bg-white if the condition is false
+    'bg-e1f5fe': props.mail?.id === email.id,
+    'bg-white': props.mail?.id !== email.id, 
   };
 };
 

@@ -106,7 +106,7 @@
         "confirmed": "確定",
         "under_review": "確認中",
         "pending": "保留",
-        "no_data": "テンプレートはありません",
+        "no_data": "該当するメールは見つかりません。",
         "role_name": "名称",
         "permission_display_name":"名称",
         "permission_name": "識別名",
