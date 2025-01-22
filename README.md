@@ -72,6 +72,8 @@ php artisan queue:work --queue=mail-fetching
 
 php artisan queue:work --queue=mail-status
 
+php artisan queue:work --queue=mail-taking
+
 php artisan schedule:work
 
 下記URLからアクセス  

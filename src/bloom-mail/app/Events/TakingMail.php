@@ -15,6 +15,8 @@ class TakingMail implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $broadcastQueue = 'mail-taking';
+
     public $mails;
 
     /**

@@ -13,10 +13,7 @@ class ProcessMails implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    public function onQueue($queue)
-    {
-        return 'mail-fetching'; // The queue name you want this job to use
-    }
+    public $broadcastQueue = 'mail-fetching';
 
     // public $timeout = 120;
     // public $tries = 3;
