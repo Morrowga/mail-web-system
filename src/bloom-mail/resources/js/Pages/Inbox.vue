@@ -14,6 +14,12 @@ import FloatReplyButton from '@/PageComponents/FloatReplyButton.vue';
 
 const createDialogVisible = ref(false);
 
+const connectionStatus = ref("Connecting to WebSocket...");
+
+const connectionFlag = ref(false)
+
+const connectionColor = ref('gray');
+
 const props = defineProps(['templates', 'from', 'auth'])
 
 const isVisibleReplyFloatButton = ref(false);
@@ -331,21 +337,64 @@ const goToSpam = () => {
   router.get('/spams');
 };
 
+function checkInternetConnection() {
+    if (navigator.onLine) {
+        connectionStatus.value = 'Connected to the internet...';
+        connectionColor.value = 'green';
+
+        setTimeout(() => {
+            connectionFlag.value = true;
+        }, 3000);
+
+        console.log('Connected to the internet');
+    } else {
+        connectionStatus.value = `No internet connection... Retrying`;
+        connectionFlag.value = false;
+        connectionColor.value = 'red';
+        console.log('No internet connection');
+    }
+}
+
+window.addEventListener('online', () => {
+    console.log('Browser went online');
+    checkInternetConnection();
+});
+
+window.addEventListener('offline', () => {
+    console.log('Browser went offline');
+    checkInternetConnection();
+});
+
 onMounted(() => {
   fetchEmails()
 
-//   axios.post(`/mails/folder-matching`)
-//     .then((response) => {
-//         if(selectedFolder.value == null)
-//         {
-//             fetchEmails()
-//         } else {
-//             fetchEmailsWithFolderId()
-//         }
-//     })
-//     .catch((error) => {
-//         console.error('Error canceling status', error);
-//     });
+  if (Echo.connector.pusher) {
+        const pusher = Echo.connector.pusher;
+        console.log(pusher.connection.state)
+
+        if(pusher.connection.state == 'connected')
+        {
+            connectionStatus.value = 'Connected to WebSocket';
+            connectionColor.value = 'green';
+
+            setTimeout(() => {
+                connectionFlag.value = true;
+                checkInternetConnection();
+            }, 3000);
+
+        } else if(pusher.connection.state == 'disconnected')
+        {
+            connectionStatus.value = 'Disconnected from WebSocket';
+            connectionFlag.value = false;
+            connectionColor.value = 'red'
+
+        } else if(pusher.connection.state == 'connecting')
+        {
+            connectionStatus.value = 'Connecting to WebSocket...';
+            connectionFlag.value = true;
+            connectionColor.value = 'gray'
+        }
+    }
 
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
@@ -539,21 +588,32 @@ onUnmounted(() => {
                             </VCol>
                             <VCol cols="12" class="scrollable-column" :lg="selectedMail ? 5 : 10"
                             >
-                                <div class="mb-3" v-if="permissionGrant(permissions, 'mail_create')">
-                                <MailCreationDialog
-                                    :label="label"
-                                    @update:labelValue="label = $event"
-                                    :createDialog="createDialogVisible"
-                                    :selectedNewMail="selectedNewMail"
-                                    :floatButton="isVisibleFloatButton"
-                                    @setNullToSelectedNewMail="setNullToSelectedNewMail"
-                                    @update:dialog="createDialogVisible = $event"
-                                    @update:visibleFloat="isVisibleFloatButton = $event"
-                                    @pushValueToNewEmails="pushValueToNewEmails"
-                                    :templates="props?.templates"
-                                    :from="props?.from"
-                                    @fetchMail="fetchEmails"
-                                />
+                                <div class="d-flex justify-start">
+                                    <div class="mb-3" v-if="permissionGrant(permissions, 'mail_create')">
+                                    <MailCreationDialog
+                                        :label="label"
+                                        @update:labelValue="label = $event"
+                                        :createDialog="createDialogVisible"
+                                        :selectedNewMail="selectedNewMail"
+                                        :floatButton="isVisibleFloatButton"
+                                        @setNullToSelectedNewMail="setNullToSelectedNewMail"
+                                        @update:dialog="createDialogVisible = $event"
+                                        @update:visibleFloat="isVisibleFloatButton = $event"
+                                        @pushValueToNewEmails="pushValueToNewEmails"
+                                        :templates="props?.templates"
+                                        :from="props?.from"
+                                        @fetchMail="fetchEmails"
+                                    />
+                                    </div>
+                                    <div class="d-flex align-center mx-3" v-if="!connectionFlag">
+                                        <v-progress-circular
+                                        indeterminate
+                                        color="primary"
+                                        size="20"
+                                        class="mr-2"
+                                        ></v-progress-circular>
+                                        <span :style="'color:' + connectionColor + '; font-style: italic;'">{{ connectionStatus }}</span>
+                                    </div>
                                 </div>
 
                                 <div>
