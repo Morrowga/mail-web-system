@@ -475,10 +475,13 @@ onMounted(() => {
 const handleSearch = (form) => {
     console.log(form)
     searchForm.value = form
-    if(form.folder_id == null || form.folder_id == '' && pageType.value == 'inbox')
+    if ((form.folder_id == null || form.folder_id == '') && pageType.value == 'inbox')
     {
+        console.log('searching all')
+
         fetchEmails()
     } else {
+        console.log('searching with folder id')
         setPageType('inbox_folder', form.folder_id ? form.folder_id : selectedFolder.value)
 
         fetchEmailsWithFolderId()
