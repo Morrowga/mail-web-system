@@ -5,10 +5,18 @@ const props = defineProps({
     floatMails: Array
 });
 
-const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat', 'changeMailDetail', 'removeMail', 'cancelMailStatus']);
-const hover = ref(false);  // Track hover state
+const emit = defineEmits([
+    'update:onOpenDialog',
+    'update:hideFloat',
+    'changeMailDetail',
+    'removeMail',
+    'cancelMailStatus',
+    'removeAllReplyMail',
+    'handleRowSelected'
+]);
 
 const handleClick = (item) => {
+    emit('handleRowSelected', item);
     emit('update:onOpenDialog', true);
     emit('changeMailDetail', item)
 };
@@ -21,11 +29,8 @@ const handleClick = (item) => {
 // ]
 
 const handleRemove = () => {
+    emit('removeAllReplyMail')
     emit('update:hideFloat', false);
-
-    props.floatMails.forEach(mail => {
-        emit('cancelMailStatus', mail.id);
-    });
 };
 
 const handleRemoveItem = (item) => {

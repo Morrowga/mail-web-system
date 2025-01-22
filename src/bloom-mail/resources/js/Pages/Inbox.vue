@@ -366,6 +366,15 @@ window.addEventListener('offline', () => {
 });
 
 onMounted(() => {
+  let storedMails = JSON.parse(localStorage.getItem('newFloatMails')) || [];
+  let replyStoredMails = JSON.parse(localStorage.getItem('floatMails')) || [];
+
+  newFloatMails.value = storedMails;
+  floatMails.value = replyStoredMails;
+
+  isVisibleFloatButton.value = newFloatMails.value.length > 0 ? true : false;
+  isVisibleReplyFloatButton.value = floatMails.value.length > 0 ? true : false;
+
   fetchEmails()
 
   if (Echo.connector.pusher) {
@@ -474,17 +483,23 @@ const changeNewMailValue = (id) => {
 }
 
 const pushValueToNewEmails = (item) => {
-    const index = newFloatMails.value.findIndex(mail => mail.id === item.id);
+    let storedMails = JSON.parse(localStorage.getItem('newFloatMails')) || [];
+
+    const index = storedMails.findIndex(mail => mail.id === item.id);
 
     if (index !== -1) {
-        newFloatMails.value[index] = item;
+        storedMails[index] = item;
     } else {
-        newFloatMails.value.push(item);
+        storedMails.push(item);
     }
 
-    if (newFloatMails.value.length > 5) {
-        newFloatMails.value.shift();
+    if (storedMails.length > 5) {
+        storedMails.shift();
     }
+
+    localStorage.setItem('newFloatMails', JSON.stringify(storedMails));
+
+    newFloatMails.value = storedMails;
 
     console.log(newFloatMails.value);
 }
@@ -496,11 +511,16 @@ const changeMailDetail = (item) => {
 
 const replyMinimize = () => {
     if (!floatMails.value.some(mail => mail.id === selectedMail.value.id)) {
-        floatMails.value.push(selectedMail.value);
-    }
+        const storedMails = JSON.parse(localStorage.getItem('floatMails')) || [];
+        storedMails.push(selectedMail.value);
 
-    if (floatMails.value.length > 5) {
-        floatMails.value.shift();
+        if (storedMails.length > 5) {
+            storedMails.shift();
+        }
+
+        localStorage.setItem('floatMails', JSON.stringify(storedMails));
+
+        floatMails.value = storedMails;
     }
 
     isVisibleReplyFloatButton.value = true;
@@ -515,19 +535,41 @@ const removeNewMail = (id) => {
         if (selectedNewMail.value && selectedNewMail.value.id === id) {
             selectedNewMail.value = null;
         }
+
+        let storedMails = JSON.parse(localStorage.getItem('newFloatMails')) || [];
+
+        storedMails = storedMails.filter(mail => mail.id !== id);
+
+        localStorage.setItem('newFloatMails', JSON.stringify(storedMails));
     }
 };
+
+const removeAllNewMail = () => {
+    console.log('Removing all new mails');
+    newFloatMails.value = [];
+    selectedNewMail.value = null;
+    localStorage.removeItem('newFloatMails');
+}
+
+const removeAllReplyMail = () => {
+    floatMails.value = [];
+    selectedMail.value = null;
+    localStorage.removeItem('floatMails');
+}
 
 const setNullToSelectedNewMail = () => {
     selectedNewMail.value = null
 }
-
 const removeMail = (item) => {
-
-    const index = floatMails.value.findIndex(mail => mail.id === item.id); // Find the index of the item
+    const index = floatMails.value.findIndex(mail => mail.id === item.id);
 
     if (index !== -1) {
-        floatMails.value.splice(index, 1); // Remove the item at the found index
+        floatMails.value.splice(index, 1);
+
+        const storedMails = JSON.parse(localStorage.getItem('floatMails')) || [];
+        const updatedMails = storedMails.filter(mail => mail.id !== item.id);
+
+        localStorage.setItem('floatMails', JSON.stringify(updatedMails));
     }
 };
 
@@ -665,6 +707,7 @@ onUnmounted(() => {
                 @update:onOpenDialog="createDialogVisible = $event"
                 @update:hideFloat="isVisibleFloatButton = $event"
                 :newFloatMails="newFloatMails"
+                @removeAllNewMail="removeAllNewMail"
                 @removeNewMail="removeNewMail"
                 @changeNewMailValue="changeNewMailValue"
             />
@@ -675,6 +718,8 @@ onUnmounted(() => {
                 v-if="isVisibleReplyFloatButton && floatMails.length > 0"
                 @changeMailDetail="changeMailDetail"
                 @removeMail="removeMail"
+                @handleRowSelected="handleRowSelected"
+                @removeAllReplyMail="removeAllReplyMail"
                 @cancelMailStatus="cancelMailStatus"
                 @update:hideFloat="isVisibleReplyFloatButton = $event"
             />

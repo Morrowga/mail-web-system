@@ -5,13 +5,10 @@ const props = defineProps({
     newFloatMails: Array
 });
 
-const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat', 'removeNewMail', 'changeNewMailValue']);
+const emit = defineEmits(['update:onOpenDialog', 'update:hideFloat', 'removeNewMail', 'changeNewMailValue', 'removeAllNewMail']);
 
 const handleRemove = () => {
-    props.newFloatMails.forEach(mail => {
-        emit('removeNewMail', mail.id);
-    });
-
+    emit('removeAllNewMail');
     emit('update:hideFloat', false);
 };
 
