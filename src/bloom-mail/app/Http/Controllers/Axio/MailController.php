@@ -76,7 +76,8 @@ class MailController extends Controller
         broadcast(new EmailStatusUpdated($mail_Log, 'replying'));
 
         return response()->json([
-            "message" => "success"
+            "message" => "success",
+            "status" => "replying"
         ]);
     }
 
@@ -90,7 +91,8 @@ class MailController extends Controller
         broadcast(new EmailStatusUpdated($mail_Log, $request->status));
 
         return response()->json([
-            "message" => "success"
+            "message" => "success",
+            "status" => $request->status
         ]);
     }
 
@@ -106,7 +108,8 @@ class MailController extends Controller
         broadcast(new EmailStatusUpdated($mail_Log, $previousStatus ?? 'new'));
 
         return response()->json([
-            "message" => "success"
+            "message" => "success",
+            "status" => $previousStatus ?? 'new'
         ]);
     }
 

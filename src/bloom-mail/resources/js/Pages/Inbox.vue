@@ -300,6 +300,11 @@ const cancelMailStatus = (id) => {
     axios
     .post(`/mails/cancel-status/${id}`)
     .then((response) => {
+        const mail = mails.value.find(mail => mail.id === selectedMail.value.id);
+
+        mail.status = response.data.status
+        selectedMail.value.status = response.data.status
+
       console.log('Status canceled successfully', response.data);
     })
     .catch((error) => {
@@ -312,6 +317,11 @@ const changeMailStatus = (id) => {
   axios
     .post(`/mails/change-reply/${id}`)
     .then((response) => {
+        const mail = mails.value.find(mail => mail.id === selectedMail.value.id);
+
+        mail.status = response.data.status
+        selectedMail.value.status = response.data.status
+
       console.log('Status changed successfully', response.data);
     })
     .catch((error) => {
@@ -557,6 +567,13 @@ const removeAllReplyMail = () => {
     localStorage.removeItem('floatMails');
 }
 
+const updateStatus = (id, status) => {
+    const mail = mails.value.find(mail => mail.id === id);
+
+    mail.status = status
+    selectedMail.value.status = status
+}
+
 const setNullToSelectedNewMail = () => {
     selectedNewMail.value = null
 }
@@ -689,6 +706,7 @@ onUnmounted(() => {
                                         :threadLoading="threadLoading"
                                         :updateThreadLoading="updateThreadLoading"
                                         :mail="selectedMail"
+                                        @updateStatus="updateStatus"
                                         @replyMinimize="replyMinimize"
                                         @handleRemoveRow="removeRow"
                                         @fetchagain="fetchEmails"

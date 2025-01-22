@@ -171,6 +171,8 @@ const changeStatus = () => {
         }
     )
     .then((response) => {
+        emit('updateStatus', props?.mail?.id, response.data.status);
+
       console.log('Status confirmed successfully', response.data);
     })
     .catch((error) => {
