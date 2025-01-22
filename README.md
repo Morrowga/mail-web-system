@@ -68,7 +68,9 @@ IMAP_PROTOCOL=imap
 
 php artisan reverb:start --port=8081
 
-php artisan queue:work --memory=2048
+php artisan queue:work --queue=mail-fetching
+
+php artisan queue:work --queue=mail-status
 
 php artisan schedule:work
 

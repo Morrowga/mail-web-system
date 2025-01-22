@@ -16,6 +16,8 @@ class EmailStatusUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $broadcastQueue = 'mail-status';
+
     public $mailId;
     public $person_in_charge;
     public $newStatus;
