@@ -24,7 +24,11 @@ const loading = ref(false);
 
 const folders = page.props.folders
 
-folders.push({ name: "受信トレイ", id: -1 });
+const folderExists = folders.some(folder => folder.name === "受信トレイ" && folder.id === -1);
+
+if (!folderExists) {
+    folders.push({ name: "受信トレイ", id: -1 });
+}
 
 const dialog = ref(props.folderSwithcerDialog);
 
@@ -44,6 +48,7 @@ const onClose = () => {
 
 const mailFolders = ref(props.mail.folders);
 
+
 const submitSwitch = async () => {
     if(form.folder_id == null)
     {
@@ -56,13 +61,14 @@ const submitSwitch = async () => {
         const response = await axios.post(`/mails/folder-switch`, form);
         if(response.data.status == 'success')
         {
-            form.folder_id = null
             mailFolders.value = [];
+            console.log(folders);
             mailFolders.value.push(folders.find(folder => folder.id === form.folder_id));
 
             loading.value = false;
             errorMessage.value = '';
             successMessage.value = t('other.switch_success');
+            form.folder_id = null
         }
     } catch (error) {
         loading.value = false;
