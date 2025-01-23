@@ -152,6 +152,7 @@
         "folder_switcher": "フォルダへ移動",
         "current_folder": "現在のフォルダ",
         "destination_folder": "移動先のフォルダ",
-        "switch_success": "メールが指定されたフォルダに正常に移動しました。"
+        "switch_success": "メールが指定されたフォルダに正常に移動しました。",
+        "inbox_mail": "受信トレイ"
     }
 }

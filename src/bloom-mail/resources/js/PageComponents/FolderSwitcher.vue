@@ -81,7 +81,7 @@ watch(() => props.folderSwithcerDialog, (newVal) => {
 
 
 <template>
-    <v-dialog v-model="dialog" max-width="700" @click:outside="onClose">
+    <v-dialog v-model="dialog" max-width="700" persistent>
       <template v-slot:default>
         <v-card style="padding: 1rem; border-radius: 20px;">
           <v-card-title>
@@ -106,7 +106,7 @@ watch(() => props.folderSwithcerDialog, (newVal) => {
                     {{
                         mailFolders
                             ? mailFolders?.map(folder => folder.name).join(', ')
-                            : 'Inbox Mail'
+                            : t('other.inbox_mail')
                     }}
                 </div>
             </div>
@@ -142,7 +142,7 @@ watch(() => props.folderSwithcerDialog, (newVal) => {
                     @click="submitSwitch"
                     :disabled="loading"
                 >
-                        {{ loading ? 'Processing...' : $t('buttons.switch') }}
+                        {{ loading ? '処理中...' : $t('buttons.switch') }}
                 </VBtn>
             </div>
           </v-card-text>

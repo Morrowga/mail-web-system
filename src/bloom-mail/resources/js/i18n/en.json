@@ -151,7 +151,8 @@
         "folder_switcher": "Folder Switcher",
         "current_folder": "Current Folder",
         "destination_folder": "Destination Folder",
-        "switch_success": "Mail moved successfully to the destination folder"
+        "switch_success": "Mail moved successfully to the destination folder",
+        "inbox_mail": "Inbox Mail"
     }
 }
 
