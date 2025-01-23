@@ -1128,21 +1128,32 @@ class MailRepository implements MailRepositoryInterface
     public function folderSwitch(Request $request)
     {
         $mail = MailLog::find($request->mail_id);
-        $folder = Folder::find($request->folder_id);
 
-        if ($mail->folders->contains($folder)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'The folder is already attached to this mail.'
-            ], 400);
+        if($request->folder_id == -1)
+        {
+            $mail->folders()->detach();
+
+            $mail->is_move = 0;
+            $mail->save();
+
+        } else {
+            $folder = Folder::find($request->folder_id);
+
+            if ($mail->folders->contains($folder)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The folder is already attached to this mail.'
+                ], 400);
+            }
+
+            $mail->folders()->detach();
+
+            $mail->folders()->attach($folder);
+
+            $mail->is_move = 1;
+            $mail->save();
         }
 
-        $mail->folders()->detach();
-
-        $mail->folders()->attach($folder);
-
-        $mail->is_move = 1;
-        $mail->save();
 
         return response()->json([
             'status' => 'success',

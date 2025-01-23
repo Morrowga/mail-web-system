@@ -24,6 +24,8 @@ const loading = ref(false);
 
 const folders = page.props.folders
 
+folders.push({ name: "受信トレイ", id: -1 });
+
 const dialog = ref(props.folderSwithcerDialog);
 
 const form = useForm({
@@ -54,6 +56,7 @@ const submitSwitch = async () => {
         const response = await axios.post(`/mails/folder-switch`, form);
         if(response.data.status == 'success')
         {
+            form.folder_id = null
             mailFolders.value = [];
             mailFolders.value.push(folders.find(folder => folder.id === form.folder_id));
 
