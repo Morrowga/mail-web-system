@@ -34,4 +34,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('change-status');
 
     Route::post('mails/folder-matching', [MailController::class, 'folderMatching']);
+
+    Route::post('mails/folder-switch', [MailController::class, 'folderSwitch']);
 });

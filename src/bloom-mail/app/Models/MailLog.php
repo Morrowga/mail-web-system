@@ -23,7 +23,8 @@ class MailLog extends Model
         'person_in_charge',
         'references',
         'deleted_at',
-        'is_match'
+        'is_match',
+        'is_move'
     ];
 
     public function mail_threads()

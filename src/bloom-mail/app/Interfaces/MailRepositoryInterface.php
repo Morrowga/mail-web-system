@@ -42,4 +42,6 @@ interface MailRepositoryInterface
     public function deleteSentMail(SentMail $sent_mail);
 
     public function singleFolderMatching();
+
+    public function folderSwitch(Request $request);
 }

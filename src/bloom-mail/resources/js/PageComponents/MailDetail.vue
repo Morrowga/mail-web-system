@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n';
 import { getTranslatedStatus } from '@/Helper/status';
 import axios from 'axios';
 import { permissionGrant } from '@/Helper/permissionUtils';
+import FolderSwitcher from './FolderSwitcher.vue';
 
 const props = defineProps({
     mail: Object,
@@ -28,6 +29,8 @@ const { t, locale } = useI18n();
 const floatVisibility = ref(props.isVisibleReplyFloatButton)
 
 const createDialogVisible = ref(props.replyDialogVisible);
+
+const folderSwithcerDialog = ref(false);
 
 watch(
     () => props.replyDialogVisible,
@@ -184,6 +187,13 @@ const handleStatusChange = () => {
     changeStatus()
 };
 
+const reloadMails = () => {
+    emit('reloadMailFetching')
+}
+
+const openFolderSwitcher = () => {
+    folderSwithcerDialog.value = true;
+}
 
 const minimizeReply = () => {
     emit('replyMinimize')
@@ -215,6 +225,10 @@ const minimizeReply = () => {
                 </div>
                 <div class="icon-wrapper" v-if="permissionGrant(permissions, 'mail_forward')">
                     <VIcon icon="mdi-arrow-right-top" @click="openDialog('forward')" class="icon-size cursor-pointer" />
+                    <div class="underline"></div>
+                </div>
+                <div class="icon-wrapper">
+                    <VIcon icon="mdi-folder-open" color="primary" @click="openFolderSwitcher()" class="icon-size cursor-pointer" />
                     <div class="underline"></div>
                 </div>
                 </div>
@@ -301,6 +315,12 @@ const minimizeReply = () => {
                 @handleLoadThread="updateThread(props?.mail?.id)"
                 :threads="props?.threads"
                 :from="props?.from"
+            />
+            <FolderSwitcher
+                :folderSwithcerDialog="folderSwithcerDialog"
+                @update:dialog="folderSwithcerDialog = $event"
+                :mail="props?.mail"
+                @reloadMails="reloadMails"
             />
             <MailConfirmDialog @handleDelete="handleDelete" :pageType="props?.pageType" @handleRedo="handleRedo" :selectedConfirmType="selectedConfirmType"  :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
         </div>

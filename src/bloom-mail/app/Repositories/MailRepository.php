@@ -171,6 +171,7 @@ class MailRepository implements MailRepositoryInterface
 
         $query = MailLog::query()
             ->where('status', '!=', 'deleted')
+            ->with(['folders'])
             ->orderBy('datetime', 'desc');
 
         if ($folderId) {
@@ -476,7 +477,7 @@ class MailRepository implements MailRepositoryInterface
             $method = strtolower($folder->method);
             $extraSearches = $folder->extra_searches;
 
-            $allMails = MailLog::where('is_match', 0)->get();
+            $allMails = MailLog::where('is_match', 0)->where('is_move', 0)->get();
 
             foreach ($allMails as $mail) {
 
@@ -551,7 +552,7 @@ class MailRepository implements MailRepositoryInterface
             $method = strtolower($folder->method);
             $extraSearches = $folder->extra_searches;
 
-            MailLog::chunk(100, function ($allMails) use ($folder, $searchCharacter, $method, $extraSearches) {
+            MailLog::where('is_move', 0)->chunk(100, function ($allMails) use ($folder, $searchCharacter, $method, $extraSearches) {
                 foreach ($allMails as $mail) {
 
                     $mail->is_match = 1;
@@ -1122,4 +1123,31 @@ class MailRepository implements MailRepositoryInterface
 
         return isset($parts[1]) ? $parts[1] : null;
     }
+
+
+    public function folderSwitch(Request $request)
+    {
+        $mail = MailLog::find($request->mail_id);
+        $folder = Folder::find($request->folder_id);
+
+        if ($mail->folders->contains($folder)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The folder is already attached to this mail.'
+            ], 400);
+        }
+
+        $mail->folders()->detach();
+
+        $mail->folders()->attach($folder);
+
+        $mail->is_move = 1;
+        $mail->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mail has been successfully moved to the new folder.'
+        ], 200);
+    }
+
 }

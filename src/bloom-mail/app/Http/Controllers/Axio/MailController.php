@@ -116,6 +116,12 @@ class MailController extends Controller
     public function folderMatching()
     {
         $mails = $this->mailRepository->singleFolderMatching();
+    }
 
+    public function folderSwitch(Request $request)
+    {
+        $mails = $this->mailRepository->folderSwitch($request);
+
+        return $mails;
     }
 }

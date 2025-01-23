@@ -148,10 +148,10 @@ const handleRowSelected = (row) => {
 //   }
 
   getHistories(row.id)
-  if(row?.status == 'new')
-  {
-    markAsRead(row?.id)
-  }
+//   if(row?.status == 'new')
+//   {
+//     markAsRead(row?.id)
+//   }
 };
 
 const removeRow = (row) => {
@@ -209,17 +209,6 @@ const fetchEmailsWithFolderId = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-
-
-const markAsRead = async (id) => {
-    return;
-    // try {
-    //     const response = await axios.post(`/mails/mark-as-read/${id}`);
-    // } catch (error) {
-    //     console.error('Failed to mark as read:', error);
-    // }
 };
 
 const getHistories = async (id) => {
@@ -593,6 +582,15 @@ const removeMail = (item) => {
     }
 };
 
+const reloadMailFetching = () => {
+    if(selectedFolder.value == null)
+    {
+        fetchEmails()
+    } else {
+        fetchEmailsWithFolderId()
+    }
+}
+
 onUnmounted(() => {
     Echo.leaveChannel('mails');
     console.log('disconnected')
@@ -703,6 +701,7 @@ onUnmounted(() => {
                                         @subjectForForward="subjectForForward"
                                         @subjectToNormal="subjectToNormal"
                                         :pageType="pageType"
+                                        @reloadMailFetching="reloadMailFetching"
                                         :isVisibleReplyFloatButton="isVisibleReplyFloatButton"
                                         @update:hideFloat="isVisibleReplyFloatButton = $event"
                                         :replyDialogVisible="replyDialogVisible"
