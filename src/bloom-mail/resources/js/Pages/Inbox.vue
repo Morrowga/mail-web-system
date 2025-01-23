@@ -42,6 +42,8 @@ const folders = ref({});
 
 const permissions = props?.auth?.user?.permissions
 
+const selectedOgSubject = ref(null)
+
 const headers = ref({
     inbox: [
         {
@@ -593,6 +595,29 @@ const removeMail = (item) => {
     }
 };
 
+const subjectForReply = () => {
+    const prefix = 'Re: ';
+    selectedOgSubject.value = selectedMail.value.subject
+
+    if(!selectedMail.value.subject.trim().toLowerCase().startsWith(prefix.toLowerCase()))
+    {
+        selectedMail.value.subject = prefix + selectedMail.value.subject;
+    }
+}
+
+const subjectToNormal = () => {
+    selectedMail.value.subject = selectedOgSubject.value
+};
+
+const subjectForForward = () => {
+    const prefix = 'Fwd: ';
+    selectedOgSubject.value = selectedMail.value.subject
+
+    if(!selectedMail.value.subject.trim().toLowerCase().startsWith(prefix.toLowerCase()))
+    {
+        selectedMail.value.subject = prefix + selectedMail.value.subject;
+    }
+}
 
 onUnmounted(() => {
     Echo.leaveChannel('mails');
@@ -700,6 +725,9 @@ onUnmounted(() => {
                                     <MailDetail
                                         @getThreads="getHistories"
                                         @updateThreads="updateHistories"
+                                        @subjectForReply="subjectForReply"
+                                        @subjectForForward="subjectForForward"
+                                        @subjectToNormal="subjectToNormal"
                                         :pageType="pageType"
                                         :isVisibleReplyFloatButton="isVisibleReplyFloatButton"
                                         @update:hideFloat="isVisibleReplyFloatButton = $event"

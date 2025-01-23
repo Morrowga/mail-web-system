@@ -26,6 +26,18 @@ const isDisabled = ref(false);
 
 const typeOfMail = ref(props.type);
 
+const emit = defineEmits([
+    'update:dialog',
+    'cancelStatus',
+    'handleLoadThread',
+    'update:mailTypeEevent',
+    'minimizeReply',
+    'updatingSubject',
+]);
+
+
+// const prefix = 'Re: ';
+
 const form = useForm({
     subject: props?.mailData?.subject,
     from: page?.props?.from,
@@ -35,8 +47,6 @@ const form = useForm({
     og_message_id: props?.mailData?.message_id,
     type: typeOfMail.value
 });
-
-console.log('hellotest', typeOfMail.value)
 
 watch(
     () => typeOfMail.value,
@@ -49,7 +59,6 @@ watch(
 console.log(form)
 
 const formattedDateTime = ref(null);
-const emit = defineEmits(['update:dialog', 'cancelStatus', 'handleLoadThread', 'update:mailTypeEevent', 'minimizeReply']);
 
 const onClose = () => {
     if(typeOfMail.value == 'reply')
@@ -104,6 +113,7 @@ watch(() => props.mailData, (newMailData) => {
         replaceDialog.value = false;
     }
 });
+
 
 const itemProps = (item) =>  {
     console.log(item);
@@ -216,6 +226,7 @@ watch(() => props.type, (newType) => {
                                         <div style="width: 90%;">
                                             <VTextField
                                                 variant="outlined"
+                                                disabled
                                                 density="compact"
                                                 required
                                                 v-model="form.subject"

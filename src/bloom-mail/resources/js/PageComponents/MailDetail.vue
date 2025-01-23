@@ -87,11 +87,28 @@ const openDialog = (type) => {
     if (type === 'reply' && props?.mail?.status !== 'resolved' && props?.mail?.status !== 'confirmed') {
         emit('changeMailStatus', props?.mail?.id);
     }
-    console.log(mailType.value);
 
-    mailType.value = type;
-    createDialogVisible.value = true;
+    if(updatingSubject(type) == "Done")
+    {
+        mailType.value = type;
+        createDialogVisible.value = true;
+    }
 }
+
+const updatingSubject = (type) => {
+    if(type == 'reply')
+    {
+        emit('subjectForReply')
+
+        return "Done";
+
+    } else {
+        emit('subjectForForward')
+
+        return "Done";
+    }
+}
+
 
 const cancelStatus = () => {
     emit('cancelMailStatus', props?.mail?.id)
@@ -101,12 +118,13 @@ const handleRemoveClick = () => {
   emit('handleRemoveRow');
 };
 
-const loadThread = (id) => {
-    emit('getThreads', id)
-}
+// const loadThread = (id) => {
+//     emit('getThreads', id)
+// }
 
 const updateThread = (id) => {
     emit('updateThreads', id)
+    emit('subjectToNormal')
 }
 
 const openConfirmDialog = (type) => {
@@ -287,6 +305,7 @@ const minimizeReply = () => {
                 </v-skeleton-loader>
             </div>
             <ReplyForwardDialog
+                v-if="createDialogVisible"
                 :createDialog="createDialogVisible"
                 @update:dialog="createDialogVisible = $event"
                 :type="mailType"
@@ -294,6 +313,8 @@ const minimizeReply = () => {
                 @update:mailTypeEevent="mailType = $event"
                 :mailData="props?.mail"
                 @cancelStatus="cancelStatus"
+                @updatingSubject="updatingSubject"
+                @subjectOg="subjectOg"
                 @minimizeReply="minimizeReply"
                 @handleLoadThread="updateThread(props?.mail?.id)"
                 :threads="props?.threads"
