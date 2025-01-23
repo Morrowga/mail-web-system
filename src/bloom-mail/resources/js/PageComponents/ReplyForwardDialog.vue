@@ -35,9 +35,6 @@ const emit = defineEmits([
     'updatingSubject',
 ]);
 
-
-// const prefix = 'Re: ';
-
 const form = useForm({
     subject: props?.mailData?.subject,
     from: page?.props?.from,
@@ -226,7 +223,6 @@ watch(() => props.type, (newType) => {
                                         <div style="width: 90%;">
                                             <VTextField
                                                 variant="outlined"
-                                                disabled
                                                 density="compact"
                                                 required
                                                 v-model="form.subject"

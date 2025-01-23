@@ -88,25 +88,8 @@ const openDialog = (type) => {
         emit('changeMailStatus', props?.mail?.id);
     }
 
-    if(updatingSubject(type) == "Done")
-    {
-        mailType.value = type;
-        createDialogVisible.value = true;
-    }
-}
-
-const updatingSubject = (type) => {
-    if(type == 'reply')
-    {
-        emit('subjectForReply')
-
-        return "Done";
-
-    } else {
-        emit('subjectForForward')
-
-        return "Done";
-    }
+    mailType.value = type;
+    createDialogVisible.value = true;
 }
 
 
@@ -124,7 +107,6 @@ const handleRemoveClick = () => {
 
 const updateThread = (id) => {
     emit('updateThreads', id)
-    emit('subjectToNormal')
 }
 
 const openConfirmDialog = (type) => {
