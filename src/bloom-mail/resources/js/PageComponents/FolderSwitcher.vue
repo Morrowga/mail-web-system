@@ -13,6 +13,8 @@ const props = defineProps({
     },
 });
 
+const { t, locale } = useI18n();
+
 const errorMessage = ref('');
 const successMessage = ref('');
 
@@ -29,15 +31,16 @@ const form = useForm({
     mail_id: props?.mail?.id ?? '',
 })
 
-console.log(props?.mail);
 
-const emit = defineEmits(['update:dialog', 'reloadMails']);
+const emit = defineEmits(['update:dialog', 'reloadMails', 'handleLoadThread']);
 
 const onClose = () => {
     dialog.value = false;
     emit('update:dialog', false);
     emit('reloadMails');
 }
+
+const mailFolders = ref(props.mail.folders);
 
 const submitSwitch = async () => {
     if(form.folder_id == null)
@@ -51,9 +54,13 @@ const submitSwitch = async () => {
         const response = await axios.post(`/mails/folder-switch`, form);
         if(response.data.status == 'success')
         {
+            mailFolders.value = [];
+            mailFolders.value.push(folders.find(folder => folder.id === form.folder_id));
+
             loading.value = false;
             errorMessage.value = '';
             successMessage.value = 'Mail moved successfully to the destination folder';
+            emit('handleLoadThread', props.mail.id);
         }
     } catch (error) {
         loading.value = false;
@@ -77,24 +84,36 @@ watch(() => props.folderSwithcerDialog, (newVal) => {
 <template>
     <v-dialog v-model="dialog" max-width="700" @click:outside="onClose">
       <template v-slot:default>
-        <v-card style="padding: 2rem; border-radius: 20px;">
-          <v-card-title>{{ 'Folder Switcher' }}</v-card-title>
+        <v-card style="padding: 1rem; border-radius: 20px;">
+          <v-card-title>
+            <div class="d-flex justify-between">
+                <h3> {{ $t('other.folder_switcher') }}</h3>
+                <div class="icon-border text-center">
+                    <VIcon
+                        icon="mdi-close"
+                        class="close-icon"
+                        style="color: #a5a5a5; font-weight: bold;"
+                        @click="onClose"
+                    ></VIcon>
+                </div>
+            </div>
+          </v-card-title>
           <v-card-text>
             <div class="d-flex justify-center">
                 <div  style="width: 50%;" >
-                    <InputLabel> Current Folder </InputLabel>
+                    <InputLabel> {{ $t('other.current_folder') }} </InputLabel>
                 </div>
                 <div style="width: 50%;" class="mb-5 mx-5">
                     {{
-                        props?.mail?.folders
-                            ? props?.mail?.folders?.map(folder => folder.name).join(', ')
+                        mailFolders
+                            ? mailFolders?.map(folder => folder.name).join(', ')
                             : 'Inbox Mail'
                     }}
                 </div>
             </div>
             <div class="d-flex justify-center">
                 <div  style="width: 50%;" >
-                    <InputLabel> Destination Folder </InputLabel>
+                    <InputLabel> {{ $t('other.destination_folder') }} </InputLabel>
                 </div>
                 <div style="width: 50%;" class="mb-5 mx-5">
                     <VAutocomplete
@@ -124,7 +143,7 @@ watch(() => props.folderSwithcerDialog, (newVal) => {
                     @click="submitSwitch"
                     :disabled="loading"
                 >
-                        {{ loading ? 'Processing...' : 'Switch' }}
+                        {{ loading ? 'Processing...' : $t('buttons.switch') }}
                 </VBtn>
             </div>
           </v-card-text>

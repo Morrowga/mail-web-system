@@ -43,7 +43,8 @@
         "search": "検索",
         "yes": "はい",
         "no": "いいえ",
-        "update": "更新"
+        "update": "更新",
+        "switch": "移動"
     },
     "input": {
         "name": "氏名",
@@ -147,6 +148,9 @@
         "welcome": "こちらはメール・アプリ管理システムのホーム画面となります。",
         "edit_templatecategory": "テンプレート カテゴリ編集",
         "create_templatecategory": "テンプレートカテゴリ登録",
-        "matchingfolder": "フォルダへの振り分け中です。しばらくお待ちください．．．"
+        "matchingfolder": "フォルダへの振り分け中です。しばらくお待ちください．．．",
+        "folder_switcher": "フォルダへ移動",
+        "current_folder": "現在のフォルダ",
+        "destination_folder": "移動先のフォルダ"
     }
 }

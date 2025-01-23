@@ -320,6 +320,7 @@ const minimizeReply = () => {
                 :folderSwithcerDialog="folderSwithcerDialog"
                 @update:dialog="folderSwithcerDialog = $event"
                 :mail="props?.mail"
+                @handleLoadThread="updateThread(props?.mail?.id)"
                 @reloadMails="reloadMails"
             />
             <MailConfirmDialog @handleDelete="handleDelete" :pageType="props?.pageType" @handleRedo="handleRedo" :selectedConfirmType="selectedConfirmType"  :confirmDialog="confirmDialog" @update:dialog="confirmDialog = $event" />
