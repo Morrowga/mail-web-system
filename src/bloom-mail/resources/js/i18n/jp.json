@@ -151,6 +151,7 @@
         "matchingfolder": "フォルダへの振り分け中です。しばらくお待ちください．．．",
         "folder_switcher": "フォルダへ移動",
         "current_folder": "現在のフォルダ",
-        "destination_folder": "移動先のフォルダ"
+        "destination_folder": "移動先のフォルダ",
+        "switch_success": "メールが指定されたフォルダに正常に移動しました。"
     }
 }

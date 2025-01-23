@@ -59,8 +59,7 @@ const submitSwitch = async () => {
 
             loading.value = false;
             errorMessage.value = '';
-            successMessage.value = 'Mail moved successfully to the destination folder';
-            emit('handleLoadThread', props.mail.id);
+            successMessage.value = t('other.switch_success');
         }
     } catch (error) {
         loading.value = false;

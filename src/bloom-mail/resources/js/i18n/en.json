@@ -43,7 +43,8 @@
         "search": "Search",
         "yes": "Yes",
         "no": "No",
-        "update": "Update"
+        "update": "Update",
+        "switch": "Switch"
     },
     "input": {
         "name": "Name",
@@ -146,7 +147,11 @@
         "welcome": "Welcome...",
         "edit_templatecategory": "Edit Template Category",
         "create_templatecategory": "Create Template Category",
-        "matchingfolder": "Please Wait ! This Folder matching with mails..."
+        "matchingfolder": "Please Wait ! This Folder matching with mails...",
+        "folder_switcher": "Folder Switcher",
+        "current_folder": "Current Folder",
+        "destination_folder": "Destination Folder",
+        "switch_success": "Mail moved successfully to the destination folder"
     }
 }
 
