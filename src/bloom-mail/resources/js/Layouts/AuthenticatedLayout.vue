@@ -122,13 +122,6 @@ const contentStyle = computed(() => ({
                             <v-list-item>
                                 <DropDownSystem
                                     :title="$t('system.nav.notification')"
-                                    icon="mdi-cube-outline"
-                                    :content="[]"
-                                />
-                            </v-list-item>
-                            <v-list-item>
-                                <DropDownSystem
-                                    :title="$t('system.nav.app_notification')"
                                     icon="mdi-alert-circle"
                                     :content="[]"
                                 />
