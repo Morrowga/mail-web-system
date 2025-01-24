@@ -287,7 +287,7 @@ const handleSubmit = () => {
     </div>
 </template>
 
-<style>
+<style scoped>
 .layout-nav-text{
     color: #fff !important;
     text-decoration: none !important;

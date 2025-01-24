@@ -16,19 +16,11 @@ const { props } = usePage();
     <Head :title="$t('nav.home')" />
 
     <AuthenticatedLayout>
-        <div class="bg-[#f2f4f6]">
-            <div class="mx-auto sm:px-6 lg:px-5">
-                <div
-                    class="overflow-hidden sm:rounded-lg"
-                >
-                    <div class="py-6 text-gray-900" style="height: 100%;">
-                        <h3>
-                            {{ $t('other.welcome') }}
-                            <!-- {{ props?.auth?.user?.name }} -->
-                        </h3>
-                    </div>
-                </div>
-            </div>
+        <div class="py-6 text-gray-900" style="height: 100%;">
+            <p>
+                {{ $t('other.welcome') }}
+                <!-- {{ props?.auth?.user?.name }} -->
+            </p>
         </div>
     </AuthenticatedLayout>
 </template>

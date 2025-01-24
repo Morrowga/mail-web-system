@@ -154,5 +154,24 @@
         "destination_folder": "移動先のフォルダ",
         "switch_success": "メールが指定されたフォルダに正常に移動しました。",
         "inbox_mail": "受信トレイ"
+    },
+    "system": {
+        "nav": {
+            "email": "メール管理",
+            "top": "管理画面TOP",
+            "membership": "会員管理",
+            "member_list": "会員一覧・検索",
+            "new_member": "新規会員登録",
+            "points": "ポイント管理",
+            "payment": "決済管理",
+            "product": "商品管理",
+            "notification": "お知らせ管理",
+            "app_notification": "アプリ通知管理",
+            "coupon": "クーポン管理",
+            "entry": "入店タブレット管理",
+            "banner": "バナー管理",
+            "store": "店舗管理",
+            "chat": "トーク管理"
+        }
     }
 }

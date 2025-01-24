@@ -153,6 +153,25 @@
         "destination_folder": "Destination Folder",
         "switch_success": "Mail moved successfully to the destination folder",
         "inbox_mail": "Inbox Mail"
+    },
+    "system": {
+        "nav": {
+            "email": "Email Management",
+            "top": "Top Management",
+            "membership": "Membership Management",
+            "member_list": "Members List",
+            "new_member": "New Member",
+            "points": "Point Management",
+            "payment": "Payment Management",
+            "product": "Product Management",
+            "notification": "Notification Management",
+            "app_notification": "App Notification Management",
+            "coupon": "Coupon Management",
+            "entry": "Entry Management",
+            "banner": "Banner Management",
+            "store": "Store Management",
+            "chat": "Chat Management"
+        }
     }
 }
 

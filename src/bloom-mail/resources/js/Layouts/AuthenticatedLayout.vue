@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -10,9 +10,11 @@ import FilterDialog from '@/PageComponents/FilterDialog.vue';
 import DropDownMenu from '@/Components/DropDownMenu.vue';
 import { useI18n } from 'vue-i18n';
 import { permissionGrant } from '@/Helper/permissionUtils';
+import DropDownSystem from '@/Components/DropDownSystem.vue';
 
 const { props } = usePage();
-
+const drawer = ref(true)
+const rail = ref(false)
 const { t, locale } = useI18n();
 
 const permissions = props?.auth?.user?.permissions
@@ -28,143 +30,17 @@ const AccDowns = [
     { label: t('nav.roles'), href: 'roles.index', post: false, show: role == '管理者' ? true : false },
     { label: t('nav.permissions'), href: 'permissions.index', post: false, show: role == '管理者' ? true : false },
 ];
+
+// Compute main content margin based on drawer state
+const contentStyle = computed(() => ({
+    marginLeft: rail.value ? '0px' : '0px', // Adjust these values based on your drawer width
+    transition: 'margin-left 0.2s'
+}));
 </script>
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-[#4891dc] fixed top-0 left-0 w-full z-10"
-            >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center" style="width: 50%;">
-                            <h2 style="color: #fff;">{{ $t('nav.logo') }}</h2>
-                        </div>
-
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 92%;">
-                            <NavLink
-                                v-if="permissionGrant(permissions, 'mail_read')"
-                                :active="route().current('inbox')"
-                                :href="route('inbox')"
-                                as="button"
-                                class="mx-5 layout-nav-text"
-                            >
-                                {{ $t('nav.inbox') }}
-                            </NavLink>
-                            <DropDownMenu :title="$t('nav.account')" v-if="permissionGrant(permissions, 'account_read')" :content="AccDowns" />
-                            <DropDownMenu :title="$page.props.auth.user.name" :content="defaultAccDowns" />
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1"
-                    >
-                    <div class="space-y-1">
-                            <ResponsiveNavLink
-                                class="layout-nav-text"
-                                :href="route('inbox')"
-                            >
-                                {{ $t('nav.inbox') }}
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                class="layout-nav-text"
-                                :href="route('users.index')"
-                            >
-                                {{ $t('nav.users') }}
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                class="layout-nav-text"
-                                :href="route('profile.edit')"
-                            >
-                                {{ $t('nav.profile') }}
-                            </ResponsiveNavLink>
-                            <!-- <ResponsiveNavLink
-                                class="layout-nav-text"
-                                :href="route('dashboard')"
-                                as="button"
-                            >
-                            </ResponsiveNavLink> -->
-                        </div>
-
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800 layout-nav-text"
-                            >
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500 layout-nav-text">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink
-                                class="layout-nav-text"
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Heading -->
+        <div>
             <header
                 class="bg-white shadow"
                 v-if="$slots.header"
@@ -175,24 +51,231 @@ const AccDowns = [
                 </div>
             </header>
 
-            <!-- Page Content -->
-            <main style="padding-top: 8vh; padding-left: 2vh; padding-right: 2vh;">
-                <slot />
-            </main>
+            <v-card>
+                <v-layout>
+                    <v-navigation-drawer
+                        v-model="drawer"
+                        :rail="rail"
+                        permanent
+                        @click="rail = false"
+                    >
+                        <v-list-item
+                            nav
+                        >
+                            <template v-slot:append>
+                                <div class="text-left d-flex justify-start my-3">
+                                    <img src="/images/bloomlogo.png" width="100%" alt="">
+                                </div>
+                                <v-btn
+                                    icon="mdi-chevron-left"
+                                    variant="text"
+                                    @click.stop="rail = !rail"
+                                ></v-btn>
+                            </template>
+                        </v-list-item>
 
-            <FilterDialog
-                :filterDialog="filterDialogVisible"
-                :form="form"
-                @handleSubmit="handleSubmit"
-                @update:filterDialog="filterDialogVisible = $event"
-            />
+                        <!-- <v-divider></v-divider> -->
+
+                        <v-list density="compact" nav>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.top')"
+                                    icon="mdi-home-variant-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item @click="router.get(route('inbox'))">
+                                <DropDownSystem
+                                    :title="$t('system.nav.email')"
+                                    icon="mdi-email-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.membership')"
+                                    icon="mdi-account-group"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.points')"
+                                    icon="mdi-alpha-p-circle"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.payment')"
+                                    icon="mdi-credit-card"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.product')"
+                                    icon="mdi-cube-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.notification')"
+                                    icon="mdi-cube-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.app_notification')"
+                                    icon="mdi-alert-circle"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.app_notification')"
+                                    icon="mdi-bell-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.coupon')"
+                                    icon="mdi-ticket-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.entry')"
+                                    icon="mdi-finance"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.banner')"
+                                    icon="mdi-image-size-select-actual"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.store')"
+                                    icon="mdi-map-marker"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                            <v-list-item>
+                                <DropDownSystem
+                                    :title="$t('system.nav.chat')"
+                                    icon="mdi-message-reply-text-outline"
+                                    :content="[]"
+                                />
+                            </v-list-item>
+                        </v-list>
+                    </v-navigation-drawer>
+
+                    <v-main>
+                        <nav
+                            class="border-b border-gray-100 bg-[#f0f2f6] fixed top-0 left-0 w-full z-10"
+                        >
+                            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <div class="flex h-16 justify-between">
+                                    <div class="hidden sm:ms-6 sm:flex sm:items-center justify-end" style="width: 100%;">
+                                        <!-- <NavLink
+                                            v-if="permissionGrant(permissions, 'mail_read')"
+                                            :active="route().current('inbox')"
+                                            :href="route('inbox')"
+                                            as="button"
+                                            class="mx-5 layout-nav-text-admin"
+                                        >
+                                            <VIcon icon="mdi-email-outline" class="mx-3"></VIcon>
+                                            {{ $t('nav.inbox') }}
+                                        </NavLink> -->
+                                        <DropDownMenu :title="$t('nav.account')" v-if="permissionGrant(permissions, 'account_read')" icon="mdi-cog-outline" :content="AccDowns" />
+                                        <DropDownMenu :title="$page.props.auth.user.name" :content="defaultAccDowns" icon="mdi-account" />
+                                    </div>
+
+                                    <!-- Hamburger -->
+                                    <div class="-me-2 flex items-center sm:hidden">
+                                        <button
+                                            @click="
+                                                showingNavigationDropdown =
+                                                    !showingNavigationDropdown
+                                            "
+                                            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                        >
+                                            <svg
+                                                class="h-6 w-6"
+                                                stroke="currentColor"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    :class="{
+                                                        hidden: showingNavigationDropdown,
+                                                        'inline-flex':
+                                                            !showingNavigationDropdown,
+                                                    }"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M4 6h16M4 12h16M4 18h16"
+                                                />
+                                                <path
+                                                    :class="{
+                                                        hidden: !showingNavigationDropdown,
+                                                        'inline-flex':
+                                                            showingNavigationDropdown,
+                                                    }"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </nav>
+                        <div class="bg-[#f2f4f6] min-h-screen" :style="contentStyle">
+                            <div class="mx-auto sm:px-6 lg:px-5 pt-16">
+                                <div
+                                    class="overflow-hidden sm:rounded-lg"
+                                >
+                                    <slot />
+                                </div>
+                            </div>
+                        </div>
+                    </v-main>
+                </v-layout>
+            </v-card>
         </div>
     </div>
 </template>
 
-<style>
-.layout-nav-text{
-    color: #fff !important;
+<style scoped>
+.v-navigation-drawer {
+    position: fixed !important;
+    z-index: 100;
+}
+
+.v-main {
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Ensure top nav bar doesn't overlap with content */
+nav {
+    transition: padding-left 0.2s;
+}
+
+.layout-nav-text-admin{
+    color: #000 !important;
     text-decoration: none !important;
 }
 </style>

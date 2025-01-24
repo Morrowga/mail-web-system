@@ -36,8 +36,8 @@ const submit = () => {
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
-
-        <form @submit.prevent="submit">
+        <img src="/images/bloomlogo.png" />
+        <form @submit.prevent="submit" class="mt-5">
             <div>
                 <InputLabel for="email" :value="$t('auth.login_id')" />
 

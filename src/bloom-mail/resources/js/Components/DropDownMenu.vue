@@ -8,12 +8,16 @@ import { router } from '@inertiajs/vue3';
 defineProps({
     title: {
         type: String,
-        required: true, // The button title (e.g., "User Name")
+        required: true,
     },
     content: {
         type: Array,
-        default: () => [], // Main dropdown items (array of objects with `label` and `href`)
+        default: () => [],
     },
+    icon: {
+        type: String,
+        default: '',
+    }
 });
 
 const getRouteName = (item) => {
@@ -37,6 +41,7 @@ const getRouteName = (item) => {
                         class="inline-flex items-center rounded-md pt-2 px-3 text-sm font-medium leading-4 layout-nav-text transition duration-150 ease-in-out
                         text-capitalize"
                     >
+                        <VIcon :icon="icon" class="mx-2"></VIcon>
                         {{ title }}
 
                         <svg
@@ -59,9 +64,6 @@ const getRouteName = (item) => {
                 <div
                 v-for="(item, index) in content" :key="index"
                 >
-                    <div>
-
-                    </div>
                     <DropdownLink
                         v-if="item.show"
                         @click="getRouteName(item)"
