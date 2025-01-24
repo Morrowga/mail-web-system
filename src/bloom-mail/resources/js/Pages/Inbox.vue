@@ -364,7 +364,46 @@ window.addEventListener('offline', () => {
     checkInternetConnection();
 });
 
+const checkConnection = (state) => {
+    console.log(state)
+    if (state === 'connected') {
+        connectionStatus.value = 'Connected to WebSocket';
+        connectionColor.value = 'green';
+
+        // Wait for 3 seconds before checking internet connection
+        setTimeout(() => {
+            connectionFlag.value = true;
+            checkInternetConnection(); // Replace with your own internet check function
+        }, 3000);
+    } else if (state === 'disconnected' || state === 'unavailable') {
+        connectionStatus.value = 'Disconnected from WebSocket';
+        connectionFlag.value = false;
+        connectionColor.value = 'red';
+    } else {
+        connectionStatus.value = 'Connecting to WebSocket...';
+        connectionFlag.value = true;
+        connectionColor.value = 'gray';
+    }
+};
+
+const listenToConnectionState = () => {
+    if (Echo.connector.pusher) {
+        const pusher = Echo.connector.pusher;
+
+        // Listen to the 'state_change' event from Pusher
+        pusher.connection.bind('state_change', (states) => {
+            const currentState = states.current;
+            checkConnection(currentState); // Update the connection status dynamically
+        });
+
+        // Initial state check
+        checkConnection(pusher.connection.state);
+    }
+};
+
 onMounted(() => {
+  listenToConnectionState();
+
   let storedMails = JSON.parse(localStorage.getItem('newFloatMails')) || [];
   let replyStoredMails = JSON.parse(localStorage.getItem('floatMails')) || [];
 
@@ -375,34 +414,6 @@ onMounted(() => {
   isVisibleReplyFloatButton.value = floatMails.value.length > 0 ? true : false;
 
   fetchEmails()
-
-  if (Echo.connector.pusher) {
-        const pusher = Echo.connector.pusher;
-        console.log(pusher.connection.state)
-
-        if(pusher.connection.state == 'connected')
-        {
-            connectionStatus.value = 'Connected to WebSocket';
-            connectionColor.value = 'green';
-
-            setTimeout(() => {
-                connectionFlag.value = true;
-                checkInternetConnection();
-            }, 3000);
-
-        } else if(pusher.connection.state == 'disconnected')
-        {
-            connectionStatus.value = 'Disconnected from WebSocket';
-            connectionFlag.value = false;
-            connectionColor.value = 'red'
-
-        } else if(pusher.connection.state == 'connecting')
-        {
-            connectionStatus.value = 'Connecting to WebSocket...';
-            connectionFlag.value = true;
-            connectionColor.value = 'gray'
-        }
-    }
 
   Echo.channel('mails')
     .listen('.mail-fetched', (event) => {
