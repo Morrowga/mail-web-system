@@ -171,6 +171,13 @@
             "banner": "Banner Management",
             "store": "Store Management",
             "chat": "Chat Management"
+        },
+        "table": {
+            "member_id": "Member Id.",
+            "name": "Name",
+            "email": "Email",
+            "age": "Age",
+            "tel": "Telephone No."
         }
     }
 }

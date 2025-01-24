@@ -27,8 +27,8 @@ const defaultAccDowns = [
 
 
 const memberArray = [
-    { label: t('system.nav.member_list'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
-    { label: t('system.nav.new_member'), href: 'users.create', post: false, show: permissionGrant(permissions, 'account_read') },
+    { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'account_read') },
+    { label: t('system.nav.new_member'), href: 'members.create', post: false, show: permissionGrant(permissions, 'account_read') },
 ];
 
 const AccDowns = [

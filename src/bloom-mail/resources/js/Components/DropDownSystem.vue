@@ -50,6 +50,7 @@ const toggleDropdown = () => {
                 class="dropdown-item"
                 v-show="item.show"
             >
+                <v-icon :icon="icon" class="nav-icon mr-2" />
                 {{ item.label }}
             </Link>
         </div>
