@@ -17,10 +17,13 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         // Assigned as SA ( Super Admin )
+        $saRole = Role::where('name', '管理者')->first();
 
-        $saRole = Role::create([
-            "name" => "管理者"
-        ]);
+        if(empty($saRole)) {
+            $saRole = Role::create([
+                "name" => "管理者"
+            ]);
+        }
 
         $permissionArrays = [
             [
@@ -126,6 +129,10 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissionArrays as $permissionArray) {
+            if(Permission::where('name', $permissionArray['name'])->exists()) {
+                continue;
+            }
+
             Permission::create($permissionArray);
         }
 
@@ -143,14 +150,15 @@ class RolePermissionSeeder extends Seeder
             "name" => "店員"
         ]);
 
-        $createStaff = User::create([
-            "name" => "staff",
-            "email" => "staff@mail.com",
-            "login_id" => 'staff',
-            "password" => Hash::make('password'),
-        ]);
+        if(!User::where('login_id', 'staff')->exists()) {
+            $createStaff = User::create([
+                "name" => "staff",
+                "email" => "staff@mail.com",
+                "login_id" => 'staff',
+                "password" => Hash::make('password'),
+            ]);
 
-        $createStaff->assignRole('店員');
-
+            $createStaff->assignRole('店員');
+        }
     }
 }

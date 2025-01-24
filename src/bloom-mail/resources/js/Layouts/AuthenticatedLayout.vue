@@ -25,6 +25,12 @@ const defaultAccDowns = [
     { label: t('nav.logout'), href: 'logout', post: true, show: true },
 ];
 
+
+const memberArray = [
+    { label: t('system.nav.member_list'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
+    { label: t('system.nav.new_member'), href: 'users.create', post: false, show: permissionGrant(permissions, 'account_read') },
+];
+
 const AccDowns = [
     { label: t('nav.users'), href: 'users.index', post: false, show: permissionGrant(permissions, 'account_read') },
     { label: t('nav.roles'), href: 'roles.index', post: false, show: role == '管理者' ? true : false },
@@ -101,7 +107,7 @@ const contentStyle = computed(() => ({
                                     v-else
                                     :title="$t('system.nav.membership')"
                                     icon="mdi-account-group"
-                                    :content="[]"
+                                    :content="memberArray"
                                 />
                             </v-list-item>
                             <v-list-item :prepend-icon="rail ? 'mdi-alpha-p-circle': ''">
