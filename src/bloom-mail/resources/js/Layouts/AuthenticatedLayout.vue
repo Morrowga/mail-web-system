@@ -66,11 +66,11 @@ const contentStyle = computed(() => ({
                                 <div class="text-left d-flex justify-start my-3">
                                     <img src="/images/bloomlogo.png" width="100%" alt="">
                                 </div>
-                                <v-btn
+                                <!-- <v-btn
                                     icon="mdi-chevron-left"
                                     variant="text"
                                     @click.stop="rail = !rail"
-                                ></v-btn>
+                                ></v-btn> -->
                             </template>
                         </v-list-item>
 
