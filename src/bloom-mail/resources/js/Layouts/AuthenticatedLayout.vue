@@ -66,103 +66,129 @@ const contentStyle = computed(() => ({
                                 <div class="text-left d-flex justify-start my-3">
                                     <img src="/images/bloomlogo.png" width="100%" alt="">
                                 </div>
-                                <!-- <v-btn
+                                <v-btn
                                     icon="mdi-chevron-left"
                                     variant="text"
                                     @click.stop="rail = !rail"
-                                ></v-btn> -->
+                                ></v-btn>
                             </template>
                         </v-list-item>
 
                         <!-- <v-divider></v-divider> -->
 
                         <v-list density="compact" nav>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-home-variant-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.top')"
                                     icon="mdi-home-variant-outline"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item @click="router.get(route('inbox'))">
+                            <v-list-item @click="router.get(route('inbox'))" :prepend-icon="rail ? 'mdi-email-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.email')"
                                     icon="mdi-email-outline"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-account-group': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.membership')"
                                     icon="mdi-account-group"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-alpha-p-circle': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.points')"
                                     icon="mdi-alpha-p-circle"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-credit-card': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.payment')"
                                     icon="mdi-credit-card"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-cube-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.product')"
                                     icon="mdi-cube-outline"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-alert-circle': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.notification')"
                                     icon="mdi-alert-circle"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-bell-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.app_notification')"
                                     icon="mdi-bell-outline"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-ticket-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.coupon')"
                                     icon="mdi-ticket-outline"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-finance': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.entry')"
                                     icon="mdi-finance"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-image-size-select-actual': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.banner')"
                                     icon="mdi-image-size-select-actual"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-map-marker': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.store')"
                                     icon="mdi-map-marker"
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item :prepend-icon="rail ? 'mdi-message-reply-text-outline': ''">
+                                <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
+                                    v-else
                                     :title="$t('system.nav.chat')"
                                     icon="mdi-message-reply-text-outline"
                                     :content="[]"
