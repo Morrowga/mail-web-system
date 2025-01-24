@@ -77,7 +77,7 @@ const contentStyle = computed(() => ({
                         <!-- <v-divider></v-divider> -->
 
                         <v-list density="compact" nav>
-                            <v-list-item :prepend-icon="rail ? 'mdi-home-variant-outline': ''">
+                            <v-list-item :prepend-icon="rail ? 'mdi-home-variant-outline': ''" :class="route().current('dashboard') ? 'border-blue' : ''">
                                 <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
                                     v-else
@@ -296,5 +296,10 @@ nav {
 .layout-nav-text-admin{
     color: #000 !important;
     text-decoration: none !important;
+}
+
+.border-blue {
+    border-right: 7px solid #41aecc;
+    border-radius: 0px;
 }
 </style>

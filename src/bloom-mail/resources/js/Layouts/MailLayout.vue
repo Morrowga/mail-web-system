@@ -55,7 +55,7 @@ const handleSubmit = () => {
     <div>
         <div class="min-h-screen bg-gray-100">
             <nav
-                class="border-b border-gray-100 bg-[#4891dc] fixed top-0 left-0 w-full z-20"
+                class="border-b border-gray-100 bg-[#45B4D3] fixed top-0 left-0 w-full z-20"
             >
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

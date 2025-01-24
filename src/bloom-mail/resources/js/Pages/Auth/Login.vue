@@ -38,65 +38,63 @@ const submit = () => {
         </div>
         <img src="/images/bloomlogo.png" />
         <form @submit.prevent="submit" class="mt-5">
-            <div>
-                <InputLabel for="email" :value="$t('auth.login_id')" />
+            <VCard style="width: 500px;">
+                <VCardText style="padding: 3rem;">
+                <div>
+                    <InputLabel for="email" :value="$t('auth.login_id')" />
 
-                <VTextField
-                    variant="outlined"
-                    id="text"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.login_id"
-                    required
-                    autofocus
-                    autocomplete="username"
-                ></VTextField>
+                    <VTextField
+                        variant="outlined"
+                        id="text"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.login_id"
+                        required
+                        autofocus
+                        autocomplete="username"
+                    ></VTextField>
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
 
-            <div>
 
-                <InputLabel for="password" :value="$t('auth.password')" />
-                <VTextField
-                    variant="outlined"
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    autocomplete="current-password"
-                    required
-                ></VTextField>
+                <div>
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+                    <InputLabel for="password" :value="$t('auth.password')" />
+                    <VTextField
+                        variant="outlined"
+                        id="password"
+                        type="password"
+                        class="mt-1 block w-full"
+                        v-model="form.password"
+                        autocomplete="current-password"
+                        required
+                    ></VTextField>
 
-            <div class="mt-4 block">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >{{$t('auth.remember_me')}}</span
+                    <InputError class="mt-2" :message="form.errors.password" />
+                </div>
+
+                <div class="mt-4 flex items-center justify-center mx-15">
+                    <VBtn
+                        type="submit"
+                        style="background: #45B4D3; color: #fff; width: 100%;"
+                        :class="{ 'opacity-25': form.processing }"
+                        :disabled="form.processing"
                     >
-                </label>
-            </div>
+                        {{$t('auth.login')}}
+                    </VBtn>
+                </div>
+                <div class="mt-4 d-flex justify-center">
+                    <label class="flex items-center">
+                        <Checkbox name="remember" v-model:checked="form.remember" />
+                        <span class="ms-2 text-sm text-gray-600"
+                            >{{$t('auth.remember_me')}}</span
+                        >
+                    </label>
+                </div>
 
-            <div class="mt-4 flex items-center justify-end">
-                <!-- <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Forgot your password?
-                </Link> -->
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    {{$t('auth.login')}}
-                </PrimaryButton>
-            </div>
+                </VCardText>
+            </VCard>
         </form>
     </GuestLayout>
 </template>
