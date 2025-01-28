@@ -2,23 +2,24 @@
 
 namespace App\Repositories;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
-use App\Interfaces\PermissionRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 
-class PermissionRepository implements PermissionRepositoryInterface
+class ProductRepository implements ProductRepositoryInterface
 {
     use CRUDResponses;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
 
-            $permissions = Permission::paginate(10);
+            $products = Product::paginate($request->per_page ?? 10);
 
-            return $this->success('Fetched Permissions', $permissions);
+            return $this->success('Fetched Products', $products);
 
         } catch (\Exception $e) {
 
@@ -34,11 +35,11 @@ class PermissionRepository implements PermissionRepositoryInterface
         DB::beginTransaction();
 
         try {
-            $permission = Permission::create($request->all());
+            $product = Product::create($request->all());
 
             DB::commit();
 
-            return $this->success('Permission has been created successfully.');
+            return $this->success('Product has been created successfully.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -47,18 +48,18 @@ class PermissionRepository implements PermissionRepositoryInterface
         }
     }
 
-    public function update(Request $request, Permission $permission)
+    public function update(Request $request, Product $product)
     {
         DB::beginTransaction();
 
         try {
-            if($permission)
+            if($product)
             {
-                $permission->update($request->all());
+                $product->update($request->all());
 
                 DB::commit();
 
-                return $this->success('Permission has been updated successfully.');
+                return $this->success('Product has been updated successfully.');
 
             }
 
@@ -71,15 +72,15 @@ class PermissionRepository implements PermissionRepositoryInterface
         }
     }
 
-    public function delete(Permission $permission)
+    public function delete(Product $product)
     {
         try {
-            if($permission)
+            if($product)
             {
-                $permission->delete();
+                $product->delete();
             }
 
-            return $this->success('Permission has been deleted');
+            return $this->success('Product has been deleted');
 
         } catch (\Exception $e) {
 

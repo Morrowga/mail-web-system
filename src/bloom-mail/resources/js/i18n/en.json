@@ -164,6 +164,8 @@
             "points": "Point Management",
             "payment": "Payment Management",
             "product": "Product Management",
+            "product_list": "Product Lists",
+            "new_product": "New Product",
             "notification": "Notification Management",
             "app_notification": "App Notification Management",
             "coupon": "Coupon Management",
@@ -177,7 +179,16 @@
             "name": "Name",
             "email": "Email",
             "age": "Age",
-            "tel": "Telephone No."
+            "tel": "Telephone No.",
+            "shop_name": "Shop",
+            "treatment_begin_date": "Treatment Begins",
+            "product_detail": "Product Detail",
+            "price": "Price",
+            "sale_start_date": "Sale Start Date",
+            "sale_end_date": "Sale End Date",
+            "status": "Status",
+            "purchase_no": "Purchase No.",
+            "buyer_registration": "Buyer Registration"
         }
     }
 }

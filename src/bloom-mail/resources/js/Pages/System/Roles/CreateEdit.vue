@@ -35,7 +35,7 @@ const formSubmit = () => {
     <Head :title="$t('nav.roles')" />
 
     <AuthenticatedLayout>
-        <div class="bg-[#f2f4f6] h-screen py-6">
+        <div class="bg-[#f2f4f6] py-6">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div
                     class="overflow-hidden sm:rounded-lg"

@@ -32,8 +32,8 @@ console.log(props?.permissions?.data);
     <Head :title="$t('nav.permissions')" />
 
     <AuthenticatedLayout>
-        <div class="bg-[#f2f4f6] h-screen py-6">
-            <div class="mx-auto sm:px-6 lg:px-8">
+        <div class="bg-[#f2f4f6] py-6">
+            <div class="">
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
@@ -49,6 +49,7 @@ console.log(props?.permissions?.data);
                                     :headers="tableHeaders"
                                     :data="props?.permissions"
                                     :url="'permissions'"
+                                    :tableTitle="$t('nav.permissions')"
                                 />
                             </div>
                         </div>

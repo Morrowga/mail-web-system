@@ -35,7 +35,7 @@ console.log(props?.users)
     <Head :title="$t('nav.users')" />
 
     <AuthenticatedLayout>
-        <div class="bg-[#f2f4f6] h-screen py-6">
+        <div class="bg-[#f2f4f6] py-6">
             <div class="mx-auto sm:px-6 lg:px-8">
                 <div class="mb-1 d-flex justify-between">
                     <h1
@@ -58,6 +58,7 @@ console.log(props?.users)
                                     :data="props?.users"
                                     :url="'users'"
                                     :permission_name="'account'"
+                                    :tableTitle="$t('nav.users')"
                                 />
                             </div>
                         </div>

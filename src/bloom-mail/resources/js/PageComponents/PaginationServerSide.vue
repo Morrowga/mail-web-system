@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed } from 'vue';
 import { router } from "@inertiajs/vue3";
 import { defineComponent } from "vue";
 
@@ -38,92 +39,124 @@ const props = defineProps({
     },
 });
 
-const onNavigatePage = (to) => {
-    // router.get(`${props.base}?page=${to}`);
-    const separator = hasQueryParams(props?.base) ? '&' : '?'; // Determine the correct separator
-    const url = `${props.base}${separator}page=${to}`; // Construct the full URL
-    router.get(url); // Navigate to the constructed URL
+const visiblePages = computed(() => {
+    const total = props.total;
+    console.log(total);
+    const current = props.currentPage;
+    const pages = [];
 
+    if (total <= 7) {
+        // If total pages are 7 or less, show all pages
+        for (let i = 1; i <= total; i++) {
+            pages.push(i);
+        }
+    } else {
+        // Always show first page
+        pages.push(1);
+
+        if (current <= 3) {
+            // If current page is near the start
+            pages.push(2, 3, 4);
+            pages.push('...');
+            pages.push(total);
+        } else if (current >= total - 2) {
+            // If current page is near the end
+            pages.push('...');
+            pages.push(total - 3, total - 2, total - 1, total);
+        } else {
+            // If current page is in the middle
+            pages.push('...');
+            pages.push(current - 1, current, current + 1);
+            pages.push('...');
+            pages.push(total);
+        }
+    }
+
+    console.log(total);
+
+    return pages;
+});
+
+const onNavigatePage = (to) => {
+    if (to === '...') {
+        // If clicking on left ellipsis
+        if (props.currentPage > 3) {
+            const newPage = Math.max(1, props.currentPage - 3);
+            router.get(`${props.base}?page=${newPage}`);
+        }
+        // If clicking on right ellipsis
+        else {
+            const newPage = Math.min(props.total, props.currentPage + 3);
+            router.get(`${props.base}?page=${newPage}`);
+        }
+        return;
+    }
+
+    router.get(`${props.base}?page=${to}`);
 };
 </script>
 
 <template>
-   <div class="flex justify-center mt-4">
-        <v-pagination
-            :total-visible="3"
-            :model-value="currentPage"
-            :length="total"
-            class="pagination-compact"
-        >
-            <!-- Previous Button -->
-            <template v-slot:prev="pages">
-                <v-btn
-                    density="compact"
-                    icon="mdi-chevron-left"
-                    flat
-                    @click="router.get(previousPageUrl)"
-                    :disabled="pages.disabled"
-                    class="pagination-btn"
-                />
-            </template>
+    <div class="flex justify-center mt-4">
+        <!-- Previous Button -->
+        <v-btn
+            density="compact"
+            icon="mdi-chevron-left"
+            flat
+            @click="router.get(previousPageUrl)"
+            :disabled="currentPage === 1"
+            class="pagination-btn"
+        />
 
-            <!-- Page Numbers -->
-            <template v-slot:item="pages">
-                <v-btn
-                    class="pagination-btn"
-                    @click="onNavigatePage(pages.page)"
-                    :active="pages.isActive"
-                    flat
-                >
-                    {{ pages.page }}
-                </v-btn>
-            </template>
+        <!-- Page Numbers -->
+        <template v-for="page in visiblePages" :key="page">
+            <v-btn
+                class="pagination-btn"
+                @click="onNavigatePage(page)"
+                :active="page === currentPage"
+                flat
+            >
+                {{ page }}
+            </v-btn>
+        </template>
 
-            <!-- Next Button -->
-            <template v-slot:next="pages">
-                <v-btn
-                    density="compact"
-                    icon="mdi-chevron-right"
-                    flat
-                    @click="router.get(nextPageUrl)"
-                    :disabled="pages.disabled"
-                    class="pagination-btn"
-                />
-            </template>
-        </v-pagination>
+        <!-- Next Button -->
+        <v-btn
+            density="compact"
+            icon="mdi-chevron-right"
+            flat
+            @click="router.get(nextPageUrl)"
+            :disabled="currentPage === total"
+            class="pagination-btn"
+        />
     </div>
 </template>
 
 <style scoped>
-.pagination-compact {
-    display: flex;
-    align-items: center;
-    gap: 2px; /* Minimal gap between items */
-    margin: 0;
-    padding: 0;
-}
-
 .pagination-btn {
     min-width: 40px;
     height: 40px;
-    margin: 0;
+    margin: 0 2px;
     padding: 0 5px;
+    border-radius: 0 !important;
+    border: 0.5px solid #e0e0e0;
     text-align: center;
     line-height: 30px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .pagination-btn:hover {
-    background-color: #f4f4f4; /* Optional hover effect */
+    background-color: #f4f4f4;
 }
 
-/* Active Page Styling */
-.pagination-btn[aria-current="page"] {
-    background-color: #E66B1C !important; /* Active background color */
-    color: #fff !important; /* Active text color */
-    font-weight: bold; /* Optional: Bold text for active page */
-    pointer-events: none; /* Disable clicks on the active button */
+.v-btn--active {
+    background-color: #41b5d3 !important;
+    color: #fff !important;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
 }
 </style>
 

@@ -8,7 +8,9 @@ use App\Repositories\SpamRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Vite;
 use App\Repositories\FolderRepository;
+use App\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\API\AuthRepository;
 use App\Repositories\TemplateRepository;
 use App\Repositories\PermissionRepository;
 use App\Interfaces\MailRepositoryInterface;
@@ -16,10 +18,14 @@ use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\SpamRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\FolderRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\API\AuthRepositoryInterface;
 use App\Interfaces\TemplateRepositoryInterface;
 use App\Repositories\TemplateCategoryRepository;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\TemplateCategoryRepositoryInterface;
+use App\Repositories\API\ProductRepository as ApiProductRepository;
+use App\Interfaces\API\ProductRepositoryInterface as ApiProductRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,8 +40,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TemplateRepositoryInterface::class, TemplateRepository::class);
         $this->app->bind(MailRepositoryInterface::class, MailRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+
+        //app system
         $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
+        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+
+
+        //API
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
+        $this->app->bind(ApiProductRepositoryInterface::class, ApiProductRepository::class);
     }
 
     /**

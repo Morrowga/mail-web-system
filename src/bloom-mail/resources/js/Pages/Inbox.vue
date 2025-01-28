@@ -163,8 +163,15 @@ const fetchEmails = async () => {
 
   loading.value = true;
 
+  axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector(
+        'meta[name="csrf-token"]'
+    ).getAttribute("content");
+
   try {
     const response = await axios.get(`/mails/fetch`, {
+      headers: {
+        Accept: 'application/json'
+      },
       params: {
         page: page.value ?? 1,
         page_type: pageType.value,

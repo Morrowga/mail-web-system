@@ -15,7 +15,9 @@ use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\System\MemberController;
+use App\Http\Controllers\System\ProductController;
 use App\Http\Controllers\TemplateCategoryController;
+use App\Http\Controllers\Axio\MailController as MailAxioController;
 
 if (config('app.env') === 'production') {
     \Illuminate\Support\Facades\URL::forceScheme('https');
@@ -46,11 +48,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/mails/delete-forever/{mail_log}',[MailController::class, 'destroyForever'])->name('mails.deleteforever');
     Route::delete('/mails/sent/delete/{sent_mail}',[MailController::class, 'sentDestroy'])->name('mails.sent.delete');
 
-    // Route::get('/old-data', function() {
-    //     $mailRepository = app(MailRepository::class);
-    //     $mailRepository->oldData();
-    //     return "success";
-    // });
 
     Route::get('/templates', function () {
         return Inertia::render('Templates/Index');
@@ -61,6 +58,29 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('template-categories', TemplateCategoryController::class);
     Route::resource('spams', SpamController::class);
 
+    // mail axios start
+
+    Route::get('/mails/fetch', [MailAxioController::class, 'index']);
+
+    Route::get('mails/fetch/folder/{folder}', [MailAxioController::class, 'indexWithFolderId'])
+        ->name('fetch-mails-with-folder-id');
+
+    Route::get('mails/histories/{id}', [MailAxioController::class, 'getHistories'])
+        ->name('histories');
+
+    Route::post('mails/change-reply/{mail_Log}', [MailAxioController::class, 'changeReply'])
+        ->name('change-reply');
+
+    Route::post('mails/cancel-status/{mail_Log}', [MailAxioController::class, 'cancelReply'])
+        ->name('cancel-status');
+
+    Route::post('mails/change-status/{mail_Log}', [MailAxioController::class, 'changeStatus'])
+        ->name('change-status');
+
+    Route::post('mails/folder-switch', [MailAxioController::class, 'folderSwitch']);
+
+    // mail axios end
+
     // <------------------ Mail System --------------------->
 
     // <------------------ App System --------------------->
@@ -68,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('users', UserController::class);
     Route::resource('members', MemberController::class);
+    Route::resource('products', ProductController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -78,4 +99,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
-require __DIR__.'/api.php';

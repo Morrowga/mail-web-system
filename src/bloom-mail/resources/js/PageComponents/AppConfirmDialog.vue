@@ -35,6 +35,7 @@ const submitDelete = () => {
       <template v-slot:activator="{ props: activatorProps }">
         <VBtn
             color="red"
+            style="border-radius: 6px;"
             v-bind="activatorProps"
         >
             {{ $t('table.delete') }}

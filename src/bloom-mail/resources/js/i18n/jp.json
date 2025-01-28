@@ -165,6 +165,8 @@
             "points": "ポイント管理",
             "payment": "決済管理",
             "product": "商品管理",
+            "product_list": "商品一覧",
+            "new_product": "新規商品登録",
             "notification": "お知らせ管理",
             "app_notification": "アプリ通知管理",
             "coupon": "クーポン管理",
@@ -178,7 +180,19 @@
             "name": "お名前",
             "email": "メールアドレス",
             "age": "年齢",
-            "tel": "電話番号"
+            "tel": "電話番号",
+            "shop_name": "店舗",
+            "treatment_begin_date": "施術開始",
+            "product_detail": "商品内容",
+            "price": "価格",
+            "sale_start_date": "販売開始日時",
+            "sale_end_date": "販売終了日時",
+            "status": "ステータス",
+            "purchase_no": "購入者会員No",
+            "buyer_registration": "購入者登録"
+        },
+        "buttons": {
+            "edit": "複製"
         }
     }
 }

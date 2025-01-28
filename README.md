@@ -76,6 +76,57 @@ php artisan queue:work --queue=mail-taking
 
 php artisan schedule:work
 
+
+### Seeding Process 
+
+Initial Seeder - php artisan db:seed
+
+### Class Seeder 
+
+php artisan db:seed --class=ProductSeeder
+
+
+### Database Switching
+
+docker exec -it bloom_db bash 
+
+mysql -u root -p
+
+password - bloom_root_password
+
+GRANT ALL PRIVILEGES ON . TO 'bloom_admin'@'%' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
+and then leave from that bash 
+
+add this to .env 
+
+
+#For Latest Version
+DB_CONNECTION=mysql
+DB_HOST=bloom_db
+DB_PORT=3306
+DB_DATABASE=bloom_db_app
+DB_USERNAME=bloom_admin
+DB_PASSWORD=bloom_password
+DB_ROOT_PASSWORD=bloom_root_passwod
+
+#For Current Version
+#DB_CONNECTION=mysql
+#DB_HOST=bloom_db
+#DB_PORT=3306
+#DB_DATABASE=bloom_db
+#DB_USERNAME=bloom_admin
+#DB_PASSWORD=bloom_password
+#DB_ROOT_PASSWORD=bloom_root_passwod
+
+and then go to phpmyadmin site , then create a new database called 'bloom_db_app"
+
+and enter to bloom bash again then run 
+
+php artisan migrate --seed 
+
 下記URLからアクセス  
 [http://localhost:80](http://localhost:80)
 

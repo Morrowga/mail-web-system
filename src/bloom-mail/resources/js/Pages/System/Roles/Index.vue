@@ -25,7 +25,7 @@ console.log(props?.roles?.data);
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] h-screen py-6">
-            <div class="mx-auto sm:px-6 lg:px-8">
+            <div class="">
                 <div class="mb-1 d-flex justify-between">
                     <h1
                         class="font-semibold leading-tight text-gray-800"
@@ -45,6 +45,7 @@ console.log(props?.roles?.data);
                                 <AppTable
                                     :headers="tableHeaders"
                                     :data="props?.roles"
+                                    :tableTitle="$t('nav.roles')"
                                     :url="'roles'"
                                     :permission_name="'role'"
                                 />

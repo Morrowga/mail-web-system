@@ -87,6 +87,8 @@ const selectedConfirmType = ref('delete');
 const form = useForm({});
 
 const openDialog = (type) => {
+    console.log(type);
+    console.log(props?.mail?.status);
     if (type === 'reply' && props?.mail?.status !== 'resolved' && props?.mail?.status !== 'confirmed') {
         emit('changeMailStatus', props?.mail?.id);
     }

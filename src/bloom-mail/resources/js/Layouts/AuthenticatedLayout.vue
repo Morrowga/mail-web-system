@@ -25,6 +25,10 @@ const defaultAccDowns = [
     { label: t('nav.logout'), href: 'logout', post: true, show: true },
 ];
 
+const merchandiseArray = [
+    { label: t('system.nav.product_list'), href: 'products.index', post: false, show: permissionGrant(permissions, 'product_read') },
+    { label: t('system.nav.new_product'), href: 'products.create', post: false, show: permissionGrant(permissions, 'product_createdit') },
+];
 
 const memberArray = [
     { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'account_read') },
@@ -42,6 +46,7 @@ const contentStyle = computed(() => ({
     marginLeft: rail.value ? '0px' : '0px', // Adjust these values based on your drawer width
     transition: 'margin-left 0.2s'
 }));
+
 </script>
 
 <template>
@@ -83,7 +88,7 @@ const contentStyle = computed(() => ({
                         <!-- <v-divider></v-divider> -->
 
                         <v-list density="compact" nav>
-                            <v-list-item :prepend-icon="rail ? 'mdi-home-variant-outline': ''" :class="route().current('dashboard') ? 'border-blue' : ''">
+                            <v-list-item @click="router.get('/home')" :prepend-icon="rail ? 'mdi-home-variant-outline': ''" :class="route().current('dashboard') ? 'border-blue' : ''">
                                 <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
                                     v-else
@@ -128,13 +133,13 @@ const contentStyle = computed(() => ({
                                     :content="[]"
                                 />
                             </v-list-item>
-                            <v-list-item :prepend-icon="rail ? 'mdi-cube-outline': ''">
+                            <v-list-item :prepend-icon="rail ? 'mdi-cube-outline': ''" :class="route().current('products.index') ? 'border-blue' : ''">
                                 <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
                                     v-else
                                     :title="$t('system.nav.product')"
                                     icon="mdi-cube-outline"
-                                    :content="[]"
+                                    :content="merchandiseArray"
                                 />
                             </v-list-item>
                             <v-list-item :prepend-icon="rail ? 'mdi-alert-circle': ''">

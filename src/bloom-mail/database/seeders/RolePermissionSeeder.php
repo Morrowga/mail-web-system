@@ -126,6 +126,21 @@ class RolePermissionSeeder extends Seeder
                 "display" => "テンプレートカテゴリ削除",
                 "description" => "テンプレートカテゴリの削除を許可します。"
             ],
+            [
+                "name" => "product_createdit",
+                "display" => "Product Creation / Edit",
+                "description" => "Product Creation and Modification"
+            ],
+            [
+                "name" => "product_read",
+                "display" => "Product Read",
+                "description" => "Products"
+            ],
+            [
+                "name" => "product_delete",
+                "display" => "Product Deletion",
+                "description" => "Product Deletion "
+            ],
         ];
 
         foreach ($permissionArrays as $permissionArray) {
@@ -146,7 +161,7 @@ class RolePermissionSeeder extends Seeder
 
         // Assigned as SA ( Super Admin )
 
-        $staffRole = Role::create([
+        $staffRole = Role::createOrFirst([
             "name" => "店員"
         ]);
 
@@ -160,5 +175,9 @@ class RolePermissionSeeder extends Seeder
 
             $createStaff->assignRole('店員');
         }
+
+        $userRole = Role::createOrFirst([
+            "name" => "User"
+        ]);
     }
 }

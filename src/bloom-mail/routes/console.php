@@ -11,8 +11,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-
-
 Artisan::command('mail-fetching', function () {
     Log::info('Dispatched ProcessMails');
     ProcessMails::dispatch()->onQueue('mail-fetching');
