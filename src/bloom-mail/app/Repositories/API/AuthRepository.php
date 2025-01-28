@@ -33,11 +33,8 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function login(Request $request)
     {
-        $checkUser = User::where('login_id', $request->login_id)->first();
 
-        $credentials = $request->only('password');
-
-        $credentials['email'] = $checkUser->email;
+        $credentials = $request->only('email' ,'password');
 
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Your crendentials are wrong'], 400);

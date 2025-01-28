@@ -189,6 +189,16 @@
             "status": "Status",
             "purchase_no": "Purchase No.",
             "buyer_registration": "Buyer Registration"
+        },
+        "title": {
+            "product_create": "Product Creation",
+            "product_edit": "Production Modify"
+        },
+        "buttons": {
+            "edit": "Edit",
+            "back": "Back",
+             "draft": "Draft",
+            "save": "Save"
         }
     }
 }

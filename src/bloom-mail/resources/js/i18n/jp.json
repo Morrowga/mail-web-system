@@ -191,8 +191,15 @@
             "purchase_no": "購入者会員No",
             "buyer_registration": "購入者登録"
         },
+        "title": {
+            "product_create": "新規商品登録",
+            "product_edit": "製品を編集"
+        },
         "buttons": {
-            "edit": "複製"
+            "edit": "複製",
+            "back": "戻る",
+            "draft": "下書き保存",
+            "save": "商品登録する"
         }
     }
 }

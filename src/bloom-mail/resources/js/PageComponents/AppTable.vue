@@ -101,7 +101,7 @@ onMounted(() => {
     const params = new URLSearchParams(window.location.search);
     queryParams.value = Object.fromEntries(params.entries());
     console.log(queryParams.value.per_page);
-    perPage.value = queryParams.value.per_page
+    perPage.value = queryParams.value.per_page ?? 10
 });
 
 
@@ -114,7 +114,7 @@ onMounted(() => {
         </VCardTitle>
         <VCardTitle class="mb-5" style="font-size: 0.8rem; border-bottom: 1px solid rgb(0,0,0,0.1);">
             <div class="d-flex justify-between my-3">
-                <p class="pt-3">1−20件 表示／全450件中</p>
+                <p class="pt-3">1−{{ perPage }}件 表示／全{{props?.data.total}}件中</p>
                 <div class="d-flex ">
                     <div class="d-flex">
                         <span style="padding-top: 0.6rem;">

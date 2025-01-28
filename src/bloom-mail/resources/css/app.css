@@ -3,3 +3,13 @@
 @tailwind utilities;
 
 /* Your custom styles, if any, go here */
+
+.action-button-width
+{
+    width: 15vh;
+}
+
+.submit-button-width
+{
+    width: 25vh;
+}
