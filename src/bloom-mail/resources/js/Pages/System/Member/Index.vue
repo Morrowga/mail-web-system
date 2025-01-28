@@ -10,10 +10,10 @@ const props = defineProps(['members'])
 const { t, locale } = useI18n();
 
 const tableHeaders = ref([
-   {
-     name: t('system.table.member_id'),
-     value: "member_id"
-   },
+//    {
+//      name: t('system.table.member_id'),
+//      value: "id"
+//    },
    {
      name: t('system.table.name'),
      value: "name"

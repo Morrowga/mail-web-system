@@ -62,7 +62,7 @@ const paginate = usePagination(props.data);
     <thead>
       <tr>
         <th class="header-cell">
-            ID
+            商品ID
         </th>
         <th class="header-cell" v-for="header in headers" :key="header.value">
           {{ header.name }}

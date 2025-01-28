@@ -48,32 +48,82 @@ const onNavigatePage = (to) => {
 </script>
 
 <template>
-    <div class="flex justify-center mt-4">
-        <v-pagination :total-visible="3" :model-value="currentPage" :length="total">
-            <template v-slot:next="pages">
-                <v-btn
-                    variant="tonal"
-                    flat
-                    density="compact"
-                    @click="router.get(nextPageUrl)"
-                    :disabled="pages.disabled"
-                    icon="mdi-chevron-right"
-                />
-            </template>
+   <div class="flex justify-center mt-4">
+        <v-pagination
+            :total-visible="3"
+            :model-value="currentPage"
+            :length="total"
+            class="pagination-compact"
+        >
+            <!-- Previous Button -->
             <template v-slot:prev="pages">
                 <v-btn
                     density="compact"
-                    :disabled="pages.disabled"
                     icon="mdi-chevron-left"
                     flat
                     @click="router.get(previousPageUrl)"
+                    :disabled="pages.disabled"
+                    class="pagination-btn"
                 />
             </template>
+
+            <!-- Page Numbers -->
             <template v-slot:item="pages">
-                <v-btn @click="onNavigatePage(pages.page)" flat>{{
-                    pages.page
-                }}</v-btn>
+                <v-btn
+                    class="pagination-btn"
+                    @click="onNavigatePage(pages.page)"
+                    :active="pages.isActive"
+                    flat
+                >
+                    {{ pages.page }}
+                </v-btn>
+            </template>
+
+            <!-- Next Button -->
+            <template v-slot:next="pages">
+                <v-btn
+                    density="compact"
+                    icon="mdi-chevron-right"
+                    flat
+                    @click="router.get(nextPageUrl)"
+                    :disabled="pages.disabled"
+                    class="pagination-btn"
+                />
             </template>
         </v-pagination>
     </div>
 </template>
+
+<style scoped>
+.pagination-compact {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Minimal gap between items */
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-btn {
+    min-width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0 5px;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #f4f4f4; /* Optional hover effect */
+}
+
+/* Active Page Styling */
+.pagination-btn[aria-current="page"] {
+    background-color: #E66B1C !important; /* Active background color */
+    color: #fff !important; /* Active text color */
+    font-weight: bold; /* Optional: Bold text for active page */
+    pointer-events: none; /* Disable clicks on the active button */
+}
+</style>
+
