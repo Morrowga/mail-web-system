@@ -17,6 +17,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\System\MemberController;
 use App\Http\Controllers\System\ProductController;
 use App\Http\Controllers\TemplateCategoryController;
+use App\Http\Controllers\System\NotificationController;
 use App\Http\Controllers\Axio\MailController as MailAxioController;
 
 if (config('app.env') === 'production') {
@@ -89,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('members', MemberController::class);
     Route::resource('products', ProductController::class);
+    Route::resource('notifications', NotificationController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

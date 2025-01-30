@@ -30,4 +30,18 @@ class AuthController extends Controller
 
         return $login;
     }
+
+    public function logout(Request $request)
+    {
+        $logout = $this->authRepository->logout($request);
+
+        return $logout;
+    }
+
+    public function revokeToken(Request $request)
+    {
+        $token = $this->authRepository->revokeToken($request);
+
+        return $token;
+    }
 }

@@ -30,6 +30,12 @@ const merchandiseArray = [
     { label: t('system.nav.new_product'), href: 'products.create', post: false, show: permissionGrant(permissions, 'product_createdit') },
 ];
 
+const notificationArray = [
+    { label: t('system.nav.notification_list'), href: 'notifications.index', post: false, show: permissionGrant(permissions, 'noti_read') },
+    { label: t('system.nav.app_notification'), href: 'notifications.create', post: false, show: permissionGrant(permissions, 'noti_createdit') },
+];
+
+
 const memberArray = [
     { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'account_read') },
     { label: t('system.nav.new_member'), href: 'members.create', post: false, show: permissionGrant(permissions, 'account_read') },
@@ -148,7 +154,7 @@ const contentStyle = computed(() => ({
                                     v-else
                                     :title="$t('system.nav.notification')"
                                     icon="mdi-alert-circle"
-                                    :content="[]"
+                                    :content="notificationArray"
                                 />
                             </v-list-item>
                             <v-list-item :prepend-icon="rail ? 'mdi-bell-outline': ''">

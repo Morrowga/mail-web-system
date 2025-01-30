@@ -10,6 +10,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\Axio\MailController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\TemplateCategoryController;
 
 Route::prefix('sys')->group(function () {
@@ -18,5 +19,9 @@ Route::prefix('sys')->group(function () {
 
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/products', [ProductController::class, 'index']);
+        Route::get('/announcements', [NotificationController::class, 'index']);
+
+        Route::get('/revoke', [AuthController::class, 'revokeToken']);
+        Route::post('/logout', [AuthController::class, 'logout']);
     });
 });

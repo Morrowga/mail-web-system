@@ -5,7 +5,7 @@ import { Head,router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const props = defineProps(['products'])
+const props = defineProps(['notifications'])
 
 const { t, locale } = useI18n();
 
@@ -15,36 +15,28 @@ const tableHeaders = ref([
 //      value: "id"
 //    },
    {
-     name: t('system.table.shop_name'),
-     value: "shop_name"
+     name: t('system.table.title'),
+     value: "title"
    },
    {
-     name: t('system.table.treatment_begin_date'),
-     value: "treatment_begin_date"
+     name: t('system.table.content'),
+     value: "content"
    },
    {
-     name: t('system.table.product_detail'),
-     value: "product_detail"
+     name: t('system.table.type'),
+     value: "type"
    },
    {
-     name: t('system.table.price'),
-     value: "price"
+     name: t('system.table.start_time'),
+     value: "start_time"
    },
    {
-     name: t('system.table.sale_start_date'),
-     value: "sale_start_date"
-   },
-   {
-     name: t('system.table.sale_end_date'),
-     value: "sale_end_date"
+     name: t('system.table.end_time'),
+     value: "end_time"
    },
    {
      name: t('system.table.status'),
      value: "status"
-   },
-   {
-     name: t('system.table.purchase_no'),
-     value: "purchase_no"
    },
 //    {
 //      name: t('system.table.buyer_registration'),
@@ -56,7 +48,7 @@ const tableHeaders = ref([
 </script>
 
 <template>
-    <Head :title="$t('system.nav.product')" />
+    <Head :title="$t('system.nav.notification')" />
 
     <AuthenticatedLayout>
         <div class="bg-[#f2f4f6] py-6">
@@ -64,7 +56,7 @@ const tableHeaders = ref([
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                    {{$t('system.nav.product_list')}}
+                    {{$t('system.nav.notification_list')}}
                 </h1>
                 <div
                     class="overflow-hidden sm:rounded-lg"
@@ -73,16 +65,16 @@ const tableHeaders = ref([
                         <div>
                             <div class="my-5">
                                 <div class="mb-5">
-                                    <VBtn color="primary" @click="router.get(route('products.create'))" variant="filled" style="border: 2px solid #45B4D3;">
-                                        {{  $t('system.buttons.create_product') }}
+                                    <VBtn color="primary" @click="router.get(route('notifications.create'))" variant="filled" style="border: 2px solid #45B4D3;">
+                                        {{  $t('system.nav.new_notification') }}
                                     </VBtn>
                                 </div>
                                 <AppTable
                                     :headers="tableHeaders"
-                                    :data="props?.products"
-                                    :url="'products'"
-                                    :permission_name="'product'"
-                                    :tableTitle="$t('system.nav.product_list')"
+                                    :data="props?.notifications"
+                                    :url="'notifications'"
+                                    :permission_name="'noti'"
+                                    :tableTitle="$t('system.nav.notification_list')"
                                 />
                             </div>
                         </div>

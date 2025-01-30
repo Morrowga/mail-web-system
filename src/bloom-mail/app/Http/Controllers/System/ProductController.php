@@ -59,7 +59,7 @@ class ProductController extends Controller
             return abort(401);
         }
 
-        $createSpam = $this->productRepository->store($request);
+        $createProduct = $this->productRepository->store($request);
 
         return redirect()->route('products.index')->with('success', 'Form submitted successfully');
     }

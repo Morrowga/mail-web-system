@@ -17,7 +17,7 @@ class ProductRepository implements ProductRepositoryInterface
     {
         try {
 
-            $products = Product::paginate($request->query('per_page') ?? 10);
+            $products = Product::with(['shop'])->where('status', 'release')->orderBy('created_at', 'desc')->paginate($request->query('per_page') ?? 10);
 
             $productsArray = [
                 'current_page' => $products->currentPage(),

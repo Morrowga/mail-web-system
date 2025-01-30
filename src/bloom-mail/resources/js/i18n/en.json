@@ -166,7 +166,9 @@
             "product": "Product Management",
             "product_list": "Product Lists",
             "new_product": "New Product",
-            "notification": "Notification Management",
+            "notification": "Announcement Management",
+            "notification_list": "お知らせ一覧",
+            "new_notification": "新規お知らせ作成",
             "app_notification": "App Notification Management",
             "coupon": "Coupon Management",
             "entry": "Entry Management",
@@ -175,6 +177,12 @@
             "chat": "Chat Management"
         },
         "table": {
+            "notification_id": "Announcement ID",
+            "title": "Announcement Title",
+            "content": "Announcement Content",
+            "type": "Announcement Type",
+            "start_time": "Announcement Start Time",
+            "end_time": "Announcement End Time",
             "member_id": "Member Id.",
             "name": "Name",
             "email": "Email",
@@ -194,6 +202,8 @@
         "title": {
             "product_create": "Product Creation",
             "product_edit": "Production Modify",
+            "notification_create": "Notification Creation",
+            "notificationt_edit": "Notification Modification",
             "confirmation": "Are you sure want to delete",
             "canttake": "※削除した商品は復元できません"
         },
@@ -201,7 +211,9 @@
             "edit": "Edit",
             "back": "Back",
             "draft": "Draft",
-            "save_product": "Save"
+            "save_product": "Save",
+            "publish": "Publish",
+            "create_product": "Create Product"
         }
     }
 }

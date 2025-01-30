@@ -17,15 +17,19 @@ use App\Interfaces\MailRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
 use App\Interfaces\SpamRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Repositories\NotificationRepository;
 use App\Interfaces\FolderRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\API\AuthRepositoryInterface;
 use App\Interfaces\TemplateRepositoryInterface;
 use App\Repositories\TemplateCategoryRepository;
 use App\Interfaces\PermissionRepositoryInterface;
+use App\Interfaces\NotificationRepositoryInterface;
 use App\Interfaces\TemplateCategoryRepositoryInterface;
 use App\Repositories\API\ProductRepository as ApiProductRepository;
+use App\Repositories\API\NotificationRepository as ApiNotificationRepository;
 use App\Interfaces\API\ProductRepositoryInterface as ApiProductRepositoryInterface;
+use App\Interfaces\API\NotificationRepositoryInterface as ApiNotificationRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,11 +49,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
 
 
         //API
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->bind(ApiProductRepositoryInterface::class, ApiProductRepository::class);
+        $this->app->bind(ApiNotificationRepositoryInterface::class, ApiNotificationRepository::class);
     }
 
     /**

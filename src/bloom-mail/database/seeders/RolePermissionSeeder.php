@@ -141,6 +141,21 @@ class RolePermissionSeeder extends Seeder
                 "display" => "Product Deletion",
                 "description" => "Product Deletion "
             ],
+            [
+                "name" => "noti_createdit",
+                "display" => "Notification Creation / Edit",
+                "description" => "Notification Creation and Modification"
+            ],
+            [
+                "name" => "noti_read",
+                "display" => "Notification Read",
+                "description" => "Notifications"
+            ],
+            [
+                "name" => "noti_delete",
+                "display" => "Notification Deletion",
+                "description" => "Notification Deletion "
+            ],
         ];
 
         foreach ($permissionArrays as $permissionArray) {

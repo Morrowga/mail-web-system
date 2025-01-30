@@ -168,6 +168,8 @@
             "product_list": "商品一覧",
             "new_product": "新規商品登録",
             "notification": "お知らせ管理",
+            "notification_list": "お知らせ一覧",
+            "new_notification": "新規お知らせ作成",
             "app_notification": "アプリ通知管理",
             "coupon": "クーポン管理",
             "entry": "入店タブレット管理",
@@ -176,6 +178,12 @@
             "chat": "トーク管理"
         },
         "table": {
+            "notification_id": "お知らせID",
+            "title": "お知らせタイトル",
+            "content": "お知らせ内容",
+            "type": "アナウンスタイプ",
+            "start_time": "公開開始日時",
+            "end_time": "公開終了日時",
             "member_id": "会員No.",
             "name": "お名前",
             "email": "メールアドレス",
@@ -195,14 +203,18 @@
         "title": {
             "product_create": "新規商品登録",
             "product_edit": "製品を編集",
+            "notification_create": "新規お知らせ作成",
+            "notification_edit": "新規お知らせ作成",
             "confirmation": "本当に削除しますか？",
             "canttake": "※削除した商品は復元できません"
         },
         "buttons": {
             "edit": "複製",
             "back": "戻る",
+            "publish": "公開",
             "draft": "下書き保存",
-            "save_product": "商品登録する"
+            "save_product": "商品登録する",
+            "create_product": "新規お知らせ作成"
         }
     }
 }

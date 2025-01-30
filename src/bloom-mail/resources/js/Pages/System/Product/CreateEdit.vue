@@ -14,7 +14,7 @@ console.log(props?.user);
 const form = useForm({
     purchase_no: props?.product?.purchase_no ?? String(Math.floor(100000 + Math.random() * 900000)),
     shop_id: props?.product?.shop_id ?? '',
-    content_time_frame: '000',
+    content_time_frame: props?.product?.content_time_frame ?? '000',
     treatment_begin_date: props?.product?.treatment_begin_date ?? '',
     product_detail: props?.product?.product_detail ?? '',
     price: props?.product?.price ?? 0,
@@ -24,7 +24,10 @@ const form = useForm({
 });
 
 const formSubmit = (status) => {
-    form.status = status;
+    if(status != '')
+    {
+        form.status = status;
+    }
 
     const isEdit = Boolean(props?.product);
 
@@ -214,13 +217,15 @@ const formatDate = (date, column) => {
                                     <InputError class="mt-2" :message="form.errors.sale_end_date" />
                                 </div>
                             </div>
-                            <div class="d-flex justify-between my-5">
+                            <div class="d-flex justify-between my-5"  v-if="props?.product">
                                 <div style="width: 80%">
                                     <v-checkbox
                                         color="primary"
                                         :value="'release'"
                                         v-model="form.status"
                                         :label="'Release'"
+                                        :true-value="'release'"
+                                        :false-value="'before_release'"
                                     />
 
                                     <InputError class="mt-2" :message="form.errors.status" />
@@ -248,7 +253,7 @@ const formatDate = (date, column) => {
                                             {{ $t('system.buttons.draft') }}
                                         </VBtn>
                                         <VBtn
-                                            @click="formSubmit('before_release')"
+                                            @click="formSubmit('')"
                                             color="primary"
                                             class="submit-button-width mx-3"
                                         >
