@@ -69,9 +69,14 @@ const tableHeaders = ref([
                 <div
                     class="overflow-hidden sm:rounded-lg"
                 >
-                    <div class="py-6 text-gray-900">
+                    <div class="text-gray-900">
                         <div>
                             <div class="my-5">
+                                <div class="mb-5">
+                                    <VBtn color="primary" @click="router.get(route('products.create'))" variant="filled" style="border: 2px solid #45B4D3;">
+                                        新規お知らせ作成
+                                    </VBtn>
+                                </div>
                                 <AppTable
                                     :headers="tableHeaders"
                                     :data="props?.products"
