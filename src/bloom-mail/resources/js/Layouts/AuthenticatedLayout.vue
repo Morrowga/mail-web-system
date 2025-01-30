@@ -32,9 +32,13 @@ const merchandiseArray = [
 
 const notificationArray = [
     { label: t('system.nav.notification_list'), href: 'notifications.index', post: false, show: permissionGrant(permissions, 'noti_read') },
-    { label: t('system.nav.app_notification'), href: 'notifications.create', post: false, show: permissionGrant(permissions, 'noti_createdit') },
+    { label: t('system.nav.notification'), href: 'notifications.create', post: false, show: permissionGrant(permissions, 'noti_createdit') },
 ];
 
+const shopArray = [
+    { label: t('system.nav.shop_list'), href: 'shops.index', post: false, show: permissionGrant(permissions, 'shop_read') },
+    { label: t('system.nav.shop'), href: 'shops.create', post: false, show: permissionGrant(permissions, 'shop_createdit') },
+];
 
 const memberArray = [
     { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'account_read') },
@@ -197,9 +201,9 @@ const contentStyle = computed(() => ({
                                 <div v-if="rail" @click="rail = false"></div>
                                 <DropDownSystem
                                     v-else
-                                    :title="$t('system.nav.store')"
+                                    :title="$t('system.nav.shop')"
                                     icon="mdi-map-marker"
-                                    :content="[]"
+                                    :content="shopArray"
                                 />
                             </v-list-item>
                             <v-list-item :prepend-icon="rail ? 'mdi-message-reply-text-outline': ''">

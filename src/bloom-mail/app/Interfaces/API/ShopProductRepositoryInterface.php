@@ -4,7 +4,7 @@ namespace App\Interfaces\API;
 
 use Illuminate\Http\Request;
 
-interface ProductRepositoryInterface
+interface ShopProductRepositoryInterface
 {
     public function index(Request $request);
 }

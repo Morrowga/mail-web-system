@@ -14,6 +14,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\System\ShopController;
 use App\Http\Controllers\System\MemberController;
 use App\Http\Controllers\System\ProductController;
 use App\Http\Controllers\TemplateCategoryController;
@@ -91,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('members', MemberController::class);
     Route::resource('products', ProductController::class);
     Route::resource('notifications', NotificationController::class);
+    Route::resource('shops', ShopController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

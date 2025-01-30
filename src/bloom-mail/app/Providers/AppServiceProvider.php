@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Repositories\MailRepository;
 use App\Repositories\RoleRepository;
+use App\Repositories\ShopRepository;
 use App\Repositories\SpamRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Vite;
@@ -15,6 +16,7 @@ use App\Repositories\TemplateRepository;
 use App\Repositories\PermissionRepository;
 use App\Interfaces\MailRepositoryInterface;
 use App\Interfaces\RoleRepositoryInterface;
+use App\Interfaces\ShopRepositoryInterface;
 use App\Interfaces\SpamRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\NotificationRepository;
@@ -22,13 +24,13 @@ use App\Interfaces\FolderRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\API\AuthRepositoryInterface;
 use App\Interfaces\TemplateRepositoryInterface;
+use App\Repositories\API\ShopProductRepository;
 use App\Repositories\TemplateCategoryRepository;
 use App\Interfaces\PermissionRepositoryInterface;
 use App\Interfaces\NotificationRepositoryInterface;
+use App\Interfaces\API\ShopProductRepositoryInterface;
 use App\Interfaces\TemplateCategoryRepositoryInterface;
-use App\Repositories\API\ProductRepository as ApiProductRepository;
 use App\Repositories\API\NotificationRepository as ApiNotificationRepository;
-use App\Interfaces\API\ProductRepositoryInterface as ApiProductRepositoryInterface;
 use App\Interfaces\API\NotificationRepositoryInterface as ApiNotificationRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
@@ -54,7 +56,8 @@ class AppServiceProvider extends ServiceProvider
 
         //API
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
-        $this->app->bind(ApiProductRepositoryInterface::class, ApiProductRepository::class);
+        $this->app->bind(ShopProductRepositoryInterface::class, ShopProductRepository::class);
+        $this->app->bind(ShopRepositoryInterface::class, ShopRepository::class);
         $this->app->bind(ApiNotificationRepositoryInterface::class, ApiNotificationRepository::class);
     }
 

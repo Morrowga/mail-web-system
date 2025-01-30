@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Models\Shop;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\CRUDResponses;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
-use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\ShopRepositoryInterface;
 
-class ProductRepository implements ProductRepositoryInterface
+class ShopRepository implements ShopRepositoryInterface
 {
     use CRUDResponses;
 
@@ -17,9 +18,9 @@ class ProductRepository implements ProductRepositoryInterface
     {
         try {
 
-            $products = Product::with('shop')->orderBy('created_at', 'desc')->paginate($request->per_page ?? 10);
+            $shops = Shop::orderBy('created_at', 'desc')->paginate($request->per_page ?? 10);
 
-            return $this->success('Fetched Products', $products);
+            return $this->success('Fetched Shops', $shops);
 
         } catch (\Exception $e) {
 
@@ -35,11 +36,11 @@ class ProductRepository implements ProductRepositoryInterface
         DB::beginTransaction();
 
         try {
-            $product = Product::create($request->all());
+            $shops = Shop::create($request->all());
 
             DB::commit();
 
-            return $this->success('Product has been created successfully.');
+            return $this->success('Shop has been created successfully.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -48,18 +49,18 @@ class ProductRepository implements ProductRepositoryInterface
         }
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Shop $shop)
     {
         DB::beginTransaction();
 
         try {
-            if($product)
+            if($shop)
             {
-                $product->update($request->all());
+                $shop->update($request->all());
 
                 DB::commit();
 
-                return $this->success('Product has been updated successfully.');
+                return $this->success('Shop has been updated successfully.');
 
             }
 
@@ -72,15 +73,15 @@ class ProductRepository implements ProductRepositoryInterface
         }
     }
 
-    public function delete(Product $product)
+    public function delete(Shop $shop)
     {
         try {
-            if($product)
+            if($shop)
             {
-                $product->delete();
+                $shop->delete();
             }
 
-            return $this->success('Product has been deleted');
+            return $this->success('Shop has been deleted');
 
         } catch (\Exception $e) {
 

@@ -4,13 +4,13 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Interfaces\API\ProductRepositoryInterface;
+use App\Interfaces\API\ShopProductRepositoryInterface;
 
-class ProductController extends Controller
+class ShopProductController extends Controller
 {
-    private ProductRepositoryInterface $productRepository;
+    private ShopProductRepositoryInterface $shopProductRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepository)
+    public function __construct(ShopProductRepositoryInterface $productRepository)
     {
         $this->productRepository = $productRepository;
     }

@@ -187,8 +187,11 @@ onMounted(() => {
                             :key="i"
                             :style="getColumnWidth(header)"
                             >
-                                <div v-if="header.value == 'description' || header.value == 'product_detail'">
+                                <div v-if="header.value == 'description' || header.value == 'product_detail' || header.value == 'content'">
                                     {{ item[header.value]?.length > 40 ? item[header.value].substring(0, 40) + '...' : item[header.value] }}
+                                </div>
+                                <div v-else-if="header.value == 'shop_name'">
+                                    {{ item?.shop?.name }}
                                 </div>
                                 <div v-else>
                                     {{ item[header.value] }}

@@ -173,7 +173,9 @@
             "coupon": "Coupon Management",
             "entry": "Entry Management",
             "banner": "Banner Management",
-            "store": "Store Management",
+            "shop": "Store Management",
+            "shop_list": "Shop List",
+            "new_shop": "Shop Creation",
             "chat": "Chat Management"
         },
         "table": {
