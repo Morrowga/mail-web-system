@@ -22,6 +22,8 @@ const formSubmit = (status) => {
     if(status != '')
     {
         form.status = status;
+    } else {
+        form.status = form.status == 'draft' ? 'before_release': form.status;
     }
 
     const isEdit = Boolean(props?.notification);
