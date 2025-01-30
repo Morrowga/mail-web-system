@@ -4,6 +4,9 @@ import { createApp } from 'vue';
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import '@mdi/font/css/materialdesignicons.css';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import { VDateInput } from "vuetify/labs/VDateInput";
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const customeTheme = {
     dark: false,
@@ -37,6 +40,8 @@ const customeTheme = {
 const vuetify = createVuetify({
     components: {
         ...components,
+        VDateInput,
+        VueDatePicker,
     },
     icons: {
         iconfont: 'mdi'

@@ -10,6 +10,7 @@ import en from './i18n/en.json';
 import jp from './i18n/jp.json';
 import { createI18n } from 'vue-i18n';
 
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const i18n = createI18n({
@@ -32,7 +33,7 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(i18n)
-            .use(vuetify) 
+            .use(vuetify)
             .mount(el);
     },
     progress: {

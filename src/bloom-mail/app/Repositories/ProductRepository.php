@@ -17,7 +17,7 @@ class ProductRepository implements ProductRepositoryInterface
     {
         try {
 
-            $products = Product::paginate($request->per_page ?? 10);
+            $products = Product::orderBy('created_at', 'desc')->paginate($request->per_page ?? 10);
 
             return $this->success('Fetched Products', $products);
 

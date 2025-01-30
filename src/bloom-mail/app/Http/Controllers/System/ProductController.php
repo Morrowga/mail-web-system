@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\System;
 
+use App\Models\Shop;
 use Inertia\Inertia;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductCreateRequest;
 use App\Interfaces\ProductRepositoryInterface;
 
 class ProductController extends Controller
@@ -41,13 +43,17 @@ class ProductController extends Controller
             return abort(401);
         }
 
-        return Inertia::render('System/Product/CreateEdit');
+        $shops = Shop::get();
+
+        return Inertia::render('System/Product/CreateEdit', [
+            "shops" => $shops
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SpamRequest $request)
+    public function store(ProductCreateRequest $request)
     {
         if (!check_user_permission('product_createdit')) {
             return abort(401);
@@ -75,15 +81,18 @@ class ProductController extends Controller
             return abort(401);
         }
 
+        $shops = Shop::get();
+
         return Inertia::render('System/Product/CreateEdit', [
-            "product" => $product
+            "product" => $product,
+            "shops" => $shops
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(SpamRequest $request, Product $product)
+    public function update(ProductCreateRequest $request, Product $product)
     {
         if (!check_user_permission('product_createdit')) {
             return abort(401);

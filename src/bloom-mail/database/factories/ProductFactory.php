@@ -2,9 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Shop;
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
 {
@@ -13,14 +14,15 @@ class ProductFactory extends Factory
     public function definition()
     {
         return [
-            'shop_name' => $this->faker->company, // Dummy shop name
-            'treatment_begin_date' => $this->faker->date(), // Random date for treatment begin
-            'product_detail' => $this->faker->paragraph, // Random text for product details
-            'price' => $this->faker->randomFloat(2, 10, 1000), // Random price between 10 and 1000
-            'sale_start_date' => $this->faker->date(), // Random sale start date
-            'sale_end_date' => $this->faker->date(), // Random sale end date
-            'status' => $this->faker->randomElement(['release']), // Random status
-            'purchase_no' => $this->faker->unique()->numerify('###########'), // 11-digit unique purchase number
+            'shop_id' => Shop::inRandomOrder()->first()?->id ?? Shop::factory(),
+            'treatment_begin_date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
+            'product_detail' => $this->faker->paragraph,
+            'content_time_frame' => $this->faker->randomNumber(3, true),
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'sale_start_date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
+            'sale_end_date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
+            'status' => $this->faker->randomElement(['release']),
+            'purchase_no' => $this->faker->unique()->numerify('###########'),
             'created_at' => now(),
             'updated_at' => now(),
         ];

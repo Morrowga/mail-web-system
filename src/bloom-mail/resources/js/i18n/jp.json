@@ -188,6 +188,7 @@
             "sale_start_date": "販売開始日時",
             "sale_end_date": "販売終了日時",
             "status": "ステータス",
+            "content_time_frame": "商品内容（時間枠）",
             "purchase_no": "購入者会員No",
             "buyer_registration": "購入者登録"
         },
@@ -199,7 +200,7 @@
             "edit": "複製",
             "back": "戻る",
             "draft": "下書き保存",
-            "save": "商品登録する"
+            "save_product": "商品登録する"
         }
     }
 }

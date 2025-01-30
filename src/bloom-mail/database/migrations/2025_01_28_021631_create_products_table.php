@@ -14,12 +14,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('shop_name');
-            $table->date('treatment_begin_date');
+            $table->string('shop_id');
+            $table->foreign('shop_id')
+            ->nullable()
+            ->references('id')
+            ->on('shops')->onDelete('cascade');
+            $table->datetime('treatment_begin_date');
             $table->longText('product_detail')->nullable();
+            $table->string('content_time_frame')->nullable();
             $table->double('price', 10, 2)->nullable();
-            $table->date('sale_start_date');
-            $table->date('sale_end_date');
+            $table->datetime('sale_start_date');
+            $table->datetime('sale_end_date');
             $table->enum('status', ['draft', 'release', 'before_release'])->default('before_release');
             $table->string('purchase_no')->default('0000000000');
             $table->timestamps();

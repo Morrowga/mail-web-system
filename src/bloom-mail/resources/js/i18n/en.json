@@ -188,6 +188,7 @@
             "sale_end_date": "Sale End Date",
             "status": "Status",
             "purchase_no": "Purchase No.",
+            "content_time_frame": "Content Timeframe",
             "buyer_registration": "Buyer Registration"
         },
         "title": {
@@ -197,8 +198,8 @@
         "buttons": {
             "edit": "Edit",
             "back": "Back",
-             "draft": "Draft",
-            "save": "Save"
+            "draft": "Draft",
+            "save_product": "Save"
         }
     }
 }
