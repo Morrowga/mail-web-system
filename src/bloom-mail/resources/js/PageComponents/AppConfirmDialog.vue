@@ -44,21 +44,20 @@ const submitDelete = () => {
 
       <template v-slot:default>
         <v-card>
-          <v-card-title>{{ $t('other.confirmation') }}</v-card-title>
+          <v-card-title>{{ $t('system.title.confirmation') }}</v-card-title>
           <v-card-text>
             <div>
               <p>
-                {{ $t('other.delete_text') }}
+                {{ $t('system.title.canttake') }}
               </p>
             </div>
           </v-card-text>
 
-          <v-card-actions>
-            <v-spacer></v-spacer>
 
-            <v-btn :text="$t('buttons.cancel')" color="green" @click="closeDialog"></v-btn>
-            <v-btn :text="$t('buttons.confirm')" color="red" @click="submitDelete"></v-btn>
-          </v-card-actions>
+        <v-card-text class="d-flex justify-end">
+            <v-btn :text="$t('buttons.cancel')" color="#727272" @click="closeDialog"></v-btn>
+            <v-btn :text="$t('buttons.confirm')" class="mx-2" color="#ff0007" @click="submitDelete"></v-btn>
+        </v-card-text>
         </v-card>
       </template>
     </v-dialog>

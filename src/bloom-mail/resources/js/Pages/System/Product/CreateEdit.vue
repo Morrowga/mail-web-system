@@ -4,7 +4,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import WriteActionCard from '@/PageComponents/WriteActionCard.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps(['product', 'shops'])
@@ -233,6 +233,7 @@ const formatDate = (date, column) => {
                                     <VBtn
                                         color="#727272"
                                         class="action-button-width"
+                                        @click="router.get('/products')"
                                     >
                                         {{ $t('system.buttons.back')}}
                                     </VBtn>
@@ -259,15 +260,6 @@ const formatDate = (date, column) => {
                         </form>
                     </VCardText>
                 </WriteActionCard>
-                <!-- <VCard
-                >
-                    <VCardTitle>
-                        <p class="text-sm text-gray-600">
-                            {{ Boolean(props?.product) ? $t('system.title.product_edit') :  $t('system.title.product_edit') }}
-                        </p>
-                    </VCardTitle>
-
-                </VCard> -->
             </div>
         </div>
     </AuthenticatedLayout>

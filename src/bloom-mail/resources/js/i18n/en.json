@@ -193,7 +193,9 @@
         },
         "title": {
             "product_create": "Product Creation",
-            "product_edit": "Production Modify"
+            "product_edit": "Production Modify",
+            "confirmation": "Are you sure want to delete",
+            "canttake": "※削除した商品は復元できません"
         },
         "buttons": {
             "edit": "Edit",

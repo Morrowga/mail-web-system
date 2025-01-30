@@ -194,7 +194,9 @@
         },
         "title": {
             "product_create": "新規商品登録",
-            "product_edit": "製品を編集"
+            "product_edit": "製品を編集",
+            "confirmation": "本当に削除しますか？",
+            "canttake": "※削除した商品は復元できません"
         },
         "buttons": {
             "edit": "複製",
