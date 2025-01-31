@@ -9,6 +9,7 @@ use App\Repositories\SpamRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Vite;
 use App\Repositories\FolderRepository;
+use App\Repositories\MemberRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\API\AuthRepository;
@@ -21,6 +22,7 @@ use App\Interfaces\SpamRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\NotificationRepository;
 use App\Interfaces\FolderRepositoryInterface;
+use App\Interfaces\MemberRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\API\AuthRepositoryInterface;
 use App\Interfaces\TemplateRepositoryInterface;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
+        $this->app->bind(MemberRepositoryInterface::class, MemberRepository::class);
 
 
         //API

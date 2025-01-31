@@ -41,8 +41,8 @@ const shopArray = [
 ];
 
 const memberArray = [
-    { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'account_read') },
-    { label: t('system.nav.new_member'), href: 'members.create', post: false, show: permissionGrant(permissions, 'account_read') },
+    { label: t('system.nav.member_list'), href: 'members.index', post: false, show: permissionGrant(permissions, 'member_read') },
+    { label: t('system.nav.new_member'), href: 'members.create', post: false, show: permissionGrant(permissions, 'member_read') },
 ];
 
 const AccDowns = [

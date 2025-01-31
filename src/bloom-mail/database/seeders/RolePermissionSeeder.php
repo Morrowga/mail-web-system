@@ -171,6 +171,21 @@ class RolePermissionSeeder extends Seeder
                 "display" => "Shop Deletion",
                 "description" => "Shop Deletion "
             ],
+            [
+                "name" => "member_createdit",
+                "display" => "Member Creation / Edit",
+                "description" => "Member Creation and Modification"
+            ],
+            [
+                "name" => "member_read",
+                "display" => "Member Read",
+                "description" => "Members"
+            ],
+            [
+                "name" => "member_delete",
+                "display" => "Member Deletion",
+                "description" => "Member Deletion "
+            ],
         ];
 
         foreach ($permissionArrays as $permissionArray) {

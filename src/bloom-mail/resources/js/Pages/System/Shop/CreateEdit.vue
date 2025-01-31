@@ -127,14 +127,14 @@ const daysOfWeek = ['不定休', '月', '火', '水', '木', '金', '土', '日'
                 <WriteActionCard :title="Boolean(props?.shop) ? $t('system.nav.new_shop') :  $t('system.nav.new_shop')">
                     <VCardText class="mx-10">
                         <form class="my-3">
-                            <div class="d-flex justify-between" v-if="props?.shop">
+                            <!-- <div class="d-flex justify-between" v-if="props?.shop">
                                 <div style="width: 20%">
                                     <InputLabel for="shop_id" class="pt-3" :value="$t('system.table.shop_id')" />
                                 </div>
 
                                 <div style="width: 80%">
                                     <TextInput
-                                        id="shop_id"
+                                    id="shop_id"
                                         type="text"
                                         density="compact"
                                         class="mt-1 block w-full"
@@ -145,7 +145,7 @@ const daysOfWeek = ['不定休', '月', '火', '水', '木', '金', '土', '日'
                                         autofocus
                                     />
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="d-flex justify-between">
                                 <div style="width: 20%">
                                     <InputLabel for="shop_type" class="pt-3">

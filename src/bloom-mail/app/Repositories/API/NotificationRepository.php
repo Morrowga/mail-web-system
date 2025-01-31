@@ -19,7 +19,7 @@ class NotificationRepository implements NotificationRepositoryInterface
         try {
 
             $notifications = Notification::orderBy('created_at', 'desc')
-            ->where('status', 'release')
+            ->where('status', '!=', 'draft')
             ->when($request->query('type'), function ($query, $type) {
                 return $query->where('type', $type);
             })

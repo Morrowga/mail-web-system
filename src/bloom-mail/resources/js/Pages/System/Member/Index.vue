@@ -7,6 +7,8 @@ import { useI18n } from 'vue-i18n';
 
 const props = defineProps(['members'])
 
+console.log(props?.members);
+
 const { t, locale } = useI18n();
 
 const tableHeaders = ref([
@@ -18,10 +20,10 @@ const tableHeaders = ref([
      name: t('system.table.name'),
      value: "name"
    },
-//    {
-//      name: t('system.table.email'),
-//      value: "email"
-//    },
+   {
+     name: t('system.table.email'),
+     value: "email"
+   },
 //    {
 //      name: t('system.table.age'),
 //      value: "age"
@@ -56,6 +58,7 @@ const tableHeaders = ref([
                                     :headers="tableHeaders"
                                     :data="props?.members"
                                     :url="'members'"
+                                    :tableTitle="$t('system.nav.membership')"
                                 />
                             </div>
                         </div>

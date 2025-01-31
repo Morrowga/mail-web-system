@@ -181,6 +181,7 @@
         },
         "table": {
             "notification_id": "お知らせID",
+            "shop_id": "",
             "title": "お知らせタイトル",
             "content": "お知らせ内容",
             "type": "アナウンスタイプ",
@@ -189,6 +190,7 @@
             "member_id": "会員No.",
             "name": "お名前",
             "email": "メールアドレス",
+            "dob": "生年月日",
             "age": "年齢",
             "tel": "電話番号",
             "shop_name": "店舗",

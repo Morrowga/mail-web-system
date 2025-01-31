@@ -18,10 +18,10 @@ const tableHeaders = ref([
      name: t('system.table.name'),
      value: "name"
    },
-   {
-     name: t('system.table.status'),
-     value: "status"
-   },
+//    {
+//      name: t('system.table.status'),
+//      value: "status"
+//    },
 //    {
 //      name: t('system.table.buyer_registration'),
 //      value: "buyer_registration"

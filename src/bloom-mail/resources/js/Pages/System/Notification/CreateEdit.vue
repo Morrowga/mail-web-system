@@ -100,7 +100,7 @@ const formatDate = (date, column) => {
                             </div>
                             <div class="d-flex justify-between">
                                 <div style="width: 20%">
-                                    <InputLabel for="shop_id" class="pt-3">
+                                    <InputLabel for="type" class="pt-3">
                                         {{$t('system.table.type')}} <strong style="color: red;" v-if="!props.notification">* 必須</strong>
                                     </InputLabel>
                                 </div>

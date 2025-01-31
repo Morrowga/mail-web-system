@@ -188,6 +188,7 @@
             "member_id": "Member Id.",
             "name": "Name",
             "email": "Email",
+            "dob": "Date Of Birth",
             "age": "Age",
             "tel": "Telephone No.",
             "shop_name": "Shop",
