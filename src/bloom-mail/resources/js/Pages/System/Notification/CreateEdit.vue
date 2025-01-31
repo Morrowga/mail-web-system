@@ -55,9 +55,9 @@ const formatDate = (date, column) => {
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                   {{  $t('system.nav.notification') }} > {{ Boolean(props?.notification) ? $t('system.title.notification_edit') :  $t('system.title.notification_edit') }}
+                   {{  $t('system.nav.notification') }} > {{ Boolean(props?.notification) ? $t('system.nav.new_notification') :  $t('system.nav.new_notification') }}
                 </h1>
-                <WriteActionCard :title="Boolean(props?.notification) ? $t('system.title.notification_edit') :  $t('system.title.notification_edit')">
+                <WriteActionCard :title="Boolean(props?.notification) ? $t('system.nav.new_notification') :  $t('system.nav.new_notification')">
                     <VCardText class="mx-10">
                         <form class="my-3">
                             <div class="d-flex justify-between" v-if="props?.notification">
@@ -148,7 +148,7 @@ const formatDate = (date, column) => {
                                 </div>
 
                                 <div style="width: 80%">
-                                    <VueDatePicker v-model="form.start_time" @update:modelValue="(date) => formatDate(date, 'start_time')" />
+                                    <VueDatePicker locale="ja" v-model="form.start_time" @update:modelValue="(date) => formatDate(date, 'start_time')" />
 
                                     <InputError class="mt-2" :message="form.errors.start_time" />
                                 </div>
@@ -161,24 +161,9 @@ const formatDate = (date, column) => {
                                 </div>
 
                                 <div style="width: 80%">
-                                    <VueDatePicker v-model="form.end_time" @update:modelValue="(date) => formatDate(date, 'end_time')" />
+                                    <VueDatePicker locale="ja" v-model="form.end_time" @update:modelValue="(date) => formatDate(date, 'end_time')" />
 
                                     <InputError class="mt-2" :message="form.errors.end_time" />
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-between my-5" v-if="props?.notification">
-                                <div style="width: 80%">
-                                    <v-checkbox
-                                        color="primary"
-                                        :value="'release'"
-                                        v-model="form.status"
-                                        :label="'Release'"
-                                        :true-value="'release'"
-                                        :false-value="'before_release'"
-                                    />
-
-                                    <InputError class="mt-2" :message="form.errors.status" />
                                 </div>
                             </div>
 

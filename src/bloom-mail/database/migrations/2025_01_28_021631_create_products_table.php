@@ -26,7 +26,6 @@ return new class extends Migration
             $table->datetime('sale_start_date');
             $table->datetime('sale_end_date');
             $table->enum('status', ['draft', 'release', 'before_release'])->default('before_release');
-            $table->string('purchase_no')->default('0000000000');
             $table->timestamps();
         });
     }

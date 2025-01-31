@@ -42,10 +42,10 @@ const tableHeaders = ref([
      name: t('system.table.status'),
      value: "status"
    },
-   {
-     name: t('system.table.purchase_no'),
-     value: "purchase_no"
-   },
+//    {
+//      name: t('system.table.purchase_no'),
+//      value: "purchase_no"
+//    },
 //    {
 //      name: t('system.table.buyer_registration'),
 //      value: "buyer_registration"
@@ -64,7 +64,7 @@ const tableHeaders = ref([
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                    {{$t('system.nav.product_list')}}
+                    {{$t('system.nav.product')}}
                 </h1>
                 <div
                     class="overflow-hidden sm:rounded-lg"

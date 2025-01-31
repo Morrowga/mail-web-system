@@ -22,7 +22,6 @@ class ProductFactory extends Factory
             'sale_start_date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
             'sale_end_date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
             'status' => $this->faker->randomElement(['release']),
-            'purchase_no' => $this->faker->unique()->numerify('###########'),
             'created_at' => now(),
             'updated_at' => now(),
         ];

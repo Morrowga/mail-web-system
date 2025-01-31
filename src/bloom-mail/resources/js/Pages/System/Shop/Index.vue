@@ -40,7 +40,7 @@ const tableHeaders = ref([
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                    {{$t('system.nav.shop_list')}}
+                    {{$t('system.nav.shop')}}
                 </h1>
                 <div
                     class="overflow-hidden sm:rounded-lg"

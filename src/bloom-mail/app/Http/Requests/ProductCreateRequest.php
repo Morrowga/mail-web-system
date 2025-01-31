@@ -22,7 +22,6 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "purchase_no" => ['required'],
             "treatment_begin_date" => ['required'],
             "shop_id" => ['required'],
             "content_time_frame" => ['required'],

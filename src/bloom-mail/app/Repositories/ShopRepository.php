@@ -33,20 +33,29 @@ class ShopRepository implements ShopRepositoryInterface
 
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
-        try {
+        // try {
+            $closeDay = $request->close_day;
+
+            if($closeDay != 'その他自由記載')
+            {
+                $isCloseDayCustom = 'Closed every ' . $closeDay;
+
+                $request['close_day_text'] = $isCloseDayCustom;
+            }
+
             $shops = Shop::create($request->all());
 
             DB::commit();
 
             return $this->success('Shop has been created successfully.');
 
-        } catch (\Exception $e) {
-            DB::rollback();
+        // } catch (\Exception $e) {
+        //     DB::rollback();
 
-            return $this->error($e->getMessage());
-        }
+        //     return $this->error($e->getMessage());
+        // }
     }
 
     public function update(Request $request, Shop $shop)
@@ -56,6 +65,16 @@ class ShopRepository implements ShopRepositoryInterface
         try {
             if($shop)
             {
+
+                $closeDay = $request->close_day;
+
+                if($closeDay != 'その他自由記載')
+                {
+                    $isCloseDayCustom = 'Closed every ' . $closeDay;
+
+                    $request['close_day_text'] = $isCloseDayCustom;
+                }
+
                 $shop->update($request->all());
 
                 DB::commit();

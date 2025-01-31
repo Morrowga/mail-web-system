@@ -13,7 +13,7 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['shop_id', 'treatment_begin_date','content_time_frame', 'product_detail', 'price', 'sale_start_date', 'sale_end_date', 'status', 'purchase_no'];
+    protected $fillable = ['shop_id', 'treatment_begin_date','content_time_frame', 'product_detail', 'price', 'sale_start_date', 'sale_end_date', 'status'];
 
     public function shop()
     {

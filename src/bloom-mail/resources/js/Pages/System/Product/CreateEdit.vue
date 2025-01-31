@@ -12,7 +12,6 @@ const props = defineProps(['product', 'shops'])
 console.log(props?.user);
 
 const form = useForm({
-    purchase_no: props?.product?.purchase_no ?? String(Math.floor(100000 + Math.random() * 900000)),
     shop_id: props?.product?.shop_id ?? '',
     content_time_frame: props?.product?.content_time_frame ?? '000',
     treatment_begin_date: props?.product?.treatment_begin_date ?? '',
@@ -60,30 +59,29 @@ const formatDate = (date, column) => {
                 <h1
                     class="font-semibold leading-tight text-gray-800"
                 >
-                   {{  $t('system.nav.product') }} > {{ Boolean(props?.product) ? $t('system.title.product_edit') :  $t('system.title.product_edit') }}
+                   {{  $t('system.nav.product') }} > {{ Boolean(props?.product) ? $t('system.nav.new_product') :  $t('system.nav.new_product') }}
                 </h1>
-                <WriteActionCard :title="Boolean(props?.product) ? $t('system.title.product_edit') :  $t('system.title.product_edit')">
+                <WriteActionCard :title="Boolean(props?.product) ? $t('system.nav.new_product') :  $t('system.nav.new_product')">
                     <VCardText class="mx-10">
                         <form class="my-3">
-                            <div class="d-flex justify-between">
+                            <div class="d-flex justify-between" v-if="props?.product">
                                 <div style="width: 20%">
-                                    <InputLabel for="purchase_no" class="pt-3" :value="$t('system.table.purchase_no')" />
+                                    <InputLabel for="id" class="pt-3" :value="$t('system.table.purchase_no')" />
                                 </div>
 
                                 <div style="width: 80%">
                                     <TextInput
-                                        id="purchase_no"
+                                        id="id"
                                         type="text"
+                                        :value="props?.product?.id"
                                         density="compact"
                                         class="mt-1 block w-full"
-                                        v-model="form.purchase_no"
                                         readonly
                                         disabled
                                         required
                                         autofocus
-                                        autocomplete="purchase_no"
+                                        autocomplete="id"
                                     />
-                                    <InputError class="mt-2" :message="form.errors.purchase_no" />
                                 </div>
                             </div>
                             <div class="d-flex justify-between">
@@ -114,7 +112,7 @@ const formatDate = (date, column) => {
                                 </div>
 
                                 <div style="width: 80%">
-                                    <VueDatePicker v-model="form.treatment_begin_date" @update:modelValue="(date) => formatDate(date, 'treatment_begin_date')" />
+                                    <VueDatePicker locale="ja" v-model="form.treatment_begin_date" @update:modelValue="(date) => formatDate(date, 'treatment_begin_date')" />
 
                                     <InputError class="mt-2" :message="form.errors.treatment_begin_date" />
                                 </div>
@@ -201,7 +199,7 @@ const formatDate = (date, column) => {
                                 </div>
 
                                 <div style="width: 80%">
-                                    <VueDatePicker v-model="form.sale_start_date" @update:modelValue="(date) => formatDate(date, 'sale_start_date')" />
+                                    <VueDatePicker locale="ja" v-model="form.sale_start_date" @update:modelValue="(date) => formatDate(date, 'sale_start_date')" />
 
                                     <InputError class="mt-2" :message="form.errors.sale_start_date" />
                                 </div>
@@ -214,23 +212,9 @@ const formatDate = (date, column) => {
                                 </div>
 
                                 <div style="width: 80%">
-                                    <VueDatePicker v-model="form.sale_end_date" @update:modelValue="(date) => formatDate(date, 'sale_end_date')" />
+                                    <VueDatePicker locale="ja" v-model="form.sale_end_date" @update:modelValue="(date) => formatDate(date, 'sale_end_date')" />
 
                                     <InputError class="mt-2" :message="form.errors.sale_end_date" />
-                                </div>
-                            </div>
-                            <div class="d-flex justify-between my-5"  v-if="props?.product">
-                                <div style="width: 80%">
-                                    <v-checkbox
-                                        color="primary"
-                                        :value="'release'"
-                                        v-model="form.status"
-                                        :label="'Release'"
-                                        :true-value="'release'"
-                                        :false-value="'before_release'"
-                                    />
-
-                                    <InputError class="mt-2" :message="form.errors.status" />
                                 </div>
                             </div>
 
