@@ -32,10 +32,10 @@ class Shop extends Model
         'gmap_photos',
         'youtube',
         'top_statement',
-        'store_sub_title',
-        'store_btm_text',
-        'store_sub_title_two',
-        'store_btm_text_two'
+        'sub_title',
+        'btm_text',
+        'sub_title_two',
+        'btm_text_two'
     ];
 
     public function products()
